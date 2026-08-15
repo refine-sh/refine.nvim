@@ -1,24 +1,76 @@
-# Refine for Neovim
+<div align="center">
+  <a href="https://refine.sh">
+    <img src="https://refine.sh/icon.png" width="96" height="96" alt="Refine icon">
+  </a>
+  <h1>Refine.nvim</h1>
+  <p><strong>A native AI grammar checker and writing assistant for Neovim, powered by Refine.</strong></p>
+  <p>
+    <a href="https://refine.sh"><img src="https://img.shields.io/badge/macOS-14%2B-111111?logo=apple" alt="macOS 14 or newer"></a>
+    <a href="https://neovim.io"><img src="https://img.shields.io/badge/Neovim-0.11%2B-57A143?logo=neovim&logoColor=white" alt="Neovim 0.11 or newer"></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT license"></a>
+  </p>
+</div>
 
-Refine for Neovim brings Refine's grammar and fluency suggestions into native
-Neovim buffers. It connects to the Refine app on the same Mac, renders
-authoritative extmark highlights and a floating suggestion card, and applies a
-suggestion as one undoable buffer change.
+Refine for Neovim is an AI grammar checker and writing assistant for Markdown,
+Git commit messages, email, plain text, and LaTeX. Use Refine's built-in local
+models for private, on-device checks that keep working offline after download,
+or connect your own AI provider.
 
-This repository is in preview. The first capability-parity release will be
-`v1.0.0`.
+Review each suggestion through native Neovim highlights and floating cards,
+ask for an explanation, and apply the correction as one undoable edit.
+
+[Refine](https://refine.sh) supplies the models, languages, checking policy,
+and writing settings. `refine.nvim` supplies the native editor experience. The
+plugin requires the Refine app for macOS and is not a standalone checker.
+
+<!--
+Demo: add assets/refine-nvim-demo.gif, then replace this comment with:
+
+![Refine checking Markdown grammar with local AI in Neovim](assets/refine-nvim-demo.gif)
+-->
+
+## Why use Refine in Neovim?
+
+- **Write with local AI.** A downloaded Refine model runs on your Mac, keeps
+  check text on your device, and works without an internet connection.
+- **Stay inside Neovim.** Suggestions appear as native highlights with a
+  focused card for reviewing the diff and available actions.
+- **Check the right scope.** Refine can check an entire buffer, the sentences
+  touched by a line range, or an exact Visual selection.
+- **Work across languages.** Refine supports grammar and fluency checks in more
+  than 50 languages and regional variants.
+- **Understand each correction.** Review suggestions individually, ask why a
+  change was proposed, and decide whether to apply, dismiss, or report it.
+- **Keep edits predictable.** Applying a suggestion performs one validated
+  buffer mutation and creates one undo entry.
+
+There is no language server, Java runtime, model endpoint, or provider API key
+to configure in Neovim. Those choices live in Refine.
 
 ## Requirements
 
-- macOS
+- macOS 14 or newer
 - Neovim 0.11 or newer
-- The Refine app with exact integration Protocol 2.4 support
-- An active Refine trial or valid license
+- A compatible Refine for Mac
+- An active Refine trial or license
 
-Refine remains the source of writing-check policy, language, model, schedule,
-appearance, and interaction settings.
+Refine includes a full-featured seven-day trial with no credit card required.
 
-## Installation
+## Quick start
+
+### 1. Install and set up Refine
+
+Install Refine with Homebrew:
+
+```sh
+brew install --cask refine
+```
+
+You can also [download Refine for Mac](https://refine.sh) directly. Launch the
+app, start the trial or activate your license, and download a local model if
+you want on-device and offline checks.
+
+### 2. Install `refine.nvim`
 
 With [lazy.nvim](https://github.com/folke/lazy.nvim):
 
@@ -28,40 +80,32 @@ With [lazy.nvim](https://github.com/folke/lazy.nvim):
 }
 ```
 
-Or install it as a standard Neovim package:
+No `setup()` call is required.
+
+#### Without a plugin manager
+
+Clone the plugin into Neovim's native package directory:
 
 ```sh
+mkdir -p ~/.local/share/nvim/site/pack/refine/start
 git clone --filter=blob:none https://github.com/runjuu/refine.nvim \
   ~/.local/share/nvim/site/pack/refine/start/refine.nvim
-nvim --headless "+helptags ALL" +qa
 ```
 
-No setup call is required. Refine activates passively for eligible prose
-buffers, but passive activity never launches the Refine app. `:RefineCheck`
-launches Refine in the background when an explicit check needs it.
+### 3. Start writing
 
-## Usage
+Restart Neovim if it was already open, then open a supported prose buffer while
+Refine is running. Automatic Checks are enabled by default, so suggestions
+appear after you pause while editing.
 
-- `:RefineCheck` checks the current eligible buffer.
-- A line range, such as `:3,8RefineCheck`, checks the complete sentences
-  touched by those lines.
-- A Visual mapping to `<Plug>(RefineCheck)` preserves exact characterwise or
-  linewise endpoints. Blockwise selections are rejected.
-- `:RefineShow` opens the suggestion under the caret; invoking it again
-  focuses the card.
-- `:RefineNext` and `:RefinePrevious` wrap through suggestions in document
-  order.
-- `:RefineApply`, `:RefineDismiss`, `:RefineExplain`,
-  and `:RefineReport` act on the open card first and otherwise on a suggestion
-  under the caret.
-- `:RefineClose` closes the card without applying or dismissing its
-  suggestion.
-- `:RefineStatus` explains the current state.
+Use `:RefineCheck` whenever you want an immediate manual check. An explicit
+check can launch Refine in the background without stealing focus. Passive
+buffer activity never launches the app.
 
-The plugin installs no permanent editor key mappings. Map its `<Plug>`
-targets yourself. It provides `RefineCheck`, `RefineShow`, `RefineNext`,
-`RefinePrevious`, `RefineApply`, `RefineDismiss`, `RefineExplain`,
-`RefineReport`, and `RefineClose` targets in the form shown below:
+## Recommended mappings
+
+The plugin installs no permanent key mappings. These mappings cover the common
+review workflow:
 
 ```lua
 vim.keymap.set({ "n", "x" }, "<leader>rc", "<Plug>(RefineCheck)")
@@ -76,129 +120,84 @@ tip says `Apply shortcut unavailable`. The card explains how to configure
 another Apply key in Refine or add the Neovim mapping above. Refine does not
 remap the key automatically.
 
-Refine's configured Apply and Dismiss keys are intercepted only while cursor
-activation or the card owns them, then the previous buffer-local mapping is
-restored exactly. On cursor activation the Dismiss key cancels activation; on
-an open card it explicitly dismisses the suggestion. A card claims a configured
-key only while the corresponding action is live; unavailable or conflicting
-keys retain their native behavior. Card ownership works from both the floating
-card and its owning editor window.
+The Check mapping supports Normal and Visual mode. Characterwise and linewise
+Visual selections preserve their exact endpoints. Blockwise selections are
+not supported.
 
-The card footer and its `a`/`d`/`e`/`r` mappings include only currently
-available actions. `n`, `p`, and `q` remain navigation/close controls; Escape
-closes when Dismiss is unavailable. A `FileType refine` autocmd may replace the
-built-in card-local mappings. Same-suggestion replacements preserve those user
-overrides unless Refine's configured transient key itself changes.
+See [Advanced configuration](docs/configuration.md#mappings) for every
+available `<Plug>` target and card mapping.
 
-When Refine temporarily owns Tab, Escape, or Return, it also preserves the
-distinct Ctrl-I, Ctrl-[, or Ctrl-M mapping or native behavior. That distinction
-requires a GUI or a terminal with Neovim's extended key encoding; a legacy
-terminal that sends each pair identically cannot preserve it. `:checkhealth
-refine` reports this limitation.
+## Commands
 
-A passive key observer performs mouse hit-testing without installing or
-shadowing `<LeftMouse>` mappings. A single click on a live highlight opens its
-card, and available footer actions are clickable.
-
-Apply prevalidates every expected range, composes disjoint edits inside their
-smallest enclosing range, and performs one undoable buffer mutation. Extmarks
-owned by other plugins inside that envelope follow Neovim's normal gravity
-rules for one enclosing replacement.
-
-## Configuration
-
-`setup()` is optional, idempotent, validated, and atomic. Each call starts
-from defaults; filetype entries merge with the default map, and `false`
-removes one:
-
-```lua
-require("refine").setup({
-  max_source_bytes = 1024 * 1024,
-  filetypes = {
-    markdown = false,
-    quarto = "mixed",
-  },
-  frontend = "auto",
-  debug_log = false,
-})
-```
-
-Supported source syntaxes are `mixed` and `latexDocument`. Automatic
-frontend detection recognizes Apple Terminal (`terminal`), iTerm2,
-Ghostty, WezTerm, Kitty, Alacritty, and Neovide. An unknown detected frontend
-uses generic behavior; an explicit override must be a recognized ID.
-
-Setting `debug_log = true` writes redacted structured diagnostics to the path
-reported by `:checkhealth refine`. Storage is bounded to a 256 KiB current
-file plus one rotated file.
-
-The default eligible filetypes are:
-
-| Filetype | Source syntax |
+| Command | Action |
 | --- | --- |
-| `markdown`, `text`, `gitcommit`, `mail` | `mixed` |
-| `tex`, `plaintex` | `latexDocument` |
+| `:[range]RefineCheck` | Check the buffer or the complete sentences touched by a line range. |
+| `:RefineShow` | Open the suggestion under the cursor, or focus its open card. |
+| `:RefineNext` / `:RefinePrevious` | Move through suggestions in document order. Navigation wraps. |
+| `:RefineApply` | Apply the open suggestion, or the suggestion under the cursor. |
+| `:RefineDismiss` | Dismiss the open suggestion, or the suggestion under the cursor. |
+| `:RefineExplain` | Request an explanation for the current suggestion. |
+| `:RefineReport` | Send feedback about the current suggestion when available. |
+| `:RefineClose` | Close the card without applying or dismissing the suggestion. |
+| `:RefineStatus` | Show the current integration state. |
 
-Eligibility also requires a loaded ordinary buffer that is modifiable, not
-read-only or binary, and no larger than `max_source_bytes`. Buffer-list
-membership is irrelevant.
+## Supported writing formats
 
-Use a validated buffer-local override when needed:
+Markdown, plain text, Git commit messages, email, TeX, and LaTeX are enabled by
+default. You can add another Neovim filetype or disable a default through
+[advanced configuration](docs/configuration.md#filetypes).
 
-```lua
-require("refine").configure_buffer(0, { enabled = false })
-require("refine").configure_buffer(0, {
-  enabled = true,
-  source_syntax = "mixed",
-})
-require("refine").configure_buffer(0, {}) -- inherit global configuration
+Only ordinary, editable, valid UTF-8 buffers within the configured size limit
+are eligible. Refine never changes file format or end-of-line settings.
+
+## Local AI and privacy
+
+When a writing task uses a downloaded Refine local model, the check text and
+model response stay on your Mac. The model can keep checking offline after it
+has been downloaded.
+
+Refine can also use a provider you connect. Those requests go directly from
+your Mac to that provider, whose terms and privacy practices apply. Downloads,
+updates, standard license services, and hosted providers still require an
+internet connection.
+
+The Neovim plugin connects only to the local Refine app through an
+authenticated, same-user Unix socket. It makes no direct network, telemetry,
+analytics, or update-check requests.
+
+`:RefineReport` is explicit, opt-in feedback. When you use it, Refine receives
+the relevant before-and-after excerpt plus suggestion and diagnostic metadata.
+
+Read [How Refine works](https://refine.sh/guides/how-refine-works), the
+[offline grammar checker guide](https://refine.sh/guides/offline-grammar-checker-mac),
+and the [privacy policy](https://refine.sh/privacy-policy) for the complete
+product boundaries.
+
+## Troubleshooting
+
+Run the built-in health check:
+
+```vim
+:checkhealth refine
 ```
 
-An override never bypasses the ordinary-buffer, editability, binary, or size
-safety checks.
+It checks the Neovim version and macOS platform, plugin configuration, local
+endpoint permissions, protocol compatibility, frontend detection, action-key
+support, integration state, and the optional debug-log path.
 
-## Status and troubleshooting
+`:RefineStatus` provides a shorter view of the current buffer state. If no
+suggestions appear, first confirm that Refine is running, Automatic Checks are
+enabled, and the current filetype is supported.
 
-`require("refine").status(bufnr)` returns a copied semantic status table.
-`require("refine").statusline(bufnr)` is a cached, side-effect-free component
-for a user-owned statusline. The plugin never rewrites `'statusline'`.
+## Documentation
 
-```lua
-vim.api.nvim_create_autocmd("User", {
-  pattern = "RefineStatusChanged",
-  callback = function()
-    vim.cmd.redrawstatus()
-  end,
-})
-```
-
-Run `:checkhealth refine` to inspect Neovim and macOS support, redacted
-configuration, endpoint permissions, Protocol 2.4 compatibility, frontend,
-semantic state, action-key compatibility, and the debug-log path when enabled.
-
-## Privacy and transport
-
-The plugin talks only to the local Refine app over an authenticated,
-same-user Unix-domain socket. It makes no direct network requests, telemetry,
-analytics, or update checks. Plugin managers own updates. Refine may use the
-local or remote provider selected in the app under Refine's existing privacy
-and consent controls.
-
-Health output and optional persistent diagnostics never include source text,
-suggestion diffs, explanations, launch tokens, credentials, or other secrets.
-
-See `:help refine` for the complete interface.
-
-## Development
-
-```sh
-make check
-make format
-make helptags
-```
-
-The shared protocol transcript in `tests/fixtures/` must stay byte-identical
-to the Refine app and other first-party integrations.
+- [Advanced configuration](docs/configuration.md) covers filetypes, buffer
+  overrides, mappings, statusline integration, frontend detection, and
+  diagnostics.
+- [`:help refine`](doc/refine.txt) is the complete public interface reference.
+- [Contributing](CONTRIBUTING.md) covers development setup, tests, module
+  boundaries, and documentation synchronization.
+- [Changelog](CHANGELOG.md) records user-visible changes.
 
 ## License
 

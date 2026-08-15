@@ -36,7 +36,7 @@ session; focusing the current Refine card is the sole exception.
 ==============================================================================
 2. Requirements                                        *refine-requirements*
 
-- macOS
+- macOS 14 or newer
 - Neovim 0.11 or newer
 - Refine with exact integration Protocol 2.4 support
 - An active Refine trial or valid license
@@ -121,9 +121,9 @@ require("refine").configure_buffer({bufnr}, {opts})
 4. Eligible buffers                              *refine-eligible-buffers*
 
 An eligible buffer is valid, loaded, ordinary ('buftype' is empty),
-modifiable, not read-only, not binary, mapped to a supported source syntax,
-and within |refine-max_source_bytes|. Whether the buffer is listed does not
-matter.
+modifiable, not read-only, not binary, valid UTF-8, mapped to a supported
+source syntax, and within |refine-max_source_bytes|. Whether the buffer is
+listed does not matter.
 
 Default map:
 
@@ -276,7 +276,7 @@ The following card controls remain available independently of actions:
     n       Next suggestion
     p       Previous suggestion
     q       Close
-    <Esc>   Close when Dismiss is unavailable
+    <Esc>   Close unless Escape is the active configured Dismiss key
 
 The higher-priority Refine-configured Apply and Dismiss keys also work while
 the card owns them. A busy action continues to consume its configured key
@@ -353,7 +353,7 @@ Run: >
 <
 The report covers:
 
-- Neovim and macOS support
+- Neovim version and macOS platform
 - redacted configuration
 - same-user endpoint permissions
 - exact Protocol 2.4 versions
