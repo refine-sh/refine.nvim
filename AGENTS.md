@@ -4,9 +4,9 @@ Keep the public interface in `doc/refine.txt`, `README.md`, and
 `CHANGELOG.md` synchronized. Regenerate `doc/tags` after help changes.
 
 Before changing transport frames, source revisions, presentation replacement,
-suggestion actions, or Apply behavior, read the normative integration contract:
-
-https://github.com/runjuu/grammar/blob/main/docs/adr/0012-host-native-writing-check-integration-interface.md
+suggestion actions, or Apply behavior, preserve the public interface documented
+in `doc/refine.txt` and exercised by the protocol and presentation contract
+tests.
 
 Preserve these module seams:
 
