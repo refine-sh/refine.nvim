@@ -38,12 +38,14 @@ function Host:observe(emit, on_end)
 
   local attached = vim.api.nvim_buf_attach(self.bufnr, false, {
     on_lines = function()
+      self.source:invalidate()
       self.presentation:clear()
       self.on_presentation({ state = { type = "pending" }, suggestions = {} })
       self.on_native_change()
       self:_schedule_refresh()
     end,
     on_reload = function()
+      self.source:invalidate()
       self.presentation:clear()
       self.on_presentation({ state = { type = "pending" }, suggestions = {} })
       self.on_native_change()

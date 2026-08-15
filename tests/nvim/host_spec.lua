@@ -50,6 +50,39 @@ harness.test("observes complete snapshots before explicit checks", function()
   harness.equal(false, ended)
 end)
 
+harness.test("never reuses a revision after coalesced ABA native edits", function()
+  vim.cmd.enew({ bang = true })
+  local bufnr = vim.api.nvim_get_current_buf()
+  vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, { "Alpha" })
+
+  local host = require("refine.nvim.host").new({
+    bufnr = bufnr,
+    source_syntax = "mixed",
+    run_id = "host-aba",
+  })
+  local observations = {}
+  local detach = host:observe(function(observation)
+    observations[#observations + 1] = observation
+  end, function() end)
+
+  local original_revision = observations[1].snapshot.revision
+  vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, { "Alpha" })
+  harness.equal(original_revision, host.source:snapshot().revision)
+
+  vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, { "Beta" })
+  vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, { "Alpha" })
+
+  harness.equal(
+    true,
+    vim.wait(1000, function()
+      return #observations == 2
+    end)
+  )
+  harness.equal("Alpha", observations[2].snapshot.sources[1].text)
+  harness.equal(false, original_revision == observations[2].snapshot.revision)
+  detach()
+end)
+
 harness.test("implements the integration host callback contract", function()
   vim.cmd.enew({ bang = true })
   local bufnr = vim.api.nvim_get_current_buf()

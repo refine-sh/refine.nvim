@@ -57,7 +57,7 @@ end
 
 local function warning_codes(snapshot)
   local quick = snapshot.interaction and snapshot.interaction.quickApply
-  if not quick or not quick.enabled then
+  if not quick then
     return {}
   end
   local supported = {}

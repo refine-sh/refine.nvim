@@ -170,6 +170,25 @@ harness.test("owns one eligible buffer and publishes copied semantic status", fu
   harness.equal(true, #status_events > 0)
 end)
 
+harness.test("reports card action key incompatibility when cursor Quick Apply is disabled", function()
+  local controller, runs = fixture()
+  local bufnr = eligible_buffer("Card keys")
+  controller:reconcile(bufnr, vim.api.nvim_get_current_win())
+
+  runs[1].host.on_presentation({
+    state = { type = "complete", coverage = "full" },
+    interaction = {
+      automaticChecksEnabled = false,
+      quickApply = { enabled = false, applyKey = "leftShift", dismissKey = "rightShift" },
+    },
+    suggestions = {
+      { id = "one", availableActions = { "apply", "dismiss" } },
+    },
+  })
+
+  harness.equal({ "unsupported_apply_key", "unsupported_dismiss_key" }, controller:status(bufnr).warnings)
+end)
+
 harness.test("updates source syntax in the existing buffer session", function()
   local controller, runs, _, _, set_syntax = fixture()
   local bufnr = eligible_buffer("Syntax")

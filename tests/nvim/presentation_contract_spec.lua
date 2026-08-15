@@ -549,7 +549,7 @@ harness.test("keeps Report completion feedback across an availability replacemen
   host:deactivate()
 end)
 
-harness.test("preserves an explanation stream and rebinds text direction until superseded", function()
+harness.test("uses explanation direction until a newer check supersedes the stream", function()
   local update
   local cancelled = 0
   local host
@@ -570,7 +570,6 @@ harness.test("preserves an explanation stream and rebinds text direction until s
         local replacement = vim.deepcopy(snapshot)
         replacement.presentationRevision = 2
         replacement.suggestions[1].availableActions = {}
-        replacement.suggestions[1].attribution.textDirection = "rtl"
         host:present(replacement, {})
         return function()
           cancelled = cancelled + 1
@@ -590,20 +589,23 @@ harness.test("preserves an explanation stream and rebinds text direction until s
     vim.tbl_contains(vim.api.nvim_buf_get_lines(card_buffer(host), 0, -1, true), "Streaming explanation")
   )
 
-  local ltr_replacement = vim.deepcopy(snapshot)
-  ltr_replacement.presentationRevision = 3
-  ltr_replacement.suggestions[1].availableActions = {}
-  ltr_replacement.suggestions[1].attribution.textDirection = "ltr"
-  host:present(ltr_replacement, {})
+  local same_lineage = vim.deepcopy(snapshot)
+  same_lineage.presentationRevision = 3
+  same_lineage.suggestions[1].availableActions = {}
+  same_lineage.suggestions[1].attribution.textDirection = "ltr"
+  host:present(same_lineage, {})
   harness.equal(card_win, host.presentation:card_window())
-  harness.equal(false, vim.wo[card_win].rightleft)
+  harness.equal(true, vim.wo[card_win].rightleft)
 
-  local superseding = vim.deepcopy(snapshot)
-  superseding.presentationRevision = 4
-  superseding.suggestions = {}
-  host:present(superseding, {})
-  harness.equal(nil, host.presentation:card_window())
+  local newer_check = vim.deepcopy(snapshot)
+  newer_check.presentationRevision = 4
+  newer_check.checkGeneration = 2
+  newer_check.suggestions[1].availableActions = {}
+  host:present(newer_check, {})
   harness.equal(1, cancelled)
+  harness.equal(true, host:show())
+  local newer_card = host.presentation:card_window()
+  harness.equal(false, vim.wo[newer_card].rightleft)
   host:deactivate()
 end)
 

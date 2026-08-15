@@ -258,7 +258,8 @@ function Presentation:_render_card()
     and vim.api.nvim_win_is_valid(self.card_win)
     and vim.api.nvim_get_current_win() == self.card_win
   if self.card_win and vim.api.nvim_win_is_valid(self.card_win) then
-    vim.wo[self.card_win].rightleft = suggestion.attribution.textDirection == "rtl"
+    local text_direction = self.explanation_text_direction or suggestion.attribution.textDirection
+    vim.wo[self.card_win].rightleft = text_direction == "rtl"
   end
   local was_at_bottom = focused
     and vim.api.nvim_win_call(self.card_win, function()
@@ -283,6 +284,16 @@ end
 function Presentation:_set_feedback(lines)
   self.card_feedback = lines
   self:_render_card()
+end
+
+function Presentation:_clear_explanation(cancel)
+  local cancel_explanation = self.explanation_cancel
+  self.explanation_cancel = nil
+  self.explanation_attribution = nil
+  self.explanation_text_direction = nil
+  if cancel and cancel_explanation then
+    pcall(cancel_explanation)
+  end
 end
 
 function Presentation:_map_card(key, callback, options)
@@ -532,6 +543,7 @@ end
 
 function Presentation:_open_card(winid, suggestion)
   self:_clear_activation()
+  self:_clear_explanation(true)
   self.card_feedback = nil
   self.card_busy_action = nil
   self.card_mouse_targets = nil
@@ -584,11 +596,7 @@ function Presentation:close(restore_focus)
   if card_win and vim.api.nvim_win_is_valid(card_win) then
     vim.api.nvim_win_close(card_win, true)
   end
-  if self.explanation_cancel then
-    pcall(self.explanation_cancel)
-  end
-  self.explanation_cancel = nil
-  self.explanation_attribution = nil
+  self:_clear_explanation(true)
   self.card_feedback = nil
   self.card_busy_action = nil
   self.card_mouse_targets = nil
@@ -738,11 +746,7 @@ function Presentation:_invoke_action(suggestion, kind)
   end
 
   if kind == "explain" then
-    if self.explanation_cancel then
-      pcall(self.explanation_cancel)
-    end
-    self.explanation_cancel = nil
-    self.explanation_attribution = nil
+    self:_clear_explanation(true)
     self:_set_feedback({ "Explaining…" })
     local ended = false
     local ok, cancel = pcall(invoke, suggestion.id, function(update)
@@ -754,6 +758,9 @@ function Presentation:_invoke_action(suggestion, kind)
         end
         if type(attribution.modelDisplayName) == "string" and attribution.modelDisplayName ~= "" then
           labels[#labels + 1] = attribution.modelDisplayName
+        end
+        if attribution.textDirection == "ltr" or attribution.textDirection == "rtl" then
+          self.explanation_text_direction = attribution.textDirection
         end
         self.explanation_attribution = "Explanation"
         if #labels > 0 then
@@ -768,12 +775,14 @@ function Presentation:_invoke_action(suggestion, kind)
         end
         self:_set_feedback(feedback)
       elseif update.status == "stale" then
+        self:_clear_explanation(false)
         if belongs_to_card then
           self:_set_feedback({ "This suggestion is no longer current." })
         else
           notify_action_failure(kind, "stale")
         end
       elseif update.status == "unavailable" then
+        self:_clear_explanation(false)
         if belongs_to_card then
           self:_set_feedback({ "Explanation unavailable: " .. tostring(update.reason or "unknown") })
         else
@@ -785,7 +794,7 @@ function Presentation:_invoke_action(suggestion, kind)
       self.explanation_cancel = nil
     end)
     if not ok then
-      self.explanation_cancel = nil
+      self:_clear_explanation(false)
       if belongs_to_card then
         self:_set_feedback({ "Explanation unavailable." })
       else
@@ -796,6 +805,8 @@ function Presentation:_invoke_action(suggestion, kind)
     self.explanation_cancel = not ended and type(cancel) == "function" and cancel or nil
     return true
   end
+
+  self:_clear_explanation(true)
 
   local tracks_busy = belongs_to_card and (kind == "apply" or kind == "dismiss")
   if tracks_busy then
