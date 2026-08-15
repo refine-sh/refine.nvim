@@ -542,17 +542,14 @@ function Presentation:_card_config(winid, suggestion, lines, content_height)
 end
 
 function Presentation:_open_card(winid, suggestion)
-  self:_clear_activation()
-  self:_clear_explanation(true)
-  self.card_feedback = nil
-  self.card_busy_action = nil
-  self.card_mouse_targets = nil
   local content = card_content(suggestion, nil, self.snapshot.interaction, self.snapshot.appearance)
   local config = self:_card_config(winid, suggestion, content.lines)
   if not config then
     return false
   end
 
+  self:close(false)
+  self:_clear_activation()
   self.card_buf = vim.api.nvim_create_buf(false, true)
   vim.bo[self.card_buf].bufhidden = "wipe"
   vim.api.nvim_buf_set_lines(self.card_buf, 0, -1, true, content.lines)

@@ -71,7 +71,7 @@ local function present(options)
     suggestions = { suggestion },
   }
   if options.before_present then
-    options.before_present(bufnr, owner_win)
+    options.before_present(bufnr, owner_win, snapshot, suggestion)
   end
   host:present(snapshot, options.actions or {})
   if options.open_card ~= false then
@@ -782,6 +782,81 @@ harness.test("observes editor and card clicks without shadowing mouse mappings",
   harness.equal("Existing mouse mapping", buffer_mapping(bufnr, "<LeftMouse>").desc)
   vim.keymap.del("n", "<LeftMouse>", { buffer = bufnr })
   vim.o.mouse = previous_mouse
+end)
+
+harness.test("keeps only one card open when different highlights are clicked", function()
+  local previous_mouse = vim.o.mouse
+  vim.o.mouse = "a"
+  local host, _, _, owner_win = present({
+    source = "bad text and wrong words",
+    open_card = false,
+    before_present = function(_, _, snapshot, first)
+      first.id = "first"
+      first.activationRange = { location = 0, length = 3 }
+      first.highlightRanges = { vim.deepcopy(first.activationRange) }
+      first.diff = {
+        { kind = "delete", text = "bad" },
+        { kind = "insert", text = "good" },
+      }
+      local second = vim.deepcopy(first)
+      second.id = "second"
+      second.activationRange = { location = 13, length = 5 }
+      second.highlightRanges = { vim.deepcopy(second.activationRange) }
+      second.diff = {
+        { kind = "delete", text = "wrong" },
+        { kind = "insert", text = "right" },
+      }
+      snapshot.suggestions = { first, second }
+    end,
+  })
+
+  local function click(column)
+    local position = vim.fn.screenpos(owner_win, 1, column)
+    vim.api.nvim_input_mouse("left", "press", "", 0, position.row - 1, position.col - 1)
+    vim.api.nvim_feedkeys(vim.keycode("<LeftMouse>"), "xt", false)
+  end
+
+  local function card_windows()
+    local windows = {}
+    for _, winid in ipairs(vim.api.nvim_list_wins()) do
+      local bufnr = vim.api.nvim_win_get_buf(winid)
+      if vim.bo[bufnr].filetype == "refine" then
+        windows[#windows + 1] = winid
+      end
+    end
+    return windows
+  end
+
+  local function card_contains(text)
+    local card_win = host.presentation:card_window()
+    if not card_win then
+      return false
+    end
+    local card_buf = vim.api.nvim_win_get_buf(card_win)
+    local content = table.concat(vim.api.nvim_buf_get_lines(card_buf, 0, -1, true), "\n")
+    return content:find(text, 1, true) ~= nil
+  end
+
+  click(1)
+  local first_opened = vim.wait(1000, function()
+    return card_contains("good")
+  end)
+  click(14)
+  local second_opened = vim.wait(1000, function()
+    return card_contains("right")
+  end)
+
+  local open_cards = card_windows()
+  host:deactivate()
+  for _, winid in ipairs(open_cards) do
+    if vim.api.nvim_win_is_valid(winid) then
+      vim.api.nvim_win_close(winid, true)
+    end
+  end
+  vim.o.mouse = previous_mouse
+  harness.equal(true, first_opened)
+  harness.equal(true, second_opened)
+  harness.equal(1, #open_cards)
 end)
 
 harness.run()
