@@ -1,0 +1,22 @@
+# Changelog
+
+All notable changes to Refine for Neovim will be documented here.
+
+The project follows [Semantic Versioning](https://semver.org/). Preview
+releases use `0.x`; `v1.0.0` is reserved for the first publicly supported
+capability-parity release.
+
+## [Unreleased]
+
+### Added
+
+- Pure Lua Refine integration runtime for Neovim 0.11 and newer on macOS.
+- Exact Protocol 2.4 transport over Refine's authenticated local Unix socket.
+- Full-buffer and selection-scoped writing checks.
+- Native suggestion highlights, floating cards, navigation, and actions.
+- Alias-safe transient action keys that preserve Ctrl-I, Ctrl-[, and Ctrl-M
+  when the Neovim frontend can distinguish them from Tab, Escape, and Return.
+- Atomic, one-undo-entry Apply behavior.
+- Optional validated setup and buffer-local overrides.
+- Structured status, statusline component, and `:checkhealth refine`.
+- Opt-in redacted diagnostics bounded to a 256 KiB file and one rotation.

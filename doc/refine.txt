@@ -1,0 +1,376 @@
+*refine.txt* *refine.nvim*                         Refine for Neovim
+
+==============================================================================
+CONTENTS                                                   *refine-contents*
+
+1. Introduction.................................|refine-introduction|
+2. Requirements..................................|refine-requirements|
+3. Setup................................................|refine-setup|
+4. Eligible buffers..........................|refine-eligible-buffers|
+5. Commands..........................................|refine-commands|
+6. Mappings..........................................|refine-mappings|
+7. Suggestion card............................|refine-suggestion-card|
+8. Lua interface................................|refine-lua-interface|
+9. Status..............................................|refine-status|
+10. Health.............................................|refine-health|
+11. Privacy and compatibility........|refine-privacy-compatibility|
+
+==============================================================================
+1. Introduction                                      *refine-introduction*
+
+Refine for Neovim presents Refine grammar and fluency suggestions in native
+Neovim buffers. The Refine app owns writing-check policy, scheduling,
+language, providers, models, prompts, appearance, interaction settings, and
+writing-check entitlement. The plugin owns authoritative buffer capture,
+native presentation, coordinate conversion, and one-mutation Apply.
+
+One live integration session follows the current eligible buffer. Passive
+buffer activity never launches Refine. An explicit |:RefineCheck| launches
+Refine in the background when necessary, without stealing focus.
+
+Switching between windows that show the same buffer retains its session and
+highlights. Card and Quick Apply activation are window-local and close on the
+switch. Entering a different or ineligible non-Refine buffer ends the active
+session; focusing the current Refine card is the sole exception.
+
+==============================================================================
+2. Requirements                                        *refine-requirements*
+
+- macOS
+- Neovim 0.11 or newer
+- Refine with exact integration Protocol 2.4 support
+- An active Refine trial or valid license
+
+The plugin is inactive in a headless Neovim. It activates when a UI attaches.
+SSH is not rejected when Neovim itself runs on macOS and can reach the
+same-machine Refine endpoint. An unknown frontend remains usable through
+generic integration behavior. When several distinct UIs are attached, Refine
+omits frontend identity instead of guessing.
+
+==============================================================================
+3. Setup                                                      *refine-setup*
+
+No setup call is required. Defaults are registered automatically.
+
+                                                        *refine.setup()*
+require("refine").setup({opts})
+
+    Replaces the global plugin configuration. The call is optional,
+    idempotent, validated, and atomic. Every call starts from defaults. An
+    invalid option raises an error and leaves the prior live configuration
+    unchanged.
+
+    Example: >lua
+        require("refine").setup({
+          max_source_bytes = 1024 * 1024,
+          filetypes = {
+            markdown = false,
+            quarto = "mixed",
+          },
+          frontend = "auto",
+          debug_log = false,
+        })
+<
+                                                 *refine-max_source_bytes*
+max_source_bytes ~
+    Positive integer. Maximum UTF-8 byte length of one canonical source.
+    Default: 1048576 (one MiB).
+
+                                                        *refine-filetypes*
+filetypes ~
+    Map from a nonempty Neovim 'filetype' to "mixed", "latexDocument", or
+    false. Entries merge with the default map; false removes an entry.
+
+                                                         *refine-frontend*
+frontend ~
+    "auto" or one recognized frontend ID: "terminal", "iterm2", "ghostty",
+    "wezterm", "kitty", "alacritty", or "neovide". Automatic detection is the
+    default. An unknown automatically detected frontend uses generic behavior.
+
+                                                        *refine-debug_log*
+debug_log ~
+    Boolean. Enables bounded persistent diagnostic metadata. Diagnostics never
+    record source text, diffs, explanations, launch tokens, credentials, or
+    other secrets. The current file is capped at 256 KiB and has one rotated
+    file. |refine-health| reports its path when enabled. Default: false.
+
+                                           *refine.configure_buffer()*
+require("refine").configure_buffer({bufnr}, {opts})
+
+    Atomically replaces the override for {bufnr}. Zero means the current
+    buffer. An empty table clears the override and inherits global
+    configuration.
+
+    Supported fields:
+
+    enabled ~
+        Boolean. false opts out. true permits normal eligibility evaluation
+        but never bypasses hard safety checks or invents a source syntax.
+
+    source_syntax ~
+        "mixed" or "latexDocument". Overrides the filetype map and can opt an
+        otherwise unmapped filetype in.
+
+    Example: >lua
+        require("refine").configure_buffer(0, {
+          enabled = true,
+          source_syntax = "mixed",
+        })
+<
+==============================================================================
+4. Eligible buffers                              *refine-eligible-buffers*
+
+An eligible buffer is valid, loaded, ordinary ('buftype' is empty),
+modifiable, not read-only, not binary, mapped to a supported source syntax,
+and within |refine-max_source_bytes|. Whether the buffer is listed does not
+matter.
+
+Default map:
+
+    markdown, text, gitcommit, mail       mixed
+    tex, plaintex                        latexDocument
+
+Every other filetype requires explicit configuration or a buffer override.
+
+Refine serializes the exact buffer lines joined with LF and does not invent a
+terminal newline. 'fileformat', 'endofline', and 'fixendofline' are write
+metadata and remain unchanged by Apply.
+
+==============================================================================
+5. Commands                                              *refine-commands*
+
+                                                       *:RefineCheck*
+:[range]RefineCheck
+    Requests a fresh manual writing check. With no range, checks the full
+    eligible buffer. An Ex range is a linewise selection; Refine checks the
+    complete sentences touched by it. See |<Plug>(RefineCheck)| for exact
+    Visual characterwise endpoints. Blockwise selection is rejected.
+
+                                                        *:RefineShow*
+:RefineShow
+    Opens the card for a suggestion under the caret. Does not jump when there
+    is no suggestion there. Invoking Show for an already open card focuses it.
+
+                                                        *:RefineNext*
+:RefineNext
+    Moves to the first visible highlight of the next suggestion in document
+    order and opens its card without taking focus. A cross-line move records a
+    jumplist entry. For a same-line column-only move, which Neovim cannot store
+    as a distinct jump, Refine retains the exact previous-context mark.
+    Navigation wraps.
+
+                                                    *:RefinePrevious*
+:RefinePrevious
+    Like |:RefineNext|, in reverse document order. Navigation wraps.
+
+                                                       *:RefineApply*
+:RefineApply
+    Applies the open card's suggestion, or the suggestion under the caret.
+    Apply validates the exact source and changes the buffer in one undo entry.
+    Multiple edits are composed inside their smallest enclosing buffer range
+    and dispatched as one mutation. Third-party extmarks inside that envelope
+    therefore follow Neovim's gravity rules for one enclosing replacement.
+
+                                                     *:RefineDismiss*
+:RefineDismiss
+    Explicitly dismisses the open card's suggestion, or the suggestion under
+    the caret. This always records Dismiss; it does not merely cancel cursor
+    activation.
+
+                                                     *:RefineExplain*
+:RefineExplain
+    Streams an explanation for the current action target when available.
+
+                                                      *:RefineReport*
+:RefineReport
+    Reports the current suggestion when feedback is available. Reporting keeps
+    the suggestion and card open.
+
+                                                       *:RefineClose*
+:RefineClose
+    Closes the suggestion card without applying or dismissing the suggestion.
+
+                                                      *:RefineStatus*
+:RefineStatus
+    Displays the semantic Refine state for the current buffer, or for the
+    owning source buffer while its suggestion card is focused.
+
+Explicit command failures notify actionably. Passive connection and background
+transitions update status silently. An Apply with an indeterminate outcome
+warns prominently and is never retried automatically.
+
+==============================================================================
+6. Mappings                                              *refine-mappings*
+
+Refine installs no permanent editor mappings. It provides these targets:
+
+    *<Plug>(RefineCheck)*       *<Plug>(RefineShow)*
+    *<Plug>(RefineNext)*        *<Plug>(RefinePrevious)*
+    *<Plug>(RefineApply)*       *<Plug>(RefineDismiss)*
+    *<Plug>(RefineExplain)*     *<Plug>(RefineReport)*
+    *<Plug>(RefineClose)*
+
+The Check target supports Normal and Visual mode. A Visual invocation
+preserves exact characterwise or linewise endpoints and rejects blockwise
+input. Other targets act on the open card first and otherwise on a suggestion
+under the caret.
+
+Example: >lua
+    vim.keymap.set({ "n", "x" }, "<leader>rc", "<Plug>(RefineCheck)")
+    vim.keymap.set("n", "<leader>rs", "<Plug>(RefineShow)")
+    vim.keymap.set("n", "]r", "<Plug>(RefineNext)")
+    vim.keymap.set("n", "[r", "<Plug>(RefinePrevious)")
+<
+Refine's configured Apply and Dismiss keys temporarily shadow buffer-local
+mappings only while Quick Apply activation or a card owns the shortcut.
+Previous mappings are restored exactly afterward. Transient interception is
+limited to Normal and Insert modes. A card claims only a currently available
+action's configured key; unsupported, unavailable, or conflicting keys remain
+native. Card ownership applies in both the floating card and its owning editor
+window.
+
+For Tab, Escape, and Return, Refine also installs a transient pass-through for
+the corresponding Ctrl-I, Ctrl-[, and Ctrl-M alias when no alias mapping
+already exists. This preserves the control key's mapping or native behavior in
+a GUI or terminal that supports Neovim's extended key encoding. A legacy
+terminal may send each pair identically, making that distinction impossible;
+|refine-health| reports the limitation.
+
+With cursor activation alone, the configured Dismiss key cancels activation
+without dismissing the suggestion. When a card owns the key, it invokes the
+explicit Dismiss action.
+
+==============================================================================
+7. Suggestion card                                *refine-suggestion-card*
+
+A suggestion card opens without taking editor focus. Invoking Show again
+focuses it. Moving away, changing the source, switching its owning window, or
+superseding the card's suggestion or check generation closes it. A replacement
+within the same source revision, check generation, and suggestion preserves
+the card, focus, streamed explanation, inline feedback, and newest actions,
+keys, and appearance.
+
+The card anchors to the first visible rendered row inside a suggestion
+highlight, prefers below then above, and clamps and wraps in small windows.
+Focused cards scroll with normal Neovim motions. Streaming follows the bottom
+only while the user is already there. The card closes when its anchor leaves
+the viewport or its window disappears. RTL attribution uses Neovim's native
+'rightleft' window option as the nearest presentation fallback.
+
+Card mappings and footer entries for actions appear only when that action is
+available:
+
+    a       Apply
+    d       Dismiss
+    e       Explain
+    r       Report
+
+The following card controls remain available independently of actions:
+
+    n       Next suggestion
+    p       Previous suggestion
+    q       Close
+    <Esc>   Close when Dismiss is unavailable
+
+The higher-priority Refine-configured Apply and Dismiss keys also work while
+the card owns them. A busy action continues to consume its configured key
+without issuing a duplicate request. Users may override built-in card-local
+mappings with a |FileType| autocmd for `refine`; same-suggestion replacements
+preserve those overrides unless the relevant Refine-configured transient key
+changes.
+
+A plain single left click on a live Refine highlight opens its card. Refine
+observes clicks passively and never installs or shadows a `<LeftMouse>`
+mapping. It does not hover-open cards or claim double-click, drag, right-click,
+wheel, or non-Refine mouse behavior. Disabling Neovim mouse input leaves
+commands and keyboard actions available without a warning.
+
+On |FocusLost|, Refine preserves the session, checking work, highlights, and
+status, while closing the card and suspending Quick Apply mappings even across
+background presentation replacements. On |FocusGained| it reconciles the
+current buffer and caret without forcing a check or launching Refine.
+
+==============================================================================
+8. Lua interface                                    *refine-lua-interface*
+
+The supported public Lua interface is deliberately small:
+
+    |refine.setup()|
+    |refine.configure_buffer()|
+    |refine.status()|
+    |refine.statusline()|
+
+Use commands or |refine-mappings| for actions. Other lua/refine modules are
+implementation details and may change without notice.
+
+==============================================================================
+9. Status                                                  *refine-status*
+
+                                                         *refine.status()*
+require("refine").status([{bufnr}])
+
+    Returns a copy of semantic state for {bufnr}, or the current buffer when
+    omitted. While a Refine card is focused, an omitted {bufnr} resolves to
+    the card's owning source buffer. The stable state values for 1.x are:
+
+        inactive
+        connecting
+        pending
+        checking
+        complete
+        unavailable
+
+    Depending on state, the table also contains semantic fields such as
+    bufnr, reason, suggestion_count, coverage, progress,
+    automatic_checks_enabled, frontend, and warnings. Minor releases may
+    add fields and new reason or warning codes. Callers must tolerate unknown
+    fields and codes.
+
+                                                     *refine.statusline()*
+require("refine").statusline([{bufnr}])
+
+    Returns a cached, side-effect-free human-readable statusline component.
+    It is empty for a non-owner or ineligible buffer. Its text is presentation,
+    not a machine-readable interface; use |refine.status()| for logic.
+
+                                            *RefineStatusChanged*
+User RefineStatusChanged
+    Fired on semantic status changes. |event-data| contains the affected
+    bufnr. Re-read |refine.status()| for current state. Refine requests a
+    statusline redraw but never rewrites the user's global 'statusline'.
+
+==============================================================================
+10. Health                                                  *refine-health*
+
+Run: >
+    :checkhealth refine
+<
+The report covers:
+
+- Neovim and macOS support
+- redacted configuration
+- same-user endpoint permissions
+- exact Protocol 2.4 versions
+- recognized or generic frontend state
+- semantic integration state
+- configured action-key compatibility
+- the legacy-terminal key-alias limitation
+- debug-log path and bounded retention when logging is enabled
+
+Endpoint credentials and writing source never appear in health output.
+
+==============================================================================
+11. Privacy and compatibility              *refine-privacy-compatibility*
+
+The plugin connects only to the local Refine app through an authenticated,
+same-user Unix-domain socket. It makes no direct network, telemetry, analytics,
+or update-check requests. Plugin managers own updates. Refine itself may use
+the provider selected in the app under its existing privacy and consent
+controls.
+
+Refine for Neovim currently requires exact Protocol 2.4. A mismatch fails
+before source is sent and reports whether the plugin or Refine must be
+updated. A compatibility policy must be accepted before a later protocol bump
+can independently update already-public clients.
+
+ vim:tw=78:ts=8:noet:ft=help:norl:
