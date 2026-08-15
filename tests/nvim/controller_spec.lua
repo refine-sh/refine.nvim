@@ -37,6 +37,7 @@ local function fixture(options)
   local launches = 0
   local status_events = {}
   local notifications = {}
+  local compatibility_notifications = {}
   local source_syntax = "mixed"
   local integration_factory = function(options)
     return {
@@ -110,7 +111,9 @@ local function fixture(options)
     notify = function(message, level)
       notifications[#notifications + 1] = { message = message, level = level }
     end,
-    notify_once = function() end,
+    notify_once = function(message, level)
+      compatibility_notifications[#compatibility_notifications + 1] = { message = message, level = level }
+    end,
   })
   return controller,
     runs,
@@ -121,7 +124,8 @@ local function fixture(options)
     function(value)
       source_syntax = value
     end,
-    notifications
+    notifications,
+    compatibility_notifications
 end
 
 harness.test("owns one eligible buffer and publishes copied semantic status", function()
@@ -188,6 +192,32 @@ harness.test("reports card action key incompatibility when cursor Quick Apply is
 
   harness.equal({ "unsupported_apply_key", "unsupported_dismiss_key" }, controller:status(bufnr).warnings)
 end)
+
+harness.test(
+  "uses a one-time notification to configure an explicit mapping for an unsupported Apply shortcut",
+  function()
+    local controller, runs, _, _, _, _, compatibility_notifications = fixture()
+    local bufnr = eligible_buffer("Apply shortcut")
+    controller:reconcile(bufnr, vim.api.nvim_get_current_win())
+
+    runs[1].host.on_presentation({
+      state = { type = "complete", coverage = "full" },
+      interaction = {
+        automaticChecksEnabled = false,
+        quickApply = { enabled = true, applyKey = "rightShift", dismissKey = "escape" },
+      },
+      suggestions = { { id = "one", availableActions = { "apply" } } },
+    })
+
+    harness.equal({
+      {
+        message = "Right Shift cannot be intercepted by Neovim. Configure another Apply key in Refine, or add a Neovim mapping:\n"
+          .. 'vim.keymap.set("n", "<leader>ra", "<Plug>(RefineApply)")',
+        level = vim.log.levels.WARN,
+      },
+    }, compatibility_notifications)
+  end
+)
 
 harness.test("updates source syntax in the existing buffer session", function()
   local controller, runs, _, _, set_syntax = fixture()

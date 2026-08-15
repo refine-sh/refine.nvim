@@ -137,6 +137,61 @@ harness.test("renders multiline diff runs with Refine colors and visible whitesp
   host:deactivate()
 end)
 
+harness.test("identifies an unsupported Apply shortcut without hiding Apply availability", function()
+  local host = present({
+    open_card = false,
+    available_actions = { "apply" },
+    interaction = {
+      automaticChecksEnabled = true,
+      quickApply = {
+        enabled = true,
+        applyKey = "rightShift",
+        dismissKey = "escape",
+        activationStyle = "showTipAndHighlight",
+      },
+    },
+  })
+
+  local tips = {}
+  for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(host.bufnr, -1, 0, -1, { details = true })) do
+    if mark[4].virt_text then
+      local chunks = {}
+      for _, chunk in ipairs(mark[4].virt_text) do
+        chunks[#chunks + 1] = chunk[1]
+      end
+      tips[#tips + 1] = table.concat(chunks)
+    end
+  end
+
+  harness.equal({ " Apply shortcut unavailable · [Esc] Cancel" }, tips)
+  host:deactivate()
+end)
+
+harness.test("shows how to configure an explicit mapping when the Apply shortcut is unsupported", function()
+  local host = present({
+    available_actions = { "apply" },
+    interaction = {
+      automaticChecksEnabled = true,
+      quickApply = {
+        enabled = true,
+        applyKey = "rightShift",
+        dismissKey = "escape",
+        activationStyle = "showTipAndHighlight",
+      },
+    },
+  })
+
+  local card_lines = vim.api.nvim_buf_get_lines(card_buffer(host), 0, -1, true)
+  harness.equal({
+    "Right Shift cannot be intercepted by Neovim.",
+    "Configure another Apply key in Refine, or add a Neovim mapping:",
+    'vim.keymap.set("n", "<leader>ra", "<Plug>(RefineApply)")',
+    "",
+    "[a] Apply  [q] Close",
+  }, vim.list_slice(card_lines, #card_lines - 4))
+  host:deactivate()
+end)
+
 harness.test("activates quick actions at either activation range endpoint", function()
   local host = present({
     open_card = false,

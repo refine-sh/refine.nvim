@@ -68,7 +68,13 @@ vim.keymap.set({ "n", "x" }, "<leader>rc", "<Plug>(RefineCheck)")
 vim.keymap.set("n", "<leader>rs", "<Plug>(RefineShow)")
 vim.keymap.set("n", "]r", "<Plug>(RefineNext)")
 vim.keymap.set("n", "[r", "<Plug>(RefinePrevious)")
+vim.keymap.set("n", "<leader>ra", "<Plug>(RefineApply)")
 ```
+
+When the configured Apply key cannot be intercepted by Neovim, the activation
+tip says `Apply shortcut unavailable`. The card explains how to configure
+another Apply key in Refine or add the Neovim mapping above. Refine does not
+remap the key automatically.
 
 Refine's configured Apply and Dismiss keys are intercepted only while cursor
 activation or the card owns them, then the previous buffer-local mapping is

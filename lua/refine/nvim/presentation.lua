@@ -36,6 +36,24 @@ local key_labels = {
   tab = "Tab",
   upArrow = "Up",
 }
+
+local function quick_action_tip(key, action)
+  local label = key_labels[key]
+  if label then
+    return ("[%s] %s"):format(label, action)
+  end
+  return action .. " shortcut unavailable"
+end
+
+local function action_key_label(key)
+  local label = key_labels[key]
+  if label then
+    return label
+  end
+  local words = key:gsub("(%l)(%u)", "%1 %2")
+  return (words:gsub("^%l", string.upper))
+end
+
 local left_mouse = vim.keycode("<LeftMouse>")
 local card_actions = {
   { kind = "apply", key = "a", label = "Apply" },
@@ -195,7 +213,9 @@ local function card_content(suggestion, feedback, interaction, appearance)
     end
     if can_apply and not action_keys[quick.applyKey] then
       lines[#lines + 1] = ""
-      lines[#lines + 1] = "Configured Apply key is unavailable in Neovim; use [a]."
+      lines[#lines + 1] = ("%s cannot be intercepted by Neovim."):format(action_key_label(quick.applyKey))
+      lines[#lines + 1] = "Configure another Apply key in Refine, or add a Neovim mapping:"
+      lines[#lines + 1] = 'vim.keymap.set("n", "<leader>ra", "<Plug>(RefineApply)")'
     end
     if can_dismiss and not action_keys[quick.dismissKey] then
       lines[#lines + 1] = "Configured Dismiss key is unavailable in Neovim; use [d]."
@@ -894,10 +914,7 @@ function Presentation:_render_activation(suggestion)
     vim.api.nvim_buf_set_extmark(self.bufnr, activation_namespace, position.row, position.byte_col, {
       virt_text = {
         {
-          (" [%s] Apply · [%s] Cancel"):format(
-            key_labels[quick.applyKey] or "Unavailable",
-            key_labels[quick.dismissKey] or "Unavailable"
-          ),
+          (" %s · %s"):format(quick_action_tip(quick.applyKey, "Apply"), quick_action_tip(quick.dismissKey, "Cancel")),
           "Comment",
         },
       },

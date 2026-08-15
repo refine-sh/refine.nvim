@@ -16,6 +16,8 @@ capability-parity release.
 - Native suggestion highlights, floating cards, navigation, and actions.
 - Alias-safe transient action keys that preserve Ctrl-I, Ctrl-[, and Ctrl-M
   when the Neovim frontend can distinguish them from Tab, Escape, and Return.
+- Actionable Apply guidance, including an explicit `<Plug>(RefineApply)`
+  mapping, when the configured shortcut cannot be intercepted by Neovim.
 - Atomic, one-undo-entry Apply behavior.
 - Optional validated setup and buffer-local overrides.
 - Structured status, statusline component, and `:checkhealth refine`.

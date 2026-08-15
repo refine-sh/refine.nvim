@@ -13,6 +13,11 @@ local interceptable_keys = {
   "downArrow",
 }
 
+local function action_key_label(key)
+  local words = key:gsub("(%l)(%u)", "%1 %2")
+  return (words:gsub("^%l", string.upper))
+end
+
 local function inactive(bufnr, reason)
   return { state = "inactive", bufnr = bufnr, reason = reason }
 end
@@ -136,9 +141,9 @@ function Controller:_on_presentation(run, snapshot)
     if warning == "conflicting_action_keys" then
       message = ("Refine Apply and Dismiss both use %q; use card actions until the keys differ."):format(quick.applyKey)
     elseif warning == "unsupported_apply_key" then
-      message = ("Refine Apply key %q cannot be intercepted by Neovim; use :RefineApply or [a] in the card."):format(
-        quick.applyKey
-      )
+      message = ("%s cannot be intercepted by Neovim. Configure another Apply key in Refine, or add a Neovim mapping:\n"):format(
+        action_key_label(quick.applyKey)
+      ) .. 'vim.keymap.set("n", "<leader>ra", "<Plug>(RefineApply)")'
     elseif warning == "unsupported_dismiss_key" then
       message = ("Refine Dismiss key %q cannot be intercepted by Neovim; use :RefineDismiss or [d] in the card."):format(
         quick.dismissKey
