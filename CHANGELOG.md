@@ -13,7 +13,9 @@ capability-parity release.
 - Pure Lua Refine integration runtime for Neovim 0.11 and newer on macOS.
 - Exact Protocol 2.4 transport over Refine's authenticated local Unix socket.
 - Full-buffer and selection-scoped writing checks.
-- Native suggestion highlights, floating cards, navigation, and actions.
+- Native suggestion highlights, floating cards with inline diff runs,
+  combining-glyph deletion midlines, visible changed whitespace, navigation,
+  and actions.
 - Alias-safe transient action keys that preserve Ctrl-I, Ctrl-[, and Ctrl-M
   when the Neovim frontend can distinguish them from Tab, Escape, and Return.
 - Actionable Apply guidance, including an explicit `<Plug>(RefineApply)`

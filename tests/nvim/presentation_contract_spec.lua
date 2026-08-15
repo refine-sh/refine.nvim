@@ -90,11 +90,15 @@ local function buffer_mapping(bufnr, lhs)
   end)
 end
 
-harness.test("renders multiline diff runs with Refine colors and visible whitespace", function()
+harness.test("renders diff runs inline with Refine colors and visible whitespace", function()
   local diff = {
-    { kind = "delete", text = "old line\nsecond\tline" },
-    { kind = "insert", text = "new \nline" },
-    { kind = "unchanged", text = "context\nnext" },
+    { kind = "unchanged", text = "The " },
+    { kind = "delete", text = "old " },
+    { kind = "insert", text = "new " },
+    { kind = "unchanged", text = "line\nkeeps " },
+    { kind = "delete", text = "second\t" },
+    { kind = "insert", text = "next " },
+    { kind = "unchanged", text = "line" },
   }
   local protocol_diff = vim.deepcopy(diff)
   local host, suggestion = present({
@@ -106,34 +110,152 @@ harness.test("renders multiline diff runs with Refine colors and visible whitesp
   harness.equal({
     "English (American) · On-Device",
     "",
-    "- old·line",
-    "- second→line",
-    "+ new·",
-    "+ line",
-    "  context",
-    "  next",
+    "The old·new·line",
+    "keeps second→next·line",
     "",
     "[a] Apply  [q] Close",
   }, vim.api.nvim_buf_get_lines(card_buf, 0, -1, true))
   harness.equal(protocol_diff, suggestion.diff)
 
+  local highlights = {}
   local groups = {}
   for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(card_buf, -1, 0, -1, { details = true })) do
     local group = mark[4].hl_group
     if group then
       groups[group] = (groups[group] or 0) + 1
+      highlights[#highlights + 1] = {
+        row = mark[2],
+        start_col = mark[3],
+        end_col = mark[4].end_col,
+        group = group,
+      }
     end
   end
+  harness.equal({
+    { row = 2, start_col = 4, end_col = 9, group = "RefineDeletion" },
+    { row = 2, start_col = 9, end_col = 14, group = "RefineAddition" },
+    { row = 3, start_col = 6, end_col = 15, group = "RefineDeletion" },
+    { row = 3, start_col = 15, end_col = 21, group = "RefineAddition" },
+  }, highlights)
   harness.equal(2, groups.RefineAddition)
   harness.equal(2, groups.RefineDeletion)
   harness.equal(0x34C759, vim.api.nvim_get_hl(0, { name = "RefineAddition", link = false }).fg)
   harness.equal(0xFF3B30, vim.api.nvim_get_hl(0, { name = "RefineDeletion", link = false }).fg)
+  harness.equal(true, vim.api.nvim_get_hl(0, { name = "RefineAddition", link = false }).bold)
+  harness.equal(true, vim.api.nvim_get_hl(0, { name = "RefineDeletion", link = false }).strikethrough)
 
   vim.api.nvim_set_hl(0, "RefineAddition", {})
   vim.api.nvim_set_hl(0, "RefineDeletion", {})
   host:refresh_highlights()
   harness.equal(0x34C759, vim.api.nvim_get_hl(0, { name = "RefineAddition", link = false }).fg)
   harness.equal(0xFF3B30, vim.api.nvim_get_hl(0, { name = "RefineDeletion", link = false }).fg)
+  host:deactivate()
+end)
+
+harness.test("draws a combining-glyph midline over deleted text", function()
+  local host = present({
+    diff = {
+      { kind = "unchanged", text = "She " },
+      { kind = "delete", text = "go" },
+      { kind = "insert", text = "went" },
+      { kind = "unchanged", text = " home." },
+    },
+    available_actions = { "apply" },
+  })
+  local card_buf = card_buffer(host)
+
+  harness.equal("She gowent home.", vim.api.nvim_buf_get_lines(card_buf, 2, 3, true)[1])
+
+  local midlines = {}
+  for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(card_buf, -1, 0, -1, { details = true })) do
+    local virtual_text = mark[4].virt_text
+    if virtual_text then
+      midlines[#midlines + 1] = {
+        row = mark[2],
+        col = mark[3],
+        text = virtual_text[1][1],
+        group = virtual_text[1][2],
+        position = mark[4].virt_text_pos,
+      }
+    end
+  end
+  harness.equal({
+    { row = 2, col = 4, text = "g̶", group = "RefineDeletion", position = "overlay" },
+    { row = 2, col = 5, text = "o̶", group = "RefineDeletion", position = "overlay" },
+  }, midlines)
+  host:deactivate()
+end)
+
+harness.test("bounds combining-glyph midlines for large deletions", function()
+  local deletion = string.rep("x", 4097)
+  local host = present({
+    diff = { { kind = "delete", text = deletion } },
+    available_actions = { "apply" },
+  })
+  local card_buf = card_buffer(host)
+  local midline_count = 0
+  for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(card_buf, -1, 0, -1, { details = true })) do
+    if mark[4].virt_text then
+      midline_count = midline_count + 1
+    end
+  end
+
+  harness.equal(deletion, vim.api.nvim_buf_get_lines(card_buf, 2, 3, true)[1])
+  harness.equal(4096, midline_count)
+  host:deactivate()
+end)
+
+harness.test("marks changed newlines while keeping their line break", function()
+  local host = present({
+    diff = {
+      { kind = "unchanged", text = "first" },
+      { kind = "delete", text = "\n" },
+      { kind = "insert", text = " " },
+      { kind = "unchanged", text = "second" },
+    },
+    available_actions = { "apply" },
+  })
+  local card_buf = card_buffer(host)
+
+  harness.equal({
+    "English (American) · On-Device",
+    "",
+    "first↵",
+    "·second",
+    "",
+    "[a] Apply  [q] Close",
+  }, vim.api.nvim_buf_get_lines(card_buf, 0, -1, true))
+
+  local highlights = {}
+  for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(card_buf, -1, 0, -1, { details = true })) do
+    if mark[4].hl_group then
+      highlights[#highlights + 1] = {
+        row = mark[2],
+        start_col = mark[3],
+        end_col = mark[4].end_col,
+        group = mark[4].hl_group,
+      }
+    end
+  end
+  harness.equal({
+    { row = 2, start_col = 5, end_col = 8, group = "RefineDeletion" },
+    { row = 3, start_col = 0, end_col = 2, group = "RefineAddition" },
+  }, highlights)
+  host:deactivate()
+end)
+
+harness.test("does not add a body row for an empty diff", function()
+  local host = present({
+    diff = {},
+    available_actions = { "apply" },
+  })
+
+  harness.equal({
+    "English (American) · On-Device",
+    "",
+    "",
+    "[a] Apply  [q] Close",
+  }, vim.api.nvim_buf_get_lines(card_buffer(host), 0, -1, true))
   host:deactivate()
 end)
 

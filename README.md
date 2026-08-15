@@ -18,6 +18,8 @@ or connect your own AI provider.
 
 Review each suggestion through native Neovim highlights and floating cards,
 ask for an explanation, and apply the correction as one undoable edit.
+Card diffs keep word replacements inline: additions are bold, deletions carry
+a visible midline, and changed whitespace is marked when enabled.
 
 [Refine](https://refine.sh) supplies the models, languages, checking policy,
 and writing settings. `refine.nvim` supplies the native editor experience. The

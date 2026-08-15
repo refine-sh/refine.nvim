@@ -233,8 +233,7 @@ harness.test("bounds an overflowing focused card to the owner window", function(
   local config = vim.api.nvim_win_get_config(card_win)
   harness.equal(true, config.width <= math.max(1, math.floor(vim.api.nvim_win_get_width(owner_win) * 0.8)))
   harness.equal(true, config.height <= math.max(1, math.floor(vim.api.nvim_win_get_height(owner_win) * 0.5)))
-  local card_buf = vim.api.nvim_win_get_buf(card_win)
-  harness.equal(true, vim.api.nvim_buf_line_count(card_buf) > config.height)
+  harness.equal(true, vim.api.nvim_win_text_height(card_win, {}).all > config.height)
   harness.equal(true, vim.wo[card_win].wrap)
 
   local first_topline = vim.api.nvim_win_call(card_win, function()

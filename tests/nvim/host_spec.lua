@@ -369,8 +369,7 @@ harness.test("shows a suggestion card without focus and focuses it on repeat", f
   harness.equal({
     "English (American) · On-Device",
     "",
-    "- are",
-    "+ is",
+    "areis",
     "",
     "[a] Apply  [d] Dismiss  [e] Explain  [r] Report  [q] Close",
   }, vim.api.nvim_buf_get_lines(card_buf, 0, -1, true))

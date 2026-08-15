@@ -67,6 +67,8 @@ local action_labels = {
   explain = "Explain",
   report = "Report",
 }
+local combining_long_stroke = vim.fn.nr2char(0x0336)
+local maximum_midline_graphemes = 4096
 
 local function notify_action_failure(kind, status, reason)
   local label = action_labels[kind] or "Action"
@@ -103,8 +105,11 @@ local function define_highlights(appearance)
   local style = appearance.highlight.style
   vim.api.nvim_set_hl(0, "RefineGrammar", highlight_attributes(style, appearance.highlight.grammarColor))
   vim.api.nvim_set_hl(0, "RefineFluency", highlight_attributes(style, appearance.highlight.fluencyColor))
-  vim.api.nvim_set_hl(0, "RefineAddition", { fg = color_number(appearance.diff.additionColor) })
-  vim.api.nvim_set_hl(0, "RefineDeletion", { fg = color_number(appearance.diff.deletionColor) })
+  vim.api.nvim_set_hl(0, "RefineAddition", { fg = color_number(appearance.diff.additionColor), bold = true })
+  vim.api.nvim_set_hl(0, "RefineDeletion", {
+    fg = color_number(appearance.diff.deletionColor),
+    strikethrough = true,
+  })
 end
 
 local function define_active_highlight()
@@ -172,24 +177,56 @@ local function visible_whitespace(text)
   return text:gsub("\t", "→"):gsub(" ", "·")
 end
 
+local function add_deletion_midlines(midlines, row, start_col, text, remaining)
+  local byte_col = start_col
+  local prefix = vim.fn.strcharpart(text, 0, remaining, true)
+  for _, grapheme in ipairs(vim.fn.split(prefix, "\\zs")) do
+    if grapheme ~= "\t" then
+      midlines[#midlines + 1] = {
+        row = row,
+        col = byte_col,
+        text = grapheme .. combining_long_stroke,
+      }
+    end
+    byte_col = byte_col + #grapheme
+    remaining = remaining - 1
+  end
+  return remaining
+end
+
 local function card_content(suggestion, feedback, interaction, appearance)
   local lines = {
     ("%s · %s"):format(suggestion.attribution.languageDisplayName, suggestion.attribution.checkModelDisplayName),
     "",
   }
   local highlights = {}
+  local midlines = {}
+  local remaining_midlines = maximum_midline_graphemes
+  local body_started = false
   for _, run in ipairs(suggestion.diff) do
     if run.text ~= "" or run.kind ~= "unchanged" then
-      local prefix = run.kind == "delete" and "- " or run.kind == "insert" and "+ " or "  "
       local group = run.kind == "delete" and "RefineDeletion" or run.kind == "insert" and "RefineAddition" or nil
-      for _, part in ipairs(vim.split(run.text, "\n", { plain = true, trimempty = false })) do
+      local parts = vim.split(run.text, "\n", { plain = true, trimempty = false })
+      for index, part in ipairs(parts) do
+        if not body_started or index > 1 then
+          lines[#lines + 1] = ""
+          body_started = true
+        end
         if group and appearance.diff.showHiddenWhitespace then
           part = visible_whitespace(part)
+          if index < #parts then
+            part = part .. "↵"
+          end
         end
-        lines[#lines + 1] = prefix .. part
-        if group then
+        local start_col = #lines[#lines]
+        lines[#lines] = lines[#lines] .. part
+        if group and part ~= "" then
+          if run.kind == "delete" then
+            remaining_midlines = add_deletion_midlines(midlines, #lines - 1, start_col, part, remaining_midlines)
+          end
           highlights[#highlights + 1] = {
             row = #lines - 1,
+            start_col = start_col,
             end_col = #lines[#lines],
             group = group,
           }
@@ -253,15 +290,23 @@ local function card_content(suggestion, feedback, interaction, appearance)
     end_col = close_start + #close_text,
   }
   lines[#lines + 1] = footer
-  return { lines = lines, highlights = highlights, targets = targets }
+  return { lines = lines, highlights = highlights, midlines = midlines, targets = targets }
 end
 
 local function apply_card_highlights(bufnr, content)
   vim.api.nvim_buf_clear_namespace(bufnr, card_namespace, 0, -1)
   for _, highlight in ipairs(content.highlights) do
-    vim.api.nvim_buf_set_extmark(bufnr, card_namespace, highlight.row, 0, {
+    vim.api.nvim_buf_set_extmark(bufnr, card_namespace, highlight.row, highlight.start_col, {
       end_col = highlight.end_col,
       hl_group = highlight.group,
+    })
+  end
+  for _, midline in ipairs(content.midlines) do
+    vim.api.nvim_buf_set_extmark(bufnr, card_namespace, midline.row, midline.col, {
+      virt_text = { { midline.text, "RefineDeletion" } },
+      virt_text_pos = "overlay",
+      virt_text_hide = true,
+      hl_mode = "combine",
     })
   end
 end

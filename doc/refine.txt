@@ -256,6 +256,12 @@ within the same source revision, check generation, and suggestion preserves
 the card, focus, streamed explanation, inline feedback, and newest actions,
 keys, and appearance.
 
+Diff runs follow their natural text flow inside the card, so word replacements
+appear inline and long text wraps normally. Additions are bold in the configured
+addition color; deletions use the configured deletion color and a combining-glyph
+midline fallback when terminals do not render native strikethrough. Changed
+whitespace uses visible markers when that appearance option is enabled.
+
 The card anchors to the first visible rendered row inside a suggestion
 highlight, prefers below then above, and clamps and wraps in small windows.
 Focused cards scroll with normal Neovim motions. Streaming follows the bottom

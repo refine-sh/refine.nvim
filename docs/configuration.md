@@ -201,6 +201,12 @@ The card opens without taking editor focus. Call `:RefineShow` again to focus
 it. Moving away, changing the source, switching its owning window, or
 superseding its suggestion closes it.
 
+Diff runs follow their natural text flow inside the card, so word replacements
+appear inline and long text wraps normally. Additions are bold in the configured
+addition color; deletions use the configured deletion color and a combining-glyph
+midline fallback when terminals do not render native strikethrough. Changed
+whitespace uses visible markers when that appearance option is enabled.
+
 The action mappings and footer entries are available only when their action is
 live:
 
