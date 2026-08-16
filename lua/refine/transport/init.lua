@@ -6,7 +6,28 @@ local wire = require("refine.transport.wire")
 
 local M = {}
 
+local HANDSHAKE_TIMEOUT_MS = 5000
 local MAX_WAITING_COMMANDS = 128
+
+local function default_delay(milliseconds, callback)
+  local timer = vim.uv.new_timer()
+  timer:start(
+    milliseconds,
+    0,
+    vim.schedule_wrap(function()
+      if not timer:is_closing() then
+        timer:close()
+      end
+      callback()
+    end)
+  )
+  return function()
+    if not timer:is_closing() then
+      timer:stop()
+      timer:close()
+    end
+  end
+end
 
 local function nonempty_string(value, label)
   if type(value) ~= "string" or value == "" then
@@ -284,6 +305,7 @@ function M.new(options)
     host_capabilities = vim.deepcopy(host_capabilities),
     endpoint_locator = options.endpoint_locator or endpoint.locator(),
     connector = options.connector or unix.connector(),
+    delay = options.delay or default_delay,
     id_generator = options.uuid or uuid.v4,
   }
 
@@ -296,11 +318,13 @@ function M.new(options)
       errors.raise("TransportProtocolError", "run_id must be at most 128 UTF-8 bytes", "fatal", nil, 2)
     end
     local callback_used = false
+    local cancel_handshake_timeout = function() end
     local function finish(err, session)
       if callback_used then
         return
       end
       callback_used = true
+      cancel_handshake_timeout()
       callback(err, session)
     end
 
@@ -317,7 +341,21 @@ function M.new(options)
 
         local session
         local welcomed = false
+        cancel_handshake_timeout = self.delay(HANDSHAKE_TIMEOUT_MS, function()
+          if callback_used then
+            return
+          end
+          finish(errors.new("EngineConnectionError", "Timed out waiting for Refine welcome", "recoverable"))
+          connection:close()
+        end)
+        if callback_used then
+          cancel_handshake_timeout()
+          return
+        end
         connection:receive(function(frame)
+          if callback_used and not welcomed then
+            return
+          end
           if welcomed then
             session:_accept_frame(frame)
             return
@@ -342,6 +380,9 @@ function M.new(options)
           session = Session.new(connection, response, self.id_generator)
           finish(nil, session)
         end, function(stream_error)
+          if callback_used and not welcomed then
+            return
+          end
           if welcomed then
             session:_end(
               stream_error or errors.new("EngineConnectionError", "Refine closed the connection", "recoverable")
@@ -349,7 +390,7 @@ function M.new(options)
           else
             finish(
               stream_error
-                or errors.new("TransportProtocolError", "Refine closed the connection before welcome", "fatal")
+                or errors.new("EngineConnectionError", "Refine closed the connection before welcome", "recoverable")
             )
           end
         end)
@@ -367,6 +408,9 @@ function M.new(options)
           hello.frontend = vim.deepcopy(self.frontend)
         end
         connection:send(hello, function(send_error)
+          if callback_used then
+            return
+          end
           if send_error then
             connection:close()
             finish(send_error)

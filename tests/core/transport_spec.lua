@@ -330,6 +330,35 @@ describe("Refine Protocol 2.4 transport", function()
     assert_equal("recoverable", connect_error.recoverability)
   end)
 
+  it("keeps a malformed handshake response fatal", function()
+    local transport = require("refine.transport")
+    local fixture = fake_transport_fixture({
+      handshake = {
+        type = "welcome",
+        protocol = { major = 2, minor = 4 },
+        serverEpoch = "",
+        runResumed = false,
+        limits = { maxFrameBytes = 8388608, maxSources = 2 },
+        capabilities = {},
+      },
+    })
+    local client = transport.new({
+      client = { id = "refine-neovim", version = "0.1.0", host = "neovim" },
+      host_capabilities = { interceptableSuggestionActionKeys = {} },
+      endpoint_locator = fixture.locator,
+      connector = fixture.connector,
+    })
+    local connect_error
+
+    client:connect({ run_id = "run-1" }, function(err)
+      connect_error = err
+    end)
+
+    assert_equal("TransportProtocolError", connect_error.kind)
+    assert_equal("fatal", connect_error.recoverability)
+    assert_equal(true, fixture.is_closed())
+  end)
+
   it("reports the required update for exact-minor handshake mismatches", function()
     local transport = require("refine.transport")
     for _, case in ipairs({
@@ -392,7 +421,7 @@ describe("Refine Protocol 2.4 transport", function()
     assert_equal("server", connect_error.required_update)
   end)
 
-  it("treats a pre-welcome close as a fatal ambiguous handshake failure", function()
+  it("treats a pre-welcome close as a recoverable connection failure", function()
     local transport = require("refine.transport")
     local on_end
     local connection = {
@@ -427,7 +456,123 @@ describe("Refine Protocol 2.4 transport", function()
     client:connect({ run_id = "run-1" }, function(err)
       connect_error = err
     end)
-    assert_equal("TransportProtocolError", connect_error.kind)
-    assert_equal("fatal", connect_error.recoverability)
+    assert_equal("EngineConnectionError", connect_error.kind)
+    assert_equal("recoverable", connect_error.recoverability)
+  end)
+
+  it("times out a silent pre-welcome connection once and closes it", function()
+    local transport = require("refine.transport")
+    local on_end
+    local scheduled_delay_ms
+    local fire_timeout
+    local finish_send
+    local close_count = 0
+    local connection = {
+      receive = function(_, _, finish)
+        on_end = finish
+      end,
+      send = function(_, _, done)
+        finish_send = done
+      end,
+      close = function()
+        close_count = close_count + 1
+      end,
+    }
+    local client = transport.new({
+      client = { id = "refine-neovim", version = "0.1.0", host = "neovim" },
+      host_capabilities = { interceptableSuggestionActionKeys = {} },
+      endpoint_locator = {
+        locate = function(_, done)
+          done(nil, {
+            socketPath = "/private/tmp/refine/server.sock",
+            launchToken = "secret-1",
+            serverEpoch = "epoch-1",
+          })
+        end,
+      },
+      connector = {
+        connect = function(_, _, done)
+          done(nil, connection)
+        end,
+      },
+      delay = function(milliseconds, callback)
+        scheduled_delay_ms = milliseconds
+        fire_timeout = callback
+        return function() end
+      end,
+    })
+    local callback_count = 0
+    local connect_error
+    client:connect({ run_id = "run-1" }, function(err)
+      callback_count = callback_count + 1
+      connect_error = err
+    end)
+
+    assert_equal(5000, scheduled_delay_ms)
+    fire_timeout()
+    assert_equal("EngineConnectionError", connect_error.kind)
+    assert_equal("recoverable", connect_error.recoverability)
+    assert_equal("Timed out waiting for Refine welcome", connect_error.message)
+    assert_equal(1, callback_count)
+    assert_equal(1, close_count)
+
+    on_end(nil)
+    finish_send({ message = "late send failure" })
+    assert_equal(1, callback_count)
+    assert_equal(1, close_count)
+  end)
+
+  it("does not start handshake I/O after a synchronous deadline", function()
+    local transport = require("refine.transport")
+    local receive_count = 0
+    local send_count = 0
+    local close_count = 0
+    local connection = {
+      receive = function()
+        receive_count = receive_count + 1
+      end,
+      send = function()
+        send_count = send_count + 1
+      end,
+      close = function()
+        close_count = close_count + 1
+      end,
+    }
+    local client = transport.new({
+      client = { id = "refine-neovim", version = "0.1.0", host = "neovim" },
+      host_capabilities = { interceptableSuggestionActionKeys = {} },
+      endpoint_locator = {
+        locate = function(_, done)
+          done(nil, {
+            socketPath = "/private/tmp/refine/server.sock",
+            launchToken = "secret-1",
+            serverEpoch = "epoch-1",
+          })
+        end,
+      },
+      connector = {
+        connect = function(_, _, done)
+          done(nil, connection)
+        end,
+      },
+      delay = function(_, callback)
+        callback()
+        return function() end
+      end,
+    })
+    local callback_count = 0
+    local connect_error
+
+    client:connect({ run_id = "run-1" }, function(err)
+      callback_count = callback_count + 1
+      connect_error = err
+    end)
+
+    assert_equal("EngineConnectionError", connect_error.kind)
+    assert_equal("recoverable", connect_error.recoverability)
+    assert_equal(1, callback_count)
+    assert_equal(1, close_count)
+    assert_equal(0, receive_count)
+    assert_equal(0, send_count)
   end)
 end)
