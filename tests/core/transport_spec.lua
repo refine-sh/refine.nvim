@@ -502,9 +502,11 @@ describe("Refine Protocol 2.4 transport", function()
       end,
     })
     local callback_count = 0
+    local close_count_when_callback_ran
     local connect_error
     client:connect({ run_id = "run-1" }, function(err)
       callback_count = callback_count + 1
+      close_count_when_callback_ran = close_count
       connect_error = err
     end)
 
@@ -515,6 +517,7 @@ describe("Refine Protocol 2.4 transport", function()
     assert_equal("Timed out waiting for Refine welcome", connect_error.message)
     assert_equal(1, callback_count)
     assert_equal(1, close_count)
+    assert_equal(1, close_count_when_callback_ran)
 
     on_end(nil)
     finish_send({ message = "late send failure" })

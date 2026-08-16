@@ -345,8 +345,12 @@ function M.new(options)
           if callback_used then
             return
           end
-          finish(errors.new("EngineConnectionError", "Timed out waiting for Refine welcome", "recoverable"))
+          local timeout_error =
+            errors.new("EngineConnectionError", "Timed out waiting for Refine welcome", "recoverable")
+          callback_used = true
+          cancel_handshake_timeout()
           connection:close()
+          callback(timeout_error)
         end)
         if callback_used then
           cancel_handshake_timeout()
