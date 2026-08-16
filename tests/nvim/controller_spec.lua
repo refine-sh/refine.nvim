@@ -228,10 +228,13 @@ harness.test("updates source syntax in the existing buffer session", function()
   set_syntax("latexDocument")
   controller:reconcile(bufnr, vim.api.nvim_get_current_win())
   harness.equal(1, #runs)
-  local observation = runs[1].observations[#runs[1].observations]
-  harness.equal("snapshot", observation.type)
-  harness.equal("latexDocument", observation.snapshot.sources[1].sourceSyntax)
-  harness.equal(false, first_revision == observation.snapshot.revision)
+  local snapshot = runs[1].observations[#runs[1].observations - 1]
+  local attention = runs[1].observations[#runs[1].observations]
+  harness.equal("snapshot", snapshot.type)
+  harness.equal("latexDocument", snapshot.snapshot.sources[1].sourceSyntax)
+  harness.equal(false, first_revision == snapshot.snapshot.revision)
+  harness.equal("attentionChanged", attention.type)
+  harness.equal(snapshot.snapshot.revision, attention.revision)
 end)
 
 harness.test("launches Refine only for an explicit disconnected check", function()
@@ -523,9 +526,11 @@ harness.test("reconciles the caret view in the same buffer and a new owner windo
   local first_win = vim.api.nvim_get_current_win()
   controller:reconcile(bufnr, first_win)
   local reconciliations = 0
+  local reconciled_windows = {}
   local suspensions = 0
-  runs[1].host.reconcile_view = function()
+  runs[1].host.reconcile_view = function(_, winid)
     reconciliations = reconciliations + 1
+    reconciled_windows[#reconciled_windows + 1] = winid
   end
   runs[1].host.suspend_view = function()
     suspensions = suspensions + 1
@@ -540,8 +545,20 @@ harness.test("reconciles the caret view in the same buffer and a new owner windo
   harness.equal(bufnr, vim.api.nvim_win_get_buf(second_win))
   harness.equal(true, controller:reconcile(bufnr, second_win))
   harness.equal(2, reconciliations)
+  harness.equal({ first_win, second_win }, reconciled_windows)
   harness.equal(1, suspensions)
   harness.equal(1, #runs)
+end)
+
+harness.test("binds a new host to the reconciled editor window", function()
+  local controller, runs = fixture()
+  local bufnr = eligible_buffer("Lifecycle")
+  local editor_win = vim.api.nvim_get_current_win()
+  vim.cmd("belowright split")
+  harness.equal(false, editor_win == vim.api.nvim_get_current_win())
+
+  harness.equal(true, controller:reconcile(bufnr, editor_win))
+  harness.equal(editor_win, runs[1].host.winid)
 end)
 
 harness.test("keeps ordinary reconciliation suspended until an explicit view resume", function()

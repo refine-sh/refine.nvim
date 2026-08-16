@@ -98,6 +98,7 @@ function Run.new(options, input)
     engine_port = options.engine_port,
     reconnect_delay_ms = options.reconnect_delay_ms or 1000,
     delay = options.delay or default_delay,
+    schedule = options.schedule or vim.schedule,
     id_generator = options.uuid or uuid.v4,
     host = input.host,
     on_error = input.on_error or function() end,
@@ -113,6 +114,10 @@ function Run.new(options, input)
     pending_replace = nil,
     detach_observer = nil,
     latest_snapshot = nil,
+    latest_attention = nil,
+    pending_attention = nil,
+    attention_flush_scheduled = false,
+    last_sent_attention = nil,
     retired_revisions = {},
     pending_check = nil,
     current_check_id = nil,
@@ -427,6 +432,9 @@ function Run:_complete_host_apply(action_id, transaction_id, request)
         and latest_queued.revision == self.latest_snapshot.revision
       then
         self:_queue_replace(latest_queued)
+      else
+        self:_flush_attention()
+        self:_send_pending_check()
       end
       if outcome.status == "indeterminate" and outcome.snapshot == nil then
         self:_restart_observation()
@@ -645,6 +653,9 @@ function Run:_accept_snapshot(snapshot)
     return
   end
   self.latest_snapshot = vim.deepcopy(snapshot)
+  self.latest_attention = nil
+  self.pending_attention = nil
+  self.last_sent_attention = nil
   self.pending_check = nil
   self.current_check_id = nil
   self.current_check_lineage_id = nil
@@ -665,6 +676,66 @@ function Run:_accept_snapshot(snapshot)
   end
 end
 
+function Run:_flush_attention()
+  local command = self.pending_attention
+  if not command then
+    return true
+  end
+  if not self.latest_snapshot or command.revision ~= self.latest_snapshot.revision then
+    self.pending_attention = nil
+    return true
+  end
+  if
+    not self.session
+    or not self.document_opened
+    or self.opening_document
+    or self.replace_in_flight
+    or self.pending_replace ~= nil
+    or self.apply_lease_action_id
+  then
+    return false
+  end
+  self.pending_attention = nil
+  if vim.deep_equal(command, self.last_sent_attention) then
+    return true
+  end
+  self.last_sent_attention = vim.deepcopy(command)
+  self:_send(vim.deepcopy(command))
+  return true
+end
+
+function Run:_schedule_attention_flush()
+  if self.attention_flush_scheduled then
+    return
+  end
+  self.attention_flush_scheduled = true
+  self.schedule(function()
+    self.attention_flush_scheduled = false
+    if self.running then
+      self:_flush_attention()
+    end
+  end)
+end
+
+function Run:_accept_attention(observation)
+  if not self.latest_snapshot or observation.revision ~= self.latest_snapshot.revision then
+    return
+  end
+  local command = {
+    type = "updateAttention",
+    revision = observation.revision,
+    attention = vim.deepcopy(observation.attention),
+  }
+  local valid, validation_error = pcall(wire.validate_command, command)
+  if not valid then
+    self:_fatal(host_error("WritingHost emitted invalid writing attention", validation_error))
+    return
+  end
+  self.latest_attention = command
+  self.pending_attention = command
+  self:_schedule_attention_flush()
+end
+
 function Run:_validate_check_observation(observation)
   if type(observation.revision) ~= "string" or observation.revision == "" then
     error(host_error("WritingHost emitted an invalid check revision"), 0)
@@ -682,6 +753,7 @@ function Run:_validate_check_observation(observation)
 end
 
 function Run:_accept_check(observation)
+  self:_flush_attention()
   local ok, validation_error = pcall(self._validate_check_observation, self, observation)
   if not ok then
     self:_fatal(validation_error)
@@ -715,7 +787,10 @@ function Run:_accept_observation(observation)
   if type(observation) ~= "table" then
     self:_fatal(host_error("WritingHost emitted a malformed observation"))
   elseif observation.type == "snapshot" then
+    self:_flush_attention()
     self:_accept_snapshot(observation.snapshot)
+  elseif observation.type == "attentionChanged" then
+    self:_accept_attention(observation)
   elseif observation.type == "checkRequested" then
     self:_accept_check(observation)
   else
@@ -839,6 +914,14 @@ function Run:_connect()
     self.opening_document = false
     self.replace_in_flight = false
     self.pending_replace = nil
+    self.last_sent_attention = nil
+    if
+      self.latest_attention
+      and self.latest_snapshot
+      and self.latest_attention.revision == self.latest_snapshot.revision
+    then
+      self.pending_attention = vim.deepcopy(self.latest_attention)
+    end
     self:_emit_state({ state = "connected" })
     local observing, observe_error = pcall(session.events, session, function(envelope)
       self:_accept_engine_event(envelope)
@@ -960,6 +1043,7 @@ function Run:_open_latest_snapshot()
       if self.latest_snapshot.revision ~= opened_snapshot.revision then
         self:_queue_replace(self.latest_snapshot)
       else
+        self:_flush_attention()
         self:_send_pending_check()
       end
     end
@@ -983,6 +1067,7 @@ function Run:_queue_replace(snapshot)
     if pending and self.session and self.document_opened then
       self:_queue_replace(pending)
     else
+      self:_flush_attention()
       self:_send_pending_check()
     end
   end)
@@ -998,9 +1083,14 @@ function Run:_send_pending_check()
     or pending.command_id
     or not self.session
     or not self.document_opened
+    or self.apply_lease_action_id
+    or self.replace_in_flight
     or self.pending_replace ~= nil
     or pending.revision ~= self.latest_snapshot.revision
   then
+    return
+  end
+  if not self:_flush_attention() then
     return
   end
   local command_id = self.id_generator()

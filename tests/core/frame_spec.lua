@@ -115,4 +115,48 @@ describe("length-prefixed JSON frames", function()
       wire.validate_command(command("mixed"))
     end)
   end)
+
+  it("accepts the exact Protocol 2.5 writing-attention command", function()
+    local wire = require("refine.transport.wire")
+    local command = {
+      type = "updateAttention",
+      revision = "revision-1",
+      attention = {
+        sourceId = "document",
+        caretOffset = 3,
+        visibleRanges = {
+          { location = 0, length = 5 },
+          { location = 12, length = 4 },
+        },
+      },
+    }
+
+    wire.validate_command(command)
+
+    local function rejects(mutator, message)
+      local invalid = vim.deepcopy(command)
+      mutator(invalid)
+      assert_raises(message, function()
+        wire.validate_command(invalid)
+      end)
+    end
+    rejects(function(value)
+      value.revision = ""
+    end, "updateAttention.revision must be a nonempty string")
+    rejects(function(value)
+      value.attention.caretOffset = -1
+    end, "caretOffset must be a nonnegative integer")
+    rejects(function(value)
+      value.attention.visibleRanges[1].length = 0
+    end, "visibleRanges item must be nonempty")
+    rejects(function(value)
+      value.attention.visibleRanges[2].location = 4
+    end, "visibleRanges must be ordered and non%-overlapping")
+    rejects(function(value)
+      value.attention.unexpected = true
+    end, "writing attention contains an unknown field")
+
+    assert_equal(2, wire.PROTOCOL_MAJOR)
+    assert_equal(5, wire.PROTOCOL_MINOR)
+  end)
 end)

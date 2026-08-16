@@ -197,6 +197,30 @@ local function check_intent(value)
   return value
 end
 
+local function writing_attention(value)
+  value = record(value, "writing attention")
+  local allowed = { sourceId = true, caretOffset = true, visibleRanges = true }
+  for key in pairs(value) do
+    if not allowed[key] then
+      fail("writing attention contains an unknown field")
+    end
+  end
+  nonempty_string(value.sourceId, "writing attention.sourceId")
+  if value.caretOffset ~= nil and (not is_integer(value.caretOffset) or value.caretOffset < 0) then
+    fail("writing attention.caretOffset must be a nonnegative integer")
+  end
+  local ranges = list(value.visibleRanges, "writing attention.visibleRanges")
+  local previous_end = 0
+  for index, item in ipairs(ranges) do
+    local visible = range(item, "writing attention.visibleRanges item", true)
+    if index > 1 and visible.location < previous_end then
+      fail("writing attention.visibleRanges must be ordered and non-overlapping")
+    end
+    previous_end = visible.location + visible.length
+  end
+  return value
+end
+
 local function apply_outcome(value)
   value = record(value, "Apply outcome")
   if value.status == "applied" then
@@ -227,6 +251,9 @@ function M.validate_command(value)
   value = record(value, "client command")
   if value.type == "openDocument" or value.type == "replaceDocument" then
     snapshot(value.snapshot, value.type .. ".snapshot")
+  elseif value.type == "updateAttention" then
+    nonempty_string(value.revision, "updateAttention.revision")
+    writing_attention(value.attention)
   elseif value.type == "requestCheck" then
     nonempty_string(value.revision, "requestCheck.revision")
     if value.intent ~= nil then

@@ -64,9 +64,25 @@
       }
     }
   },
-  "selectionCheck": {
+  "updateAttention": {
     "type": "command",
     "sequence": 2,
+    "id": "command-attention",
+    "command": {
+      "type": "updateAttention",
+      "revision": "fixture:0",
+      "attention": {
+        "sourceId": "document",
+        "caretOffset": 21,
+        "visibleRanges": [
+          { "location": 0, "length": 23 }
+        ]
+      }
+    }
+  },
+  "selectionCheck": {
+    "type": "command",
+    "sequence": 3,
     "id": "command-selection-check",
     "command": {
       "type": "requestCheck",
@@ -248,7 +264,7 @@
   },
   "completeApply": {
     "type": "command",
-    "sequence": 3,
+    "sequence": 4,
     "id": "command-receipt",
     "command": {
       "type": "completeApply",

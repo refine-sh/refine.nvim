@@ -291,6 +291,7 @@ function Controller:_start(bufnr, winid, source_syntax)
   })
   run.host = self.host_factory({
     bufnr = bufnr,
+    winid = winid,
     run_id = self.uuid(),
     source_syntax = source_syntax,
     on_presentation = function(snapshot)
@@ -372,7 +373,7 @@ function Controller:reconcile(bufnr, winid)
       self.run.winid = winid
     end
     if not self.view_suspended then
-      self.run.host:reconcile_view()
+      self.run.host:reconcile_view(winid)
     end
     return true
   end

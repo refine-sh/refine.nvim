@@ -12,6 +12,15 @@ describe("integration protocol 2.5 golden transcript", function()
       { sourceId = "document", range = { location = 8, length = 2 } },
       fixture.selectionCheck.command.intent.selection
     )
+    assert_equal({
+      type = "updateAttention",
+      revision = "fixture:0",
+      attention = {
+        sourceId = "document",
+        caretOffset = 21,
+        visibleRanges = { { location = 0, length = 23 } },
+      },
+    }, fixture.updateAttention.command)
     assert_equal(fixture.welcome, wire.decode_handshake(fixture.welcome))
     assert_equal(fixture.presentation, wire.decode_event(fixture.presentation))
     assert_equal(fixture.applyRequested, wire.decode_event(fixture.applyRequested))
@@ -110,11 +119,15 @@ describe("integration protocol 2.5 golden transcript", function()
     session:send(fixture.openDocument.command, fixture.openDocument.id, function(err)
       assert_equal(nil, err)
     end)
+    session:send(fixture.updateAttention.command, fixture.updateAttention.id, function(err)
+      assert_equal(nil, err)
+    end)
     session:send(fixture.selectionCheck.command, fixture.selectionCheck.id, function(err)
       assert_equal(nil, err)
     end)
     assert_equal(fixture.openDocument, sent[2])
-    assert_equal(fixture.selectionCheck, sent[3])
+    assert_equal(fixture.updateAttention, sent[3])
+    assert_equal(fixture.selectionCheck, sent[4])
 
     local events = {}
     session:events(function(value)
@@ -130,7 +143,7 @@ describe("integration protocol 2.5 golden transcript", function()
     session:send(fixture.completeApply.command, fixture.completeApply.id, function(err)
       assert_equal(nil, err)
     end)
-    assert_equal(fixture.completeApply, sent[4])
+    assert_equal(fixture.completeApply, sent[5])
   end)
 
   it("accepts writing-check entitlement as an unavailable presentation reason", function()

@@ -329,6 +329,128 @@ describe("host-neutral Refine integration runtime", function()
     assert_equal({}, fixture.errors)
   end)
 
+  it("holds result attention and an explicit check behind the Apply receipt", function()
+    local fixture = runtime_fixture()
+    local finish_apply
+    fixture.set_apply(function(_, done)
+      finish_apply = done
+    end)
+    fixture.event(1, {
+      type = "presentationContentReplaced",
+      checkId = "check-1",
+      content = suggestion_content(),
+    }, fixture.commands[1].id)
+    fixture.presentations[#fixture.presentations].actions.apply("suggestion-1", function() end)
+    local perform = fixture.commands[2]
+    fixture.event(2, {
+      type = "applyRequested",
+      actionId = perform.command.actionId,
+      transactionId = "transaction-attention",
+      request = {
+        expectedRevision = "doc:0",
+        sourceId = "document",
+        edits = { { range = { location = 7, length = 2 }, expectedText = "an", replacement = "a" } },
+      },
+    }, perform.id)
+
+    local updated = source("doc:1", "create a link.")
+    fixture.observe({ type = "snapshot", snapshot = updated })
+    fixture.observe({
+      type = "attentionChanged",
+      revision = "doc:1",
+      attention = {
+        sourceId = "document",
+        caretOffset = 8,
+        visibleRanges = { { location = 0, length = 14 } },
+      },
+    })
+    fixture.observe({ type = "checkRequested", revision = "doc:1" })
+    assert_equal(
+      { "openDocument", "performAction" },
+      vim.tbl_map(function(item)
+        return item.command.type
+      end, fixture.commands)
+    )
+
+    finish_apply(nil, { status = "applied", snapshot = updated })
+    assert_equal(
+      { "openDocument", "performAction", "completeApply", "updateAttention", "requestCheck" },
+      vim.tbl_map(function(item)
+        return item.command.type
+      end, fixture.commands)
+    )
+    assert_equal(8, fixture.commands[4].command.attention.caretOffset)
+  end)
+
+  it("orders a genuinely later snapshot before its matching attention after Apply", function()
+    local fixture = runtime_fixture()
+    local finish_apply
+    fixture.set_apply(function(_, done)
+      finish_apply = done
+    end)
+    fixture.event(1, {
+      type = "presentationContentReplaced",
+      checkId = "check-1",
+      content = suggestion_content(),
+    }, fixture.commands[1].id)
+    fixture.presentations[#fixture.presentations].actions.apply("suggestion-1", function() end)
+    local perform = fixture.commands[2]
+    fixture.event(2, {
+      type = "applyRequested",
+      actionId = perform.command.actionId,
+      transactionId = "transaction-later-attention",
+      request = {
+        expectedRevision = "doc:0",
+        sourceId = "document",
+        edits = { { range = { location = 7, length = 2 }, expectedText = "an", replacement = "a" } },
+      },
+    }, perform.id)
+
+    local result = source("doc:1", "create a link.")
+    fixture.observe({ type = "snapshot", snapshot = result })
+    fixture.observe({
+      type = "attentionChanged",
+      revision = "doc:1",
+      attention = {
+        sourceId = "document",
+        caretOffset = 8,
+        visibleRanges = { { location = 0, length = 14 } },
+      },
+    })
+    local later = source("doc:2", "create a better link.")
+    fixture.observe({ type = "snapshot", snapshot = later })
+    fixture.observe({
+      type = "attentionChanged",
+      revision = "doc:2",
+      attention = {
+        sourceId = "document",
+        caretOffset = 17,
+        visibleRanges = { { location = 0, length = 21 } },
+      },
+    })
+    fixture.observe({ type = "checkRequested", revision = "doc:2" })
+
+    finish_apply(nil, { status = "applied", snapshot = result })
+    assert_equal(
+      {
+        "openDocument",
+        "performAction",
+        "completeApply",
+        "replaceDocument",
+        "updateAttention",
+        "requestCheck",
+      },
+      vim.tbl_map(function(item)
+        return item.command.type
+      end, fixture.commands)
+    )
+    assert_equal("doc:1", fixture.commands[3].command.outcome.snapshot.revision)
+    assert_equal("doc:2", fixture.commands[4].command.snapshot.revision)
+    assert_equal("doc:2", fixture.commands[5].command.revision)
+    assert_equal(17, fixture.commands[5].command.attention.caretOffset)
+    assert_equal("doc:2", fixture.commands[6].command.revision)
+  end)
+
   it("validates and explicitly dismisses a live suggestion", function()
     local fixture = runtime_fixture()
     fixture.event(1, {

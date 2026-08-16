@@ -8,6 +8,242 @@ package.path = table.concat({
 
 local harness = require("support.harness")
 
+harness.test("reports initial active-window attention in UTF-16 source coordinates", function()
+  vim.cmd.only()
+  vim.cmd.enew({ bang = true })
+  local bufnr = vim.api.nvim_get_current_buf()
+  local winid = vim.api.nvim_get_current_win()
+  vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, { "A😀 tail", "Second" })
+  vim.api.nvim_win_set_cursor(winid, { 1, 5 })
+
+  local host = require("refine.nvim.host").new({
+    bufnr = bufnr,
+    winid = winid,
+    source_syntax = "plainText",
+    run_id = "host-attention",
+  })
+  local observations = {}
+  local detach = host:observe(function(observation)
+    observations[#observations + 1] = observation
+  end, function() end)
+
+  harness.equal("snapshot", observations[1].type)
+  harness.equal({
+    type = "attentionChanged",
+    revision = "host-attention:1",
+    attention = {
+      sourceId = "document",
+      caretOffset = 3,
+      visibleRanges = { { location = 0, length = 15 } },
+    },
+  }, observations[2])
+  detach()
+end)
+
+harness.test("reports disjoint visible source ranges around closed folds", function()
+  vim.cmd.only()
+  vim.cmd.enew({ bang = true })
+  local bufnr = vim.api.nvim_get_current_buf()
+  local winid = vim.api.nvim_get_current_win()
+  vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, { "one", "two", "three", "four", "five", "six" })
+  vim.wo[winid].foldmethod = "manual"
+  vim.api.nvim_win_set_cursor(winid, { 2, 0 })
+  vim.cmd("2,4fold")
+
+  local host = require("refine.nvim.host").new({
+    bufnr = bufnr,
+    winid = winid,
+    source_syntax = "plainText",
+    run_id = "host-fold",
+  })
+  local observations = {}
+  local detach = host:observe(function(observation)
+    observations[#observations + 1] = observation
+  end, function() end)
+
+  harness.equal({
+    { location = 0, length = 8 },
+    { location = 19, length = 8 },
+  }, observations[2].attention.visibleRanges)
+
+  vim.cmd("normal! zo")
+  host:refresh_view()
+  harness.equal(
+    true,
+    vim.wait(1000, function()
+      return #observations >= 3
+    end)
+  )
+  harness.equal("host-fold:1", observations[3].revision)
+  harness.equal({ { location = 0, length = 27 } }, observations[3].attention.visibleRanges)
+  detach()
+end)
+
+harness.test("omits the caret for a noncollapsed native selection", function()
+  vim.cmd.only()
+  vim.cmd.enew({ bang = true })
+  local bufnr = vim.api.nvim_get_current_buf()
+  local winid = vim.api.nvim_get_current_win()
+  vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, { "selection" })
+  vim.api.nvim_win_set_cursor(winid, { 1, 0 })
+
+  local host = require("refine.nvim.host").new({
+    bufnr = bufnr,
+    winid = winid,
+    source_syntax = "plainText",
+    run_id = "host-selection",
+  })
+  local observations = {}
+  local detach = host:observe(function(observation)
+    observations[#observations + 1] = observation
+  end, function() end)
+
+  vim.cmd("normal! vl")
+  harness.equal(
+    true,
+    vim.wait(1000, function()
+      return #observations >= 3
+    end)
+  )
+  harness.equal(nil, observations[3].attention.caretOffset)
+
+  vim.api.nvim_feedkeys("\27", "x", false)
+  harness.equal(
+    true,
+    vim.wait(1000, function()
+      return #observations >= 4
+    end)
+  )
+  harness.equal(1, observations[4].attention.caretOffset)
+  detach()
+end)
+
+harness.test("coalesces raw caret movement without crossing an explicit-check barrier", function()
+  vim.cmd.only()
+  vim.cmd.enew({ bang = true })
+  local bufnr = vim.api.nvim_get_current_buf()
+  local winid = vim.api.nvim_get_current_win()
+  vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, { "movement" })
+
+  local host = require("refine.nvim.host").new({
+    bufnr = bufnr,
+    winid = winid,
+    source_syntax = "plainText",
+    run_id = "host-movement",
+  })
+  local snapshot_calls = 0
+  local snapshot = host.source.snapshot
+  host.source.snapshot = function(source)
+    snapshot_calls = snapshot_calls + 1
+    return snapshot(source)
+  end
+  local observations = {}
+  local detach = host:observe(function(observation)
+    observations[#observations + 1] = observation
+  end, function() end)
+  harness.equal(1, snapshot_calls)
+
+  vim.api.nvim_win_set_cursor(winid, { 1, 1 })
+  vim.api.nvim_exec_autocmds("CursorMoved", { buffer = bufnr, modeline = false })
+  vim.api.nvim_win_set_cursor(winid, { 1, 2 })
+  vim.api.nvim_exec_autocmds("CursorMoved", { buffer = bufnr, modeline = false })
+  harness.equal(2, #observations)
+  harness.equal(
+    true,
+    vim.wait(1000, function()
+      return #observations >= 3
+    end)
+  )
+  harness.equal(2, observations[3].attention.caretOffset)
+  harness.equal(1, snapshot_calls)
+
+  vim.api.nvim_win_set_cursor(winid, { 1, 3 })
+  vim.api.nvim_exec_autocmds("CursorMoved", { buffer = bufnr, modeline = false })
+  harness.equal(true, host:request_check({}))
+  harness.equal("attentionChanged", observations[4].type)
+  harness.equal(3, observations[4].attention.caretOffset)
+  harness.equal("checkRequested", observations[5].type)
+  harness.equal(2, snapshot_calls)
+  vim.wait(20)
+  harness.equal(5, #observations)
+  detach()
+end)
+
+harness.test("retains attention while suspended and refreshes from a new active window", function()
+  vim.cmd.only()
+  vim.cmd.enew({ bang = true })
+  local bufnr = vim.api.nvim_get_current_buf()
+  local first_win = vim.api.nvim_get_current_win()
+  vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, { "attention" })
+  vim.api.nvim_win_set_cursor(first_win, { 1, 1 })
+
+  local host = require("refine.nvim.host").new({
+    bufnr = bufnr,
+    winid = first_win,
+    source_syntax = "plainText",
+    run_id = "host-focus",
+  })
+  local observations = {}
+  local detach = host:observe(function(observation)
+    observations[#observations + 1] = observation
+  end, function() end)
+
+  host:suspend_view()
+  vim.api.nvim_win_set_cursor(first_win, { 1, 2 })
+  vim.api.nvim_exec_autocmds("CursorMoved", { buffer = bufnr, modeline = false })
+  vim.wait(20)
+  harness.equal(2, #observations)
+
+  vim.cmd("belowright split")
+  local second_win = vim.api.nvim_get_current_win()
+  vim.api.nvim_win_set_cursor(second_win, { 1, 4 })
+  host:reconcile_view(second_win)
+  harness.equal(
+    true,
+    vim.wait(1000, function()
+      return #observations >= 3
+    end)
+  )
+  harness.equal(4, observations[3].attention.caretOffset)
+  detach()
+end)
+
+harness.test("restarts every observation cycle with a snapshot and matching attention", function()
+  vim.cmd.only()
+  vim.cmd.enew({ bang = true })
+  local bufnr = vim.api.nvim_get_current_buf()
+  local host = require("refine.nvim.host").new({
+    bufnr = bufnr,
+    winid = vim.api.nvim_get_current_win(),
+    source_syntax = "plainText",
+    run_id = "host-reobserve",
+  })
+
+  local first = {}
+  host:observe(function(observation)
+    first[#first + 1] = observation
+  end, function() end)()
+  local second = {}
+  local detach = host:observe(function(observation)
+    second[#second + 1] = observation
+  end, function() end)
+
+  harness.equal(
+    { "snapshot", "attentionChanged" },
+    vim.tbl_map(function(observation)
+      return observation.type
+    end, first)
+  )
+  harness.equal(
+    { "snapshot", "attentionChanged" },
+    vim.tbl_map(function(observation)
+      return observation.type
+    end, second)
+  )
+  harness.equal(second[1].snapshot.revision, second[2].revision)
+  detach()
+end)
+
 harness.test("observes complete snapshots before explicit checks", function()
   vim.cmd.enew({ bang = true })
   local bufnr = vim.api.nvim_get_current_buf()
@@ -29,22 +265,29 @@ harness.test("observes complete snapshots before explicit checks", function()
   harness.equal("snapshot", observations[1].type)
   harness.equal("host:1", observations[1].snapshot.revision)
   harness.equal("First", observations[1].snapshot.sources[1].text)
+  harness.equal("attentionChanged", observations[2].type)
+  harness.equal("host:1", observations[2].revision)
 
   vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, { "Second" })
   harness.equal(
     true,
     vim.wait(1000, function()
-      return #observations == 2
+      return #observations >= 4
     end)
   )
-  harness.equal("host:2", observations[2].snapshot.revision)
+  harness.equal("snapshot", observations[3].type)
+  harness.equal("host:2", observations[3].snapshot.revision)
+  harness.equal("attentionChanged", observations[4].type)
+  harness.equal("host:2", observations[4].revision)
 
   vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, { "Third" })
   host:request_check({ selection = { sourceId = "document", range = { location = 0, length = 5 } } })
-  harness.equal("snapshot", observations[3].type)
-  harness.equal("host:3", observations[3].snapshot.revision)
-  harness.equal("checkRequested", observations[4].type)
-  harness.equal("host:3", observations[4].revision)
+  harness.equal("snapshot", observations[5].type)
+  harness.equal("host:3", observations[5].snapshot.revision)
+  harness.equal("attentionChanged", observations[6].type)
+  harness.equal("host:3", observations[6].revision)
+  harness.equal("checkRequested", observations[7].type)
+  harness.equal("host:3", observations[7].revision)
 
   detach()
   harness.equal(false, ended)
@@ -75,11 +318,14 @@ harness.test("never reuses a revision after coalesced ABA native edits", functio
   harness.equal(
     true,
     vim.wait(1000, function()
-      return #observations == 2
+      return #observations >= 4
     end)
   )
-  harness.equal("Alpha", observations[2].snapshot.sources[1].text)
-  harness.equal(false, original_revision == observations[2].snapshot.revision)
+  harness.equal("snapshot", observations[3].type)
+  harness.equal("Alpha", observations[3].snapshot.sources[1].text)
+  harness.equal(false, original_revision == observations[3].snapshot.revision)
+  harness.equal("attentionChanged", observations[4].type)
+  harness.equal(observations[3].snapshot.revision, observations[4].revision)
   detach()
 end)
 
