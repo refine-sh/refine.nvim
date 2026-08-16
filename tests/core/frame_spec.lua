@@ -75,7 +75,7 @@ describe("length-prefixed JSON frames", function()
         sources = {
           {
             sourceId = "document",
-            sourceSyntax = "mixed",
+            sourceSyntax = "plainText",
             text = source,
           },
         },
@@ -88,5 +88,31 @@ describe("length-prefixed JSON frames", function()
 
     assert_truthy(body_bytes > 4 * 1024 * 1024)
     assert_truthy(body_bytes <= frame.MAX_FRAME_BYTES)
+  end)
+
+  it("accepts only Protocol 2.5 source syntaxes", function()
+    local wire = require("refine.transport.wire")
+    local function command(source_syntax)
+      return {
+        type = "openDocument",
+        snapshot = {
+          revision = "revision-1",
+          sources = {
+            {
+              sourceId = "document",
+              sourceSyntax = source_syntax,
+              text = "Prose",
+            },
+          },
+        },
+      }
+    end
+
+    for _, source_syntax in ipairs({ "plainText", "markdownDocument", "latexDocument" }) do
+      wire.validate_command(command(source_syntax))
+    end
+    assert_raises("sourceSyntax is unsupported", function()
+      wire.validate_command(command("mixed"))
+    end)
   end)
 end)

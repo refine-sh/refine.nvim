@@ -33,7 +33,7 @@ local function present(options)
 
   local host = require("refine.nvim.host").new({
     bufnr = bufnr,
-    source_syntax = "mixed",
+    source_syntax = "plainText",
     run_id = options.run_id or "presentation-contract",
   })
   local suggestion = {

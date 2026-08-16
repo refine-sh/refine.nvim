@@ -1,4 +1,4 @@
-describe("integration protocol 2.4 golden transcript", function()
+describe("integration protocol 2.5 golden transcript", function()
   it("is consumed without translation by the Lua wire decoder", function()
     local wire = require("refine.transport.wire")
     local path = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":p:h:h")
@@ -6,7 +6,7 @@ describe("integration protocol 2.4 golden transcript", function()
     local fixture =
       vim.json.decode(table.concat(vim.fn.readfile(path), "\n"), { luanil = { object = true, array = true } })
 
-    assert_equal({ major = 2, minor = 4 }, fixture.hello.protocol)
+    assert_equal({ major = 2, minor = 5 }, fixture.hello.protocol)
     assert_equal(15, #fixture.hello.hostCapabilities.interceptableSuggestionActionKeys)
     assert_equal(
       { sourceId = "document", range = { location = 8, length = 2 } },

@@ -138,7 +138,7 @@ local function report_endpoint()
       ("Refine endpoint permissions are secure; the legacy descriptor advertises protocol %d without a minor version"):format(
         descriptor.protocolMajor
       ),
-      "Connect once to verify exact Protocol 2.4 compatibility."
+      "Connect once to verify exact Protocol 2.5 compatibility."
     )
     return
   end

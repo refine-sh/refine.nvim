@@ -2,7 +2,7 @@ local errors = require("refine.transport.errors")
 
 local M = {
   PROTOCOL_MAJOR = 2,
-  PROTOCOL_MINOR = 4,
+  PROTOCOL_MINOR = 5,
   MAX_FRAME_BYTES = 8 * 1024 * 1024,
   MAX_SOURCES = 2,
 }
@@ -52,6 +52,11 @@ local unavailable_reasons = {
   unsupportedSource = true,
   resourceLimit = true,
   writingCheckEntitlementRequired = true,
+}
+local source_syntaxes = {
+  plainText = true,
+  markdownDocument = true,
+  latexDocument = true,
 }
 local action_unavailable_reasons = {
   disconnected = true,
@@ -160,7 +165,7 @@ local function snapshot(value, label)
     if type(source.text) ~= "string" then
       fail(label .. ".text must be a string")
     end
-    if source.sourceSyntax ~= "mixed" and source.sourceSyntax ~= "latexDocument" then
+    if not source_syntaxes[source.sourceSyntax] then
       fail(label .. ".sourceSyntax is unsupported")
     end
   end

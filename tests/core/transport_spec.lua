@@ -17,7 +17,7 @@ local function fake_transport_fixture(options)
     if value.type == "hello" then
       receiver(options.handshake or {
         type = "welcome",
-        protocol = { major = 2, minor = 4 },
+        protocol = { major = 2, minor = 5 },
         serverEpoch = "epoch-1",
         runResumed = false,
         limits = { maxFrameBytes = 8388608, maxSources = 2 },
@@ -47,7 +47,7 @@ local function fake_transport_fixture(options)
         pid = 123,
       }
       if not options.legacy_descriptor then
-        descriptor.protocolMinor = 4
+        descriptor.protocolMinor = 5
       end
       callback(nil, descriptor)
     end,
@@ -68,7 +68,7 @@ local function fake_transport_fixture(options)
   }
 end
 
-describe("Refine Protocol 2.4 transport", function()
+describe("Refine Protocol 2.5 transport", function()
   it("authenticates with frontend and host capabilities then sequences commands and events", function()
     local transport = require("refine.transport")
     local fixture = fake_transport_fixture()
@@ -91,7 +91,7 @@ describe("Refine Protocol 2.4 transport", function()
     assert_truthy(session)
     assert_equal({
       type = "hello",
-      protocol = { major = 2, minor = 4 },
+      protocol = { major = 2, minor = 5 },
       client = { id = "refine-neovim", version = "0.1.0", host = "neovim" },
       frontend = { id = "ghostty" },
       hostCapabilities = { interceptableSuggestionActionKeys = { "tab", "escape" } },
@@ -106,7 +106,7 @@ describe("Refine Protocol 2.4 transport", function()
         type = "openDocument",
         snapshot = {
           revision = "doc:0",
-          sources = { { sourceId = "document", text = "create an link", sourceSyntax = "mixed" } },
+          sources = { { sourceId = "document", text = "create an link", sourceSyntax = "plainText" } },
         },
       },
       nil,
@@ -149,7 +149,7 @@ describe("Refine Protocol 2.4 transport", function()
         local wire = require("refine.transport.wire")
         receive_frame({
           type = "welcome",
-          protocol = { major = 2, minor = 4 },
+          protocol = { major = 2, minor = 5 },
           serverEpoch = "epoch-1",
           runResumed = false,
           limits = { maxFrameBytes = wire.MAX_FRAME_BYTES, maxSources = wire.MAX_SOURCES },
@@ -198,7 +198,7 @@ describe("Refine Protocol 2.4 transport", function()
         type = "openDocument",
         snapshot = {
           revision = "doc:0",
-          sources = { { sourceId = "document", text = "private source contents", sourceSyntax = "mixed" } },
+          sources = { { sourceId = "document", text = "private source contents", sourceSyntax = "plainText" } },
         },
       },
       "open",
@@ -220,7 +220,7 @@ describe("Refine Protocol 2.4 transport", function()
         type = "openDocument",
         snapshot = {
           revision = "private-overflow-revision",
-          sources = { { sourceId = "document", text = "private overflow contents", sourceSyntax = "mixed" } },
+          sources = { { sourceId = "document", text = "private overflow contents", sourceSyntax = "plainText" } },
         },
       },
       "overflow",
@@ -309,7 +309,7 @@ describe("Refine Protocol 2.4 transport", function()
     local fixture = fake_transport_fixture({
       handshake = {
         type = "welcome",
-        protocol = { major = 2, minor = 4 },
+        protocol = { major = 2, minor = 5 },
         serverEpoch = "epoch-2",
         runResumed = false,
         limits = { maxFrameBytes = 8388608, maxSources = 2 },
@@ -335,7 +335,7 @@ describe("Refine Protocol 2.4 transport", function()
     local fixture = fake_transport_fixture({
       handshake = {
         type = "welcome",
-        protocol = { major = 2, minor = 4 },
+        protocol = { major = 2, minor = 5 },
         serverEpoch = "",
         runResumed = false,
         limits = { maxFrameBytes = 8388608, maxSources = 2 },
@@ -362,8 +362,8 @@ describe("Refine Protocol 2.4 transport", function()
   it("reports the required update for exact-minor handshake mismatches", function()
     local transport = require("refine.transport")
     for _, case in ipairs({
-      { protocol = { major = 2, minor = 3 }, update = "server" },
-      { protocol = { major = 2, minor = 5 }, update = "client" },
+      { protocol = { major = 2, minor = 4 }, update = "server" },
+      { protocol = { major = 2, minor = 6 }, update = "client" },
     }) do
       local fixture = fake_transport_fixture({
         handshake = {
@@ -396,7 +396,7 @@ describe("Refine Protocol 2.4 transport", function()
       legacy_descriptor = true,
       handshake = {
         type = "welcome",
-        protocol = { major = 2, minor = 3 },
+        protocol = { major = 2, minor = 4 },
         serverEpoch = "epoch-1",
         runResumed = false,
         limits = { maxFrameBytes = 8388608, maxSources = 2 },

@@ -20,7 +20,7 @@ harness.test("applies disjoint edits as one mutation and one undo entry", functi
 
   local source = require("refine.nvim.source").new({
     bufnr = bufnr,
-    source_syntax = "mixed",
+    source_syntax = "plainText",
     run_id = "apply",
   })
   local before = source:snapshot()
@@ -73,7 +73,7 @@ harness.test("maps visible cursors through semantic edits", function()
 
   local source = require("refine.nvim.source").new({
     bufnr = bufnr,
-    source_syntax = "mixed",
+    source_syntax = "plainText",
     run_id = "cursors",
   })
   local before = source:snapshot()
@@ -109,7 +109,7 @@ harness.test("keeps an Insert-mode Apply separate from following typing", functi
   vim.bo[bufnr].undolevels = undo_levels
   local source = require("refine.nvim.source").new({
     bufnr = bufnr,
-    source_syntax = "mixed",
+    source_syntax = "plainText",
     run_id = "insert-undo",
   })
   local before = source:snapshot()
@@ -143,7 +143,7 @@ harness.test("rejects ambiguous edits at the same source location before mutatio
   vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, { "ab" })
   local source = require("refine.nvim.source").new({
     bufnr = bufnr,
-    source_syntax = "mixed",
+    source_syntax = "plainText",
     run_id = "ambiguous",
   })
   local before = source:snapshot()
@@ -165,7 +165,7 @@ harness.test("refuses Apply after the buffer becomes structurally ineligible", f
   vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, { "cat" })
   local source = require("refine.nvim.source").new({
     bufnr = bufnr,
-    source_syntax = "mixed",
+    source_syntax = "plainText",
     run_id = "ineligible",
   })
   local before = source:snapshot()

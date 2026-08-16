@@ -1,5 +1,5 @@
 describe("Refine endpoint discovery", function()
-  it("parses an exact Protocol 2.4 endpoint descriptor", function()
+  it("parses an exact Protocol 2.5 endpoint descriptor", function()
     local endpoint = require("refine.transport.endpoint")
     local descriptor = endpoint.parse(vim.json.encode({
       version = 1,
@@ -7,19 +7,19 @@ describe("Refine endpoint discovery", function()
       launchToken = "secret",
       serverEpoch = "epoch-1",
       protocolMajor = 2,
-      protocolMinor = 4,
+      protocolMinor = 5,
       pid = 123,
     }))
 
-    assert_equal(4, descriptor.protocolMinor)
+    assert_equal(5, descriptor.protocolMinor)
     assert_equal("/private/tmp/refine/server.sock", descriptor.socketPath)
   end)
 
   it("reports which side must update for an incompatible endpoint", function()
     local endpoint = require("refine.transport.endpoint")
     for _, case in ipairs({
-      { minor = 3, required_update = "server" },
-      { minor = 5, required_update = "client" },
+      { minor = 4, required_update = "server" },
+      { minor = 6, required_update = "client" },
     }) do
       local ok, err = pcall(
         endpoint.parse,
@@ -75,7 +75,7 @@ describe("Refine endpoint discovery", function()
             launchToken = "secret",
             serverEpoch = "epoch-1",
             protocolMajor = 2,
-            protocolMinor = 4,
+            protocolMinor = 5,
             pid = 123,
           })
         )

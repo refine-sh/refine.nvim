@@ -38,7 +38,7 @@ session; focusing the current Refine card is the sole exception.
 
 - macOS 14 or newer
 - Neovim 0.11 or newer
-- Refine with exact integration Protocol 2.4 support
+- Refine with exact integration Protocol 2.5 support
 - An active Refine trial or valid license
 
 The plugin is inactive in a headless Neovim. It activates when a UI attaches.
@@ -65,7 +65,7 @@ require("refine").setup({opts})
           max_source_bytes = 1024 * 1024,
           filetypes = {
             markdown = false,
-            quarto = "mixed",
+            quarto = "markdownDocument",
           },
           frontend = "auto",
           debug_log = false,
@@ -78,8 +78,9 @@ max_source_bytes ~
 
                                                         *refine-filetypes*
 filetypes ~
-    Map from a nonempty Neovim 'filetype' to "mixed", "latexDocument", or
-    false. Entries merge with the default map; false removes an entry.
+    Map from a nonempty Neovim 'filetype' to "plainText",
+    "markdownDocument", "latexDocument", or false. Entries merge with the
+    default map; false removes an entry.
 
                                                          *refine-frontend*
 frontend ~
@@ -108,13 +109,13 @@ require("refine").configure_buffer({bufnr}, {opts})
         but never bypasses hard safety checks or invents a source syntax.
 
     source_syntax ~
-        "mixed" or "latexDocument". Overrides the filetype map and can opt an
-        otherwise unmapped filetype in.
+        "plainText", "markdownDocument", or "latexDocument". Overrides the
+        filetype map and can opt an otherwise unmapped filetype in.
 
     Example: >lua
         require("refine").configure_buffer(0, {
           enabled = true,
-          source_syntax = "mixed",
+          source_syntax = "markdownDocument",
         })
 <
 ==============================================================================
@@ -127,14 +128,21 @@ listed does not matter.
 
 Default map:
 
-    markdown, text, gitcommit, mail       mixed
-    tex, plaintex                        latexDocument
+    markdown                             markdownDocument
+    text, gitcommit, mail                 plainText
+    tex, plaintex                         latexDocument
 
 Every other filetype requires explicit configuration or a buffer override.
 
 Refine serializes the exact buffer lines joined with LF and does not invent a
 terminal newline. 'fileformat', 'endofline', and 'fixendofline' are write
 metadata and remain unchanged by Apply.
+
+"markdownDocument" lets Refine treat Markdown soft line breaks as whitespace
+inside one logical paragraph. "plainText" keeps physical line breaks as
+paragraph boundaries. "latexDocument" uses TeX and LaTeX document semantics.
+Apply preserves existing layout where possible and may reflow only the affected
+logical paragraph when a correction cannot retain its original soft breaks.
 
 ==============================================================================
 5. Commands                                              *refine-commands*
@@ -365,7 +373,7 @@ The report covers:
 - Neovim version and macOS platform
 - redacted configuration
 - same-user endpoint permissions
-- exact Protocol 2.4 versions
+- exact Protocol 2.5 versions
 - recognized or generic frontend state
 - semantic integration state
 - configured action-key compatibility
@@ -383,9 +391,8 @@ or update-check requests. Plugin managers own updates. Refine itself may use
 the provider selected in the app under its existing privacy and consent
 controls.
 
-Refine for Neovim currently requires exact Protocol 2.4. A mismatch fails
+Refine for Neovim currently requires exact Protocol 2.5. A mismatch fails
 before source is sent and reports whether the plugin or Refine must be
-updated. A compatibility policy must be accepted before a later protocol bump
-can independently update already-public clients.
+updated. Protocol changes are released as exact app-and-plugin pairs.
 
  vim:tw=78:ts=8:noet:ft=help:norl:

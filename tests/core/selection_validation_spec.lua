@@ -18,7 +18,7 @@ describe("selection and presentation range validation", function()
           type = "snapshot",
           snapshot = {
             revision = "doc:0",
-            sources = { { sourceId = "document", text = "A 👩‍💻 works.", sourceSyntax = "mixed" } },
+            sources = { { sourceId = "document", text = "A 👩‍💻 works.", sourceSyntax = "plainText" } },
           },
         })
         return function() end
@@ -73,7 +73,7 @@ describe("selection and presentation range validation", function()
           type = "snapshot",
           snapshot = {
             revision = "doc:0",
-            sources = { { sourceId = "document", text = "Short text.", sourceSyntax = "mixed" } },
+            sources = { { sourceId = "document", text = "Short text.", sourceSyntax = "plainText" } },
           },
         })
         return function() end

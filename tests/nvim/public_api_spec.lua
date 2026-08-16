@@ -54,7 +54,7 @@ harness.test("configure_buffer replaces a validated local override", function()
   local bufnr = vim.api.nvim_get_current_buf()
   harness.equal("unsupported_filetype", refine.status(bufnr).reason)
 
-  refine.configure_buffer(bufnr, { enabled = true, source_syntax = "mixed" })
+  refine.configure_buffer(bufnr, { enabled = true, source_syntax = "markdownDocument" })
   harness.equal("no_ui", refine.status(bufnr).reason)
 
   refine.configure_buffer(bufnr, { enabled = false })
@@ -67,6 +67,39 @@ harness.test("configure_buffer replaces a validated local override", function()
 
   refine.configure_buffer(bufnr, {})
   harness.equal("unsupported_filetype", refine.status(bufnr).reason)
+end)
+
+harness.test("configuration accepts only explicit document syntaxes", function()
+  vim.cmd.enew({ bang = true })
+  vim.bo.buftype = ""
+  vim.bo.filetype = "quarto"
+
+  local refine = require("refine")
+  refine.setup({})
+  local bufnr = vim.api.nvim_get_current_buf()
+
+  refine.configure_buffer(bufnr, { source_syntax = "plainText" })
+  harness.equal("no_ui", refine.status(bufnr).reason)
+
+  local ok, failure = pcall(refine.configure_buffer, bufnr, { source_syntax = "mixed" })
+  harness.equal(false, ok)
+  harness.matches("unsupported source syntax", failure)
+  harness.equal("no_ui", refine.status(bufnr).reason)
+end)
+
+harness.test("setup preserves its prior filetype map after a legacy syntax is rejected", function()
+  vim.cmd.enew({ bang = true })
+  vim.bo.buftype = ""
+  vim.bo.filetype = "quarto"
+
+  local refine = require("refine")
+  refine.setup({ filetypes = { quarto = "plainText" } })
+  harness.equal("no_ui", refine.status().reason)
+
+  local ok, failure = pcall(refine.setup, { filetypes = { quarto = "mixed" } })
+  harness.equal(false, ok)
+  harness.matches("unsupported source syntax for quarto", failure)
+  harness.equal("no_ui", refine.status().reason)
 end)
 
 harness.run()

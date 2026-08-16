@@ -11,7 +11,7 @@ local INTERACTION = {
 local function source(revision, text)
   return {
     revision = revision,
-    sources = { { sourceId = "document", text = text or "create an link.", sourceSyntax = "mixed" } },
+    sources = { { sourceId = "document", text = text or "create an link.", sourceSyntax = "plainText" } },
   }
 end
 

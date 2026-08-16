@@ -1,7 +1,7 @@
 local function snapshot(revision, text)
   return {
     revision = revision,
-    sources = { { sourceId = "document", text = text, sourceSyntax = "mixed" } },
+    sources = { { sourceId = "document", text = text, sourceSyntax = "plainText" } },
   }
 end
 
@@ -26,7 +26,7 @@ describe("integration command ordering", function()
         done(nil)
         receive_frame({
           type = "welcome",
-          protocol = { major = 2, minor = 4 },
+          protocol = { major = 2, minor = 5 },
           serverEpoch = "epoch",
           runResumed = false,
           limits = { maxFrameBytes = 8388608, maxSources = 2 },

@@ -13,11 +13,16 @@ capability-parity release.
 - `:RefineShow` and source-highlight clicks now focus a suggestion card
   immediately; navigation retains unfocused previews with an explicit focus
   hint for card-local keys.
+- Markdown now uses the explicit `markdownDocument` source syntax, while text,
+  Git commit, and mail buffers use `plainText`; this lets Refine join Markdown
+  soft line breaks without changing plain-text paragraph behavior.
+- The integration now requires exact Protocol 2.5 support. The legacy `mixed`
+  source syntax is no longer accepted in configuration or buffer overrides.
 
 ### Added
 
 - Pure Lua Refine integration runtime for Neovim 0.11 and newer on macOS.
-- Exact Protocol 2.4 transport over Refine's authenticated local Unix socket.
+- Exact Protocol 2.5 transport over Refine's authenticated local Unix socket.
 - Full-buffer and selection-scoped writing checks.
 - Native suggestion highlights, floating cards with inline diff runs,
   combining-glyph deletion midlines, visible changed whitespace, navigation,

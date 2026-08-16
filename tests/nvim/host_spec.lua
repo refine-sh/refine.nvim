@@ -15,7 +15,7 @@ harness.test("observes complete snapshots before explicit checks", function()
 
   local host = require("refine.nvim.host").new({
     bufnr = bufnr,
-    source_syntax = "mixed",
+    source_syntax = "plainText",
     run_id = "host",
   })
   local observations = {}
@@ -57,7 +57,7 @@ harness.test("never reuses a revision after coalesced ABA native edits", functio
 
   local host = require("refine.nvim.host").new({
     bufnr = bufnr,
-    source_syntax = "mixed",
+    source_syntax = "plainText",
     run_id = "host-aba",
   })
   local observations = {}
@@ -90,7 +90,7 @@ harness.test("implements the integration host callback contract", function()
   local statuses = {}
   local host = require("refine.nvim.host").new({
     bufnr = bufnr,
-    source_syntax = "mixed",
+    source_syntax = "plainText",
     run_id = "callbacks",
     on_presentation = function(snapshot)
       statuses[#statuses + 1] = snapshot.state.type
@@ -140,7 +140,7 @@ harness.test("presents and replaces authoritative suggestion highlights", functi
   vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, { "This are text." })
   local host = require("refine.nvim.host").new({
     bufnr = bufnr,
-    source_syntax = "mixed",
+    source_syntax = "plainText",
     run_id = "presentation",
   })
   local revision = host.source:snapshot().revision
@@ -227,7 +227,7 @@ harness.test("clears presentation before dispatch even when native mutation erro
   vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, { "bad text" })
   local host = require("refine.nvim.host").new({
     bufnr = bufnr,
-    source_syntax = "mixed",
+    source_syntax = "plainText",
     run_id = "apply-clear",
   })
   local revision = host.source:snapshot().revision
@@ -294,7 +294,7 @@ harness.test("shows and focuses a suggestion card on first invocation", function
   vim.api.nvim_win_set_cursor(editor_win, { 1, 6 })
   local host = require("refine.nvim.host").new({
     bufnr = bufnr,
-    source_syntax = "mixed",
+    source_syntax = "plainText",
     run_id = "card",
   })
   local revision = host.source:snapshot().revision
@@ -411,7 +411,7 @@ harness.test("renders insertion-only suggestions at a zero-length range", functi
   vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, { "word" })
   local host = require("refine.nvim.host").new({
     bufnr = bufnr,
-    source_syntax = "mixed",
+    source_syntax = "plainText",
     run_id = "insertion",
   })
   host:present({
@@ -454,7 +454,7 @@ harness.test("navigates suggestions in document order with wrapping", function()
   vim.api.nvim_win_set_cursor(editor_win, { 1, 0 })
   local host = require("refine.nvim.host").new({
     bufnr = bufnr,
-    source_syntax = "mixed",
+    source_syntax = "plainText",
     run_id = "navigation",
   })
   local revision = host.source:snapshot().revision
@@ -564,7 +564,7 @@ harness.test("transient quick keys cancel activation and restore prior mappings"
 
   local host = require("refine.nvim.host").new({
     bufnr = bufnr,
-    source_syntax = "mixed",
+    source_syntax = "plainText",
     run_id = "quick",
   })
   local revision = host.source:snapshot().revision

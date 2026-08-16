@@ -38,7 +38,7 @@ local function fixture(options)
   local status_events = {}
   local notifications = {}
   local compatibility_notifications = {}
-  local source_syntax = "mixed"
+  local source_syntax = "markdownDocument"
   local integration_factory = function(options)
     return {
       run = function(_, input)
@@ -323,7 +323,7 @@ harness.test("stays inactive without a UI or on unsupported platforms", function
       return true
     end,
     resolve_buffer = function()
-      return "mixed"
+      return "markdownDocument"
     end,
   })
   no_ui:reconcile(bufnr, vim.api.nvim_get_current_win())
@@ -337,7 +337,7 @@ harness.test("stays inactive without a UI or on unsupported platforms", function
       return false
     end,
     resolve_buffer = function()
-      return "mixed"
+      return "markdownDocument"
     end,
   })
   non_macos:reconcile(bufnr, vim.api.nvim_get_current_win())
@@ -418,7 +418,7 @@ harness.test("keeps fatal protocol incompatibility in the public unavailable sta
       return true
     end,
     resolve_buffer = function()
-      return "mixed"
+      return "markdownDocument"
     end,
     frontend = function()
       return nil
@@ -431,7 +431,7 @@ harness.test("keeps fatal protocol incompatibility in the public unavailable sta
             message = "incompatible protocol",
             recoverability = "fatal",
             required_update = "client",
-            received_protocol = { major = 2, minor = 5 },
+            received_protocol = { major = 2, minor = 6 },
           })
         end,
       }
@@ -444,7 +444,7 @@ harness.test("keeps fatal protocol incompatibility in the public unavailable sta
   harness.equal("unavailable", status.state)
   harness.equal("incompatible_protocol", status.reason)
   harness.equal("client", status.required_update)
-  harness.equal({ major = 2, minor = 5 }, status.received_protocol)
+  harness.equal({ major = 2, minor = 6 }, status.received_protocol)
   assert_public_status_states(observed_states)
 end)
 
@@ -466,7 +466,7 @@ harness.test("keeps clean integration completion inside the public status states
       return true
     end,
     resolve_buffer = function()
-      return "mixed"
+      return "markdownDocument"
     end,
     frontend = function()
       return nil

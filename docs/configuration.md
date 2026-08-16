@@ -23,7 +23,7 @@ require("refine").setup({
   max_source_bytes = 1024 * 1024,
   filetypes = {
     markdown = false,
-    quarto = "mixed",
+    quarto = "markdownDocument",
   },
   frontend = "auto",
   debug_log = false,
@@ -41,19 +41,20 @@ Unknown options and invalid values are rejected.
 
 ## Filetypes
 
-Refine supports two source syntaxes:
+Refine supports three source syntaxes:
 
-- `"mixed"` for prose and Markdown-like content
+- `"plainText"` for prose whose physical line breaks are paragraph boundaries
+- `"markdownDocument"` for Markdown, including soft line breaks within logical paragraphs
 - `"latexDocument"` for TeX and LaTeX documents
 
 The default map is:
 
 | Neovim filetype | Source syntax |
 | --- | --- |
-| `markdown` | `mixed` |
-| `text` | `mixed` |
-| `gitcommit` | `mixed` |
-| `mail` | `mixed` |
+| `markdown` | `markdownDocument` |
+| `text` | `plainText` |
+| `gitcommit` | `plainText` |
+| `mail` | `plainText` |
 | `tex` | `latexDocument` |
 | `plaintex` | `latexDocument` |
 
@@ -64,7 +65,7 @@ Entries passed to `filetypes` merge with that default map. Set an entry to
 require("refine").setup({
   filetypes = {
     markdown = false,
-    quarto = "mixed",
+    quarto = "markdownDocument",
     context = "latexDocument",
   },
 })
@@ -100,7 +101,7 @@ require("refine").configure_buffer(0, { enabled = false })
 
 require("refine").configure_buffer(0, {
   enabled = true,
-  source_syntax = "mixed",
+  source_syntax = "markdownDocument",
 })
 
 require("refine").configure_buffer(0, {})
@@ -111,7 +112,7 @@ Supported fields:
 | Field | Description |
 | --- | --- |
 | `enabled` | `false` opts out. `true` permits normal eligibility evaluation. |
-| `source_syntax` | `"mixed"` or `"latexDocument"`. This can opt an otherwise unmapped filetype in. |
+| `source_syntax` | `"plainText"`, `"markdownDocument"`, or `"latexDocument"`. This can opt an otherwise unmapped filetype in. |
 
 ## Automatic and manual checks
 
@@ -297,7 +298,7 @@ The report covers:
 - Neovim version and macOS platform
 - redacted configuration
 - same-user endpoint permissions
-- exact Integration Protocol 2.4 compatibility
+- exact Integration Protocol 2.5 compatibility
 - detected or generic frontend state
 - semantic integration state
 - configured action-key compatibility
@@ -331,6 +332,6 @@ for the user-facing summary.
 invoke it. The [Refine privacy policy](https://refine.sh/privacy-policy)
 describes the reported context and metadata.
 
-The current integration requires exact Protocol 2.4 compatibility. A mismatch
+The current integration requires exact Protocol 2.5 compatibility. A mismatch
 fails before source text is sent and reports whether the plugin or Refine must
 be updated.

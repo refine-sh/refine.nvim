@@ -47,4 +47,27 @@ harness.test("rejects invalid UTF-8 before a normal non-binary buffer can connec
   harness.equal("invalid_utf8", controller:status(bufnr).reason)
 end)
 
+harness.test("maps default prose filetypes to explicit document syntaxes", function()
+  local eligibility = require("refine.nvim.eligibility")
+  local cases = {
+    { filetype = "markdown", source_syntax = "markdownDocument" },
+    { filetype = "text", source_syntax = "plainText" },
+    { filetype = "gitcommit", source_syntax = "plainText" },
+    { filetype = "mail", source_syntax = "plainText" },
+    { filetype = "tex", source_syntax = "latexDocument" },
+    { filetype = "plaintex", source_syntax = "latexDocument" },
+  }
+
+  for _, case in ipairs(cases) do
+    vim.cmd.enew({ bang = true })
+    local bufnr = vim.api.nvim_get_current_buf()
+    vim.bo[bufnr].buftype = ""
+    vim.bo[bufnr].filetype = case.filetype
+    vim.bo[bufnr].modifiable = true
+    vim.bo[bufnr].readonly = false
+    vim.bo[bufnr].binary = false
+    harness.equal(case.source_syntax, eligibility.resolve(bufnr))
+  end
+end)
+
 harness.run()

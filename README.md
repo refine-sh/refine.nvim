@@ -33,7 +33,7 @@ Features:
 
 - macOS 14+
 - Neovim 0.11+
-- Refine 1.35+
+- Refine with integration Protocol 2.5 support
 
 Refine includes a full-featured seven-day trial with no credit card required.
 
@@ -132,6 +132,14 @@ Next and Previous previews keep editor focus.
 Markdown, plain text, Git commit messages, email, TeX, and LaTeX are enabled by
 default. You can add another Neovim filetype or disable a default through
 [advanced configuration](docs/configuration.md#filetypes).
+
+The plugin identifies Markdown separately from plain text. Refine can therefore
+check Markdown soft-wrapped lines as one logical paragraph while continuing to
+treat physical line breaks in plain-text, commit-message, and email buffers as
+paragraph boundaries. TeX and LaTeX buffers use LaTeX document semantics. The
+exact buffer text is preserved when it is sent to Refine; an applied correction
+keeps existing layout where possible and may reflow only the affected logical
+paragraph when necessary.
 
 Only ordinary, editable, valid UTF-8 buffers within the configured size limit
 are eligible. Refine never changes file format or end-of-line settings.

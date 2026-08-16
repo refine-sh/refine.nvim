@@ -87,7 +87,7 @@ harness.test("reports redacted configuration and semantic state", function()
       get = function()
         return {
           debug_log = true,
-          filetypes = { tex = "latexDocument", markdown = "mixed" },
+          filetypes = { tex = "latexDocument", markdown = "markdownDocument" },
           frontend = "auto",
           max_source_bytes = 1024 * 1024,
         }
@@ -125,7 +125,7 @@ harness.test("reports redacted configuration and semantic state", function()
   harness.equal(7, requested_bufnr)
   harness.equal(true, has_call(calls, "ok", "Configuration is valid"))
   harness.equal(true, has_call(calls, "info", "Source limit: 1048576 bytes"))
-  harness.equal(true, has_call(calls, "info", "Filetypes: markdown=mixed, tex=latexDocument"))
+  harness.equal(true, has_call(calls, "info", "Filetypes: markdown=markdownDocument, tex=latexDocument"))
   harness.equal(true, has_call(calls, "info", "Frontend: ghostty"))
   harness.equal(true, has_call(calls, "info", "State: complete; 2 suggestions; full coverage"))
   harness.equal(true, has_call(calls, "ok", "action keys are compatible"))
@@ -145,16 +145,16 @@ harness.test("verifies the private endpoint without exposing credentials", funct
             callback(nil, {
               launchToken = "secret-token",
               protocolMajor = 2,
-              protocolMinor = 4,
+              protocolMinor = 5,
             })
           end,
         }
       end,
     },
-    ["refine.transport.wire"] = { PROTOCOL_MAJOR = 2, PROTOCOL_MINOR = 4 },
+    ["refine.transport.wire"] = { PROTOCOL_MAJOR = 2, PROTOCOL_MINOR = 5 },
   })
 
-  harness.equal(true, has_call(calls, "ok", "endpoint is secure and uses protocol 2%.4"))
+  harness.equal(true, has_call(calls, "ok", "endpoint is secure and uses protocol 2%.5"))
   harness.equal(false, messages(calls):find("secret%-token") ~= nil)
 end)
 

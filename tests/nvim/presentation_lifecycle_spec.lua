@@ -79,7 +79,7 @@ local function present(lines, suggestions, actions)
   vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, lines)
   local host = require("refine.nvim.host").new({
     bufnr = bufnr,
-    source_syntax = "mixed",
+    source_syntax = "plainText",
     run_id = "presentation-lifecycle",
   })
   host:present({

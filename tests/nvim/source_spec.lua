@@ -17,7 +17,7 @@ harness.test("snapshots canonical buffer text with incarnation revisions", funct
 
   local source = require("refine.nvim.source").new({
     bufnr = bufnr,
-    source_syntax = "mixed",
+    source_syntax = "markdownDocument",
     run_id = "run",
   })
 
@@ -26,7 +26,7 @@ harness.test("snapshots canonical buffer text with incarnation revisions", funct
   harness.equal({
     sourceId = "document",
     text = "Alpha\n😀",
-    sourceSyntax = "mixed",
+    sourceSyntax = "markdownDocument",
   }, first.sources[1])
   harness.equal(first, source:snapshot())
 

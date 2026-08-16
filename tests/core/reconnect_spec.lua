@@ -10,7 +10,7 @@ local INTERACTION = {
 local function snapshot(revision, text)
   return {
     revision = revision,
-    sources = { { sourceId = "document", text = text, sourceSyntax = "mixed" } },
+    sources = { { sourceId = "document", text = text, sourceSyntax = "plainText" } },
   }
 end
 

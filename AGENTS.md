@@ -12,7 +12,7 @@ Preserve these module seams:
 
 - `lua/refine/integration/` owns host-neutral lifecycle and action
   coordination.
-- `lua/refine/transport/` owns the editor-neutral authenticated Protocol 2.4
+- `lua/refine/transport/` owns the editor-neutral authenticated Protocol 2.5
   connection.
 - `lua/refine/nvim/` owns canonical buffer snapshots, native presentation,
   coordinate conversion, and one-mutation Apply.

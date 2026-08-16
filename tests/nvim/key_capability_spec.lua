@@ -33,7 +33,7 @@ local function present_quick_apply(apply_key)
 
   local host = require("refine.nvim.host").new({
     bufnr = bufnr,
-    source_syntax = "mixed",
+    source_syntax = "plainText",
     run_id = "key-capability",
   })
   local source = host.source:snapshot()
@@ -206,7 +206,7 @@ harness.test("transient ownership leaves an existing control-alias mapping untou
 
   local host = require("refine.nvim.host").new({
     bufnr = bufnr,
-    source_syntax = "mixed",
+    source_syntax = "plainText",
     run_id = "existing-control-alias",
   })
   local source = host.source:snapshot()

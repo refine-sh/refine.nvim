@@ -1,7 +1,8 @@
 local M = {}
 
 local source_syntaxes = {
-  mixed = true,
+  plainText = true,
+  markdownDocument = true,
   latexDocument = true,
 }
 
@@ -19,12 +20,12 @@ local frontend_ids = {
 local defaults = {
   debug_log = false,
   filetypes = {
-    gitcommit = "mixed",
-    mail = "mixed",
-    markdown = "mixed",
+    gitcommit = "plainText",
+    mail = "plainText",
+    markdown = "markdownDocument",
     plaintex = "latexDocument",
     tex = "latexDocument",
-    text = "mixed",
+    text = "plainText",
   },
   frontend = "auto",
   max_source_bytes = 1024 * 1024,
