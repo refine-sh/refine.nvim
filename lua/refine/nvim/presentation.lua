@@ -194,7 +194,7 @@ local function add_deletion_midlines(midlines, row, start_col, text, remaining)
   return remaining
 end
 
-local function card_content(suggestion, feedback, interaction, appearance)
+local function card_content(suggestion, feedback, interaction, appearance, focused)
   local lines = {
     ("%s · %s"):format(suggestion.attribution.languageDisplayName, suggestion.attribution.checkModelDisplayName),
     "",
@@ -258,7 +258,7 @@ local function card_content(suggestion, feedback, interaction, appearance)
       lines[#lines + 1] = "Configured Dismiss key is unavailable in Neovim; use [d]."
     end
   end
-  lines[#lines + 1] = ""
+  lines[#lines + 1] = focused and "" or "Preview · :RefineShow to focus for card keys"
   local footer = ""
   local targets = {}
   for _, action in ipairs(card_actions) do
@@ -331,7 +331,8 @@ function Presentation:_render_card()
       return vim.fn.line("w$") >= vim.api.nvim_buf_line_count(self.card_buf)
     end)
   vim.bo[self.card_buf].modifiable = true
-  local content = card_content(suggestion, self.card_feedback, self.snapshot.interaction, self.snapshot.appearance)
+  local content =
+    card_content(suggestion, self.card_feedback, self.snapshot.interaction, self.snapshot.appearance, focused)
   vim.api.nvim_buf_set_lines(self.card_buf, 0, -1, true, content.lines)
   apply_card_highlights(self.card_buf, content)
   self.card_mouse_targets = content.targets
@@ -607,7 +608,7 @@ function Presentation:_card_config(winid, suggestion, lines, content_height)
 end
 
 function Presentation:_open_card(winid, suggestion)
-  local content = card_content(suggestion, nil, self.snapshot.interaction, self.snapshot.appearance)
+  local content = card_content(suggestion, nil, self.snapshot.interaction, self.snapshot.appearance, false)
   local config = self:_card_config(winid, suggestion, content.lines)
   if not config then
     return false
@@ -629,13 +630,43 @@ function Presentation:_open_card(winid, suggestion)
   self.owner_win = winid
   self:_refresh_card_controls()
   vim.bo[self.card_buf].filetype = "refine"
+  self:_install_card_focus_observer()
   return self:refresh_view()
+end
+
+function Presentation:_install_card_focus_observer()
+  local card_buf = self.card_buf
+  if not self.presentation_group or not card_buf or not vim.api.nvim_buf_is_valid(card_buf) then
+    return
+  end
+  vim.api.nvim_create_autocmd({ "WinEnter", "WinLeave" }, {
+    buffer = card_buf,
+    group = self.presentation_group,
+    callback = function()
+      vim.schedule(function()
+        if self.card_buf == card_buf and vim.api.nvim_buf_is_valid(card_buf) then
+          self:_render_card()
+        end
+      end)
+    end,
+  })
+end
+
+function Presentation:_focus_card()
+  local card_win = self.card_win
+  if not card_win or not vim.api.nvim_win_is_valid(card_win) then
+    return false
+  end
+  vim.api.nvim_set_current_win(card_win)
+  self:_render_card()
+  return self.card_win == card_win
+    and vim.api.nvim_win_is_valid(card_win)
+    and vim.api.nvim_get_current_win() == card_win
 end
 
 function Presentation:show()
   if self.card_win and vim.api.nvim_win_is_valid(self.card_win) then
-    vim.api.nvim_set_current_win(self.card_win)
-    return true
+    return self:_focus_card()
   end
 
   local winid = vim.api.nvim_get_current_win()
@@ -646,7 +677,14 @@ function Presentation:show()
   if not suggestion then
     return false
   end
-  return self:_open_card(winid, suggestion)
+  if not self:_open_card(winid, suggestion) then
+    return false
+  end
+  if self:_focus_card() then
+    return true
+  end
+  self:close(false)
+  return false
 end
 
 function Presentation:close(restore_focus)
@@ -1127,15 +1165,15 @@ function Presentation:_activate_from_cursor(is_explicit_move)
 end
 
 function Presentation:_install_cursor_observer()
-  if self.cursor_group then
+  if self.presentation_group then
     return
   end
-  self.cursor_group = vim.api.nvim_create_augroup("RefinePresentation" .. self.bufnr, {
+  self.presentation_group = vim.api.nvim_create_augroup("RefinePresentation" .. self.bufnr, {
     clear = true,
   })
   vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
     buffer = self.bufnr,
-    group = self.cursor_group,
+    group = self.presentation_group,
     callback = function()
       if self.card_win and vim.api.nvim_win_is_valid(self.card_win) then
         local winid = vim.api.nvim_get_current_win()
@@ -1245,7 +1283,7 @@ function Presentation:_navigate(direction)
     return false
   end
   if card_focused then
-    vim.api.nvim_set_current_win(self.card_win)
+    return self:_focus_card()
   end
   return true
 end

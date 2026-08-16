@@ -8,6 +8,12 @@ capability-parity release.
 
 ## [Unreleased]
 
+### Changed
+
+- `:RefineShow` now focuses a suggestion card on its first invocation;
+  navigation and highlight clicks retain unfocused previews with an explicit
+  focus hint for card-local keys.
+
 ### Added
 
 - Pure Lua Refine integration runtime for Neovim 0.11 and newer on macOS.

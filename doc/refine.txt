@@ -148,8 +148,8 @@ metadata and remain unchanged by Apply.
 
                                                         *:RefineShow*
 :RefineShow
-    Opens the card for a suggestion under the caret. Does not jump when there
-    is no suggestion there. Invoking Show for an already open card focuses it.
+    Opens and focuses the card for a suggestion under the caret, or focuses
+    its open preview. Does not jump when there is no suggestion there.
 
                                                         *:RefineNext*
 :RefineNext
@@ -249,12 +249,15 @@ explicit Dismiss action.
 ==============================================================================
 7. Suggestion card                                *refine-suggestion-card*
 
-A suggestion card opens without taking editor focus. Invoking Show again
-focuses it. Moving away, changing the source, switching its owning window, or
-superseding the card's suggestion or check generation closes it. A replacement
-within the same source revision, check generation, and suggestion preserves
-the card, focus, streamed explanation, inline feedback, and newest actions,
-keys, and appearance.
+Show opens and focuses a suggestion card immediately. Next, Previous, and a
+source-highlight click instead open an unfocused preview so editor navigation
+remains active. A preview displays
+`Preview · :RefineShow to focus for card keys`; invoking Show focuses it.
+Moving away, changing the source, switching its owning window, or superseding
+the card's suggestion or check generation closes it. A replacement within the
+same source revision, check generation, and suggestion preserves the card,
+focus, streamed explanation, inline feedback, and newest actions, keys, and
+appearance.
 
 Diff runs follow their natural text flow inside the card, so word replacements
 appear inline and long text wraps normally. Additions are bold in the configured
@@ -291,11 +294,11 @@ mappings with a |FileType| autocmd for `refine`; same-suggestion replacements
 preserve those overrides unless the relevant Refine-configured transient key
 changes.
 
-A plain single left click on a live Refine highlight opens its card. Refine
-observes clicks passively and never installs or shadows a `<LeftMouse>`
-mapping. It does not hover-open cards or claim double-click, drag, right-click,
-wheel, or non-Refine mouse behavior. Disabling Neovim mouse input leaves
-commands and keyboard actions available without a warning.
+A plain single left click on a live Refine highlight opens its unfocused
+preview. Refine observes clicks passively and never installs or shadows a
+`<LeftMouse>` mapping. It does not hover-open cards or claim double-click,
+drag, right-click, wheel, or non-Refine mouse behavior. Disabling Neovim mouse
+input leaves commands and keyboard actions available without a warning.
 
 On |FocusLost|, Refine preserves the session, checking work, highlights, and
 status, while closing the card and suspending Quick Apply mappings even across

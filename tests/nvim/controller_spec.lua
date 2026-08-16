@@ -598,7 +598,6 @@ harness.test("reports the owner source status through RefineStatus while its car
     },
   }, {})
   harness.equal(true, runs[1].host:show())
-  harness.equal(true, runs[1].host:show())
 
   local notifications = {}
   local original_notify = vim.notify

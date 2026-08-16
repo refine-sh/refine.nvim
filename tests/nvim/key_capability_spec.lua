@@ -137,7 +137,6 @@ end)
 
 local function focus_card(host)
   harness.equal(true, host:show())
-  harness.equal(true, host:show())
   return host.presentation:card_window()
 end
 

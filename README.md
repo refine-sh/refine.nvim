@@ -134,8 +134,8 @@ available `<Plug>` target and card mapping.
 | Command | Action |
 | --- | --- |
 | `:[range]RefineCheck` | Check the buffer or the complete sentences touched by a line range. |
-| `:RefineShow` | Open the suggestion under the cursor, or focus its open card. |
-| `:RefineNext` / `:RefinePrevious` | Move through suggestions in document order. Navigation wraps. |
+| `:RefineShow` | Open and focus the suggestion under the cursor, or focus its open preview. |
+| `:RefineNext` / `:RefinePrevious` | Move through suggestions and open an unfocused preview. Navigation wraps. |
 | `:RefineApply` | Apply the open suggestion, or the suggestion under the cursor. |
 | `:RefineDismiss` | Dismiss the open suggestion, or the suggestion under the cursor. |
 | `:RefineExplain` | Request an explanation for the current suggestion. |

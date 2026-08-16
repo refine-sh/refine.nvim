@@ -134,9 +134,9 @@ when needed without taking focus.
 | Command | Behavior |
 | --- | --- |
 | `:[range]RefineCheck` | Request a fresh manual writing check for the buffer or selection. |
-| `:RefineShow` | Open the suggestion under the cursor. Calling it again focuses the card. |
-| `:RefineNext` | Move to and open the next suggestion. Navigation wraps. |
-| `:RefinePrevious` | Move to and open the previous suggestion. Navigation wraps. |
+| `:RefineShow` | Open and focus the suggestion under the cursor, or focus its open preview. |
+| `:RefineNext` | Move to and preview the next suggestion without taking focus. Navigation wraps. |
+| `:RefinePrevious` | Move to and preview the previous suggestion without taking focus. Navigation wraps. |
 | `:RefineApply` | Apply the open suggestion, or the suggestion under the cursor. |
 | `:RefineDismiss` | Dismiss the open suggestion, or the suggestion under the cursor. |
 | `:RefineExplain` | Stream an explanation when that action is available. |
@@ -197,9 +197,12 @@ each pair identically. `:checkhealth refine` reports that limitation.
 
 ## Suggestion card
 
-The card opens without taking editor focus. Call `:RefineShow` again to focus
-it. Moving away, changing the source, switching its owning window, or
-superseding its suggestion closes it.
+`:RefineShow` opens and focuses the card immediately. `:RefineNext`,
+`:RefinePrevious`, and a source-highlight click instead open an unfocused
+preview so editor navigation remains active. A preview displays
+`Preview · :RefineShow to focus for card keys`; one `:RefineShow` focuses it.
+Moving away, changing the source, switching its owning window, or superseding
+its suggestion closes it.
 
 Diff runs follow their natural text flow inside the card, so word replacements
 appear inline and long text wraps normally. Additions are bold in the configured
@@ -230,9 +233,9 @@ Replace these buffer-local mappings with a `FileType refine` autocmd when you
 want different card controls. Same-suggestion replacements preserve your
 overrides unless the relevant Refine-configured transient key changes.
 
-A plain left click on a live highlight opens its card. Refine observes clicks
-without installing or shadowing a `<LeftMouse>` mapping. Available footer
-actions are clickable.
+A plain left click on a live highlight opens its unfocused preview. Refine
+observes clicks without installing or shadowing a `<LeftMouse>` mapping.
+Available footer actions are clickable.
 
 ## Apply behavior
 

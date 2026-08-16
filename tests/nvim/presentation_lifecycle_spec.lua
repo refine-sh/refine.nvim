@@ -228,7 +228,6 @@ harness.test("bounds an overflowing focused card to the owner window", function(
   vim.cmd.redraw()
 
   harness.equal(true, host:show())
-  harness.equal(true, host:show())
   local card_win = host.presentation:card_window()
   local config = vim.api.nvim_win_get_config(card_win)
   harness.equal(true, config.width <= math.max(1, math.floor(vim.api.nvim_win_get_width(owner_win) * 0.8)))
@@ -350,7 +349,6 @@ harness.test("grows streamed feedback and follows the focused card only while it
     end,
   })
   vim.api.nvim_win_set_cursor(owner_win, { 1, 1 })
-  harness.equal(true, host:show())
   harness.equal(true, host:show())
   harness.equal(true, host:action("explain"))
   local card_win = host.presentation:card_window()
