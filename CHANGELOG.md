@@ -10,9 +10,9 @@ capability-parity release.
 
 ### Changed
 
-- `:RefineShow` now focuses a suggestion card on its first invocation;
-  navigation and highlight clicks retain unfocused previews with an explicit
-  focus hint for card-local keys.
+- `:RefineShow` and source-highlight clicks now focus a suggestion card
+  immediately; navigation retains unfocused previews with an explicit focus
+  hint for card-local keys.
 
 ### Added
 

@@ -197,9 +197,9 @@ each pair identically. `:checkhealth refine` reports that limitation.
 
 ## Suggestion card
 
-`:RefineShow` opens and focuses the card immediately. `:RefineNext`,
-`:RefinePrevious`, and a source-highlight click instead open an unfocused
-preview so editor navigation remains active. A preview displays
+`:RefineShow` and a source-highlight click open and focus the card immediately.
+`:RefineNext` and `:RefinePrevious` instead open an unfocused preview so editor
+navigation remains active. A preview displays
 `Preview · :RefineShow to focus for card keys`; one `:RefineShow` focuses it.
 Moving away, changing the source, switching its owning window, or superseding
 its suggestion closes it.
@@ -233,7 +233,7 @@ Replace these buffer-local mappings with a `FileType refine` autocmd when you
 want different card controls. Same-suggestion replacements preserve your
 overrides unless the relevant Refine-configured transient key changes.
 
-A plain left click on a live highlight opens its unfocused preview. Refine
+A plain left click on a live highlight opens and focuses its card. Refine
 observes clicks without installing or shadowing a `<LeftMouse>` mapping.
 Available footer actions are clickable.
 

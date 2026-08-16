@@ -906,7 +906,7 @@ harness.test("notifies actionable async failures for explicit actions without a 
   host:deactivate()
 end)
 
-harness.test("observes editor and card clicks without shadowing mouse mappings", function()
+harness.test("focuses source-highlight clicks without shadowing mouse mappings", function()
   local previous_mouse = vim.o.mouse
   vim.o.mouse = "a"
   local observer_count = vim.on_key()
@@ -931,19 +931,34 @@ harness.test("observes editor and card clicks without shadowing mouse mappings",
 
   harness.equal(observer_count + 1, vim.on_key())
   harness.equal("Existing mouse mapping", buffer_mapping(bufnr, "<LeftMouse>").desc)
-  local highlight = vim.fn.screenpos(owner_win, 1, 1)
-  vim.api.nvim_input_mouse("left", "press", "", 0, highlight.row - 1, highlight.col - 1)
-  vim.api.nvim_feedkeys(vim.keycode("<LeftMouse>"), "xt", false)
+  local function click_highlight(expected_native_clicks)
+    local highlight = vim.fn.screenpos(owner_win, 1, 1)
+    vim.api.nvim_input_mouse("left", "press", "", 0, highlight.row - 1, highlight.col - 1)
+    vim.api.nvim_feedkeys(vim.keycode("<LeftMouse>"), "xt", false)
+    harness.equal(
+      true,
+      vim.wait(1000, function()
+        return native_clicks == expected_native_clicks and host.presentation:card_window() ~= nil
+      end)
+    )
+    return host.presentation:card_window()
+  end
+
+  local card_win = click_highlight(1)
+  harness.equal(card_win, vim.api.nvim_get_current_win())
+  local card_buf = vim.api.nvim_win_get_buf(card_win)
+  harness.equal({}, buffer_mapping(card_buf, "<LeftMouse>"))
+  vim.api.nvim_feedkeys("d", "x", false)
   harness.equal(
     true,
     vim.wait(1000, function()
-      return native_clicks == 1 and host.presentation:card_window() ~= nil
+      return dismissed == 1 and host.presentation:card_window() == nil
     end)
   )
+  harness.equal(owner_win, vim.api.nvim_get_current_win())
 
-  local card_win = host.presentation:card_window()
-  local card_buf = vim.api.nvim_win_get_buf(card_win)
-  harness.equal({}, buffer_mapping(card_buf, "<LeftMouse>"))
+  card_win = click_highlight(2)
+  card_buf = vim.api.nvim_win_get_buf(card_win)
   local footer_line = vim.api.nvim_buf_line_count(card_buf)
   local original_getmousepos = vim.fn.getmousepos
   vim.fn.getmousepos = function()
@@ -951,7 +966,7 @@ harness.test("observes editor and card clicks without shadowing mouse mappings",
   end
   vim.api.nvim_feedkeys(vim.keycode("<LeftMouse>"), "xt", false)
   local footer_observed = vim.wait(1000, function()
-    return dismissed == 1 and host.presentation:card_window() == nil
+    return dismissed == 2 and host.presentation:card_window() == nil
   end)
   vim.fn.getmousepos = original_getmousepos
   harness.equal(true, footer_observed)

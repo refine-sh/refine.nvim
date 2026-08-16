@@ -143,6 +143,9 @@ available `<Plug>` target and card mapping.
 | `:RefineClose` | Close the card without applying or dismissing the suggestion. |
 | `:RefineStatus` | Show the current integration state. |
 
+A plain click on an underlined suggestion also opens and focuses its card.
+Next and Previous previews keep editor focus.
+
 ## Supported writing formats
 
 Markdown, plain text, Git commit messages, email, TeX, and LaTeX are enabled by

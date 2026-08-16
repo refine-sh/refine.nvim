@@ -249,8 +249,8 @@ explicit Dismiss action.
 ==============================================================================
 7. Suggestion card                                *refine-suggestion-card*
 
-Show opens and focuses a suggestion card immediately. Next, Previous, and a
-source-highlight click instead open an unfocused preview so editor navigation
+Show and a source-highlight click open and focus a suggestion card immediately.
+Next and Previous instead open an unfocused preview so editor navigation
 remains active. A preview displays
 `Preview · :RefineShow to focus for card keys`; invoking Show focuses it.
 Moving away, changing the source, switching its owning window, or superseding
@@ -294,8 +294,8 @@ mappings with a |FileType| autocmd for `refine`; same-suggestion replacements
 preserve those overrides unless the relevant Refine-configured transient key
 changes.
 
-A plain single left click on a live Refine highlight opens its unfocused
-preview. Refine observes clicks passively and never installs or shadows a
+A plain single left click on a live Refine highlight opens and focuses its
+card. Refine observes clicks passively and never installs or shadows a
 `<LeftMouse>` mapping. It does not hover-open cards or claim double-click,
 drag, right-click, wheel, or non-Refine mouse behavior. Disabling Neovim mouse
 input leaves commands and keyboard actions available without a warning.

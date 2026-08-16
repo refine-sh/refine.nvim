@@ -1091,8 +1091,8 @@ function Presentation:_handle_left_mouse()
     return
   end
   local suggestion = self:_suggestion_at_position(winid, line, column)
-  if suggestion then
-    self:_open_card(winid, suggestion)
+  if suggestion and self:_open_card(winid, suggestion) and not self:_focus_card() then
+    self:close(false)
   end
 end
 
