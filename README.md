@@ -1,6 +1,9 @@
 <div align="center">
   <a href="https://refine.sh">
-    <img src="https://refine.sh/icon.png" width="128" alt="Refine icon">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://refine.sh/icon-dark.png">
+      <img src="https://refine.sh/icon.png" width="128" alt="Refine icon">
+    </picture>
   </a>
   <h1>Refine.nvim</h1>
   <p><strong>A native AI grammar checker and writing assistant for Neovim, powered by Refine.</strong></p>
@@ -11,50 +14,26 @@
   </p>
 </div>
 
-Refine for Neovim is an AI grammar checker and writing assistant for Markdown,
-Git commit messages, email, plain text, and LaTeX. Use Refine's built-in local
-models for private, on-device checks that keep working offline after download,
-or connect your own AI provider.
+Refine is an AI grammar checker powered by a local language model, so it can run
+entirely offline. This plugin brings its contextual grammar and fluency
+suggestions to Neovim, helping you improve your writing without leaving your
+editor.
 
-Review each suggestion through native Neovim highlights and floating cards,
-ask for an explanation, and apply the correction as one undoable edit.
-Card diffs keep word replacements inline: additions are bold, deletions carry
-a visible midline, and changed whitespace is marked when enabled.
+Features:
 
-[Refine](https://refine.sh) supplies the models, languages, checking policy,
-and writing settings. `refine.nvim` supplies the native editor experience. The
-plugin requires the Refine app for macOS and is not a standalone checker.
+- Private, offline checks powered by a local LLM on your device
+- Native highlights and floating cards for reviewing changes in context
+- Clear explanations of why each change is suggested
 
 <!--
-Demo: add assets/refine-nvim-demo.gif, then replace this comment with:
-
 ![Refine checking Markdown grammar with local AI in Neovim](assets/refine-nvim-demo.gif)
 -->
 
-## Why use Refine in Neovim?
-
-- **Write with local AI.** A downloaded Refine model runs on your Mac, keeps
-  check text on your device, and works without an internet connection.
-- **Stay inside Neovim.** Suggestions appear as native highlights with a
-  focused card for reviewing the diff and available actions.
-- **Check the right scope.** Refine can check an entire buffer, the sentences
-  touched by a line range, or an exact Visual selection.
-- **Work across languages.** Refine supports grammar and fluency checks in more
-  than 50 languages and regional variants.
-- **Understand each correction.** Review suggestions individually, ask why a
-  change was proposed, and decide whether to apply, dismiss, or report it.
-- **Keep edits predictable.** Applying a suggestion performs one validated
-  buffer mutation and creates one undo entry.
-
-There is no language server, Java runtime, model endpoint, or provider API key
-to configure in Neovim. Those choices live in Refine.
-
 ## Requirements
 
-- macOS 14 or newer
-- Neovim 0.11 or newer
-- A compatible Refine for Mac
-- An active Refine trial or license
+- macOS 14+
+- Neovim 0.11+
+- Refine 1.35+
 
 Refine includes a full-featured seven-day trial with no credit card required.
 
@@ -68,13 +47,17 @@ Install Refine with Homebrew:
 brew install --cask refine
 ```
 
-You can also [download Refine for Mac](https://refine.sh) directly. Launch the
-app, start the trial or activate your license, and download a local model if
-you want on-device and offline checks.
+You can also [download Refine for Mac](https://refine.sh) directly.
 
 ### 2. Install `refine.nvim`
 
-With [lazy.nvim](https://github.com/folke/lazy.nvim):
+Choose one of the following installation methods. No `setup()` call is
+required.
+
+#### Option 1: With lazy.nvim
+
+Add `refine.nvim` to your [lazy.nvim](https://github.com/folke/lazy.nvim)
+plugin spec:
 
 ```lua
 {
@@ -82,11 +65,9 @@ With [lazy.nvim](https://github.com/folke/lazy.nvim):
 }
 ```
 
-No `setup()` call is required.
+#### Option 2: Without a plugin manager
 
-#### Without a plugin manager
-
-Clone the plugin into Neovim's native package directory:
+Alternatively, clone the plugin into Neovim's native package directory:
 
 ```sh
 mkdir -p ~/.local/share/nvim/site/pack/refine/start
@@ -157,9 +138,8 @@ are eligible. Refine never changes file format or end-of-line settings.
 
 ## Local AI and privacy
 
-When a writing task uses a downloaded Refine local model, the check text and
-model response stay on your Mac. The model can keep checking offline after it
-has been downloaded.
+When Refine uses a downloaded local model, the checked text and model response
+stay on your Mac. Once downloaded, the model continues working offline.
 
 Refine can also use a provider you connect. Those requests go directly from
 your Mac to that provider, whose terms and privacy practices apply. Downloads,
@@ -171,12 +151,12 @@ authenticated, same-user Unix socket. It makes no direct network, telemetry,
 analytics, or update-check requests.
 
 `:RefineReport` is explicit, opt-in feedback. When you use it, Refine receives
-the relevant before-and-after excerpt plus suggestion and diagnostic metadata.
+the relevant before-and-after excerpt, along with suggestion and diagnostic
+metadata.
 
 Read [How Refine works](https://refine.sh/guides/how-refine-works), the
 [offline grammar checker guide](https://refine.sh/guides/offline-grammar-checker-mac),
-and the [privacy policy](https://refine.sh/privacy-policy) for the complete
-product boundaries.
+and the [privacy policy](https://refine.sh/privacy-policy) for full details.
 
 ## Troubleshooting
 
