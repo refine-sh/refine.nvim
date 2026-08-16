@@ -1,6 +1,6 @@
 <div align="center">
   <a href="https://refine.sh">
-    <img src="https://refine.sh/icon.png" width="96" height="96" alt="Refine icon">
+    <img src="https://refine.sh/icon.png" width="128" alt="Refine icon">
   </a>
   <h1>Refine.nvim</h1>
   <p><strong>A native AI grammar checker and writing assistant for Neovim, powered by Refine.</strong></p>
