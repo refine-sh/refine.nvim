@@ -1,0 +1,26 @@
+{
+  "formatVersion": 1,
+  "id": "unicode-scalar-coordinates",
+  "description": "Wire ranges use UTF-16 code units, accept scalar boundaries inside a grapheme, and reject endpoints that split a surrogate pair.",
+  "socketRunnable": false,
+  "connections": [],
+  "coordinateCases": [
+    { "id": "emoji-whole-scalar", "text": "A😀B", "range": { "location": 1, "length": 2 }, "valid": true },
+    { "id": "between-scalars-inside-grapheme", "text": "é", "range": { "location": 1, "length": 0 }, "valid": true },
+    { "id": "split-surrogate-start", "text": "A😀B", "range": { "location": 2, "length": 0 }, "valid": false },
+    { "id": "split-surrogate-end", "text": "A😀B", "range": { "location": 1, "length": 1 }, "valid": false },
+    { "id": "past-utf16-end", "text": "A😀B", "range": { "location": 4, "length": 1 }, "valid": false }
+  ],
+  "applyEditCases": [
+    {
+      "id": "nonoverlapping-edits",
+      "ranges": [{ "location": 0, "length": 1 }, { "location": 3, "length": 1 }],
+      "valid": true
+    },
+    {
+      "id": "overlapping-edits",
+      "ranges": [{ "location": 0, "length": 3 }, { "location": 2, "length": 1 }],
+      "valid": false
+    }
+  ]
+}

@@ -847,6 +847,17 @@ function Run:_schedule_reconnect()
   end)
 end
 
+function Run:_clear_coordinator_state()
+  self:_abandon_receipts()
+  self.current_check_id = nil
+  self.current_check_lineage_id = nil
+  self.retired_check_ids = {}
+  self.retired_check_command_ids = {}
+  self.check_lifecycles = {}
+  self.check_lineages = {}
+  self.resumable_check = nil
+end
+
 function Run:_connect()
   if not self.running or self.connecting or self.session or not self.latest_snapshot then
     return
@@ -875,7 +886,14 @@ function Run:_connect()
       return
     end
     if err then
-      if errors.is_fatal(err) then
+      if err.recovery == "newRun" then
+        self:_clear_coordinator_state()
+        self.server_epoch = nil
+        self.run_id = self.id_generator()
+        self:_emit_state({ state = "disconnected", error = err })
+        self:_publish_unavailable("disconnected")
+        self:_schedule_reconnect()
+      elseif errors.is_fatal(err) then
         self:_fatal(err)
       else
         self:_emit_state({ state = "disconnected", error = err })
@@ -896,17 +914,10 @@ function Run:_connect()
       self:_fatal(engine_error("WritingCheckEnginePort.connect returned an invalid session"))
       return
     end
-    local retained_run = self.server_epoch == nil
-      or (self.server_epoch == session.server_epoch and session.run_resumed == true)
-    if not retained_run then
-      self:_abandon_receipts()
-      self.current_check_id = nil
-      self.current_check_lineage_id = nil
-      self.retired_check_ids = {}
-      self.retired_check_command_ids = {}
-      self.check_lifecycles = {}
-      self.check_lineages = {}
-      self.resumable_check = nil
+    local first_connection = self.server_epoch == nil
+    local resumed_run = self.server_epoch == session.server_epoch and session.run_resumed == true
+    if not first_connection and not resumed_run then
+      self:_clear_coordinator_state()
     end
     self.server_epoch = session.server_epoch
     self.session = session
@@ -935,9 +946,14 @@ function Run:_connect()
     if not self.running or self.session ~= session then
       return
     end
-    self:_restore_receipts(function()
+    local function open_snapshot()
       self:_open_latest_snapshot()
-    end)
+    end
+    if session.run_resumed then
+      self:_restore_receipts(open_snapshot)
+    else
+      open_snapshot()
+    end
   end
   local started, connect_error = pcall(self.engine_port.connect, self.engine_port, { run_id = self.run_id }, connected)
   if not started then

@@ -159,6 +159,42 @@ harness.test("rejects ambiguous edits at the same source location before mutatio
   harness.equal({ "ab" }, vim.api.nvim_buf_get_lines(bufnr, 0, -1, true))
 end)
 
+harness.test("applies at scalar boundaries but rejects a split surrogate pair", function()
+  vim.cmd.enew({ bang = true })
+  local bufnr = vim.api.nvim_get_current_buf()
+  vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, { "é" })
+  local source = require("refine.nvim.source").new({
+    bufnr = bufnr,
+    source_syntax = "plainText",
+    run_id = "scalar-boundary",
+  })
+  local before = source:snapshot()
+
+  local applied = require("refine.nvim.apply").apply(source, {
+    expectedRevision = before.revision,
+    sourceId = "document",
+    edits = {
+      { range = { location = 0, length = 1 }, expectedText = "e", replacement = "a" },
+    },
+  })
+
+  harness.equal("applied", applied.status)
+  harness.equal({ "á" }, vim.api.nvim_buf_get_lines(bufnr, 0, -1, true))
+
+  vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, { "😀" })
+  local emoji = source:snapshot()
+  local rejected = require("refine.nvim.apply").apply(source, {
+    expectedRevision = emoji.revision,
+    sourceId = "document",
+    edits = {
+      { range = { location = 0, length = 1 }, expectedText = "", replacement = "x" },
+    },
+  })
+
+  harness.equal("unavailable", rejected.status)
+  harness.equal({ "😀" }, vim.api.nvim_buf_get_lines(bufnr, 0, -1, true))
+end)
+
 harness.test("refuses Apply after the buffer becomes structurally ineligible", function()
   vim.cmd.enew({ bang = true })
   local bufnr = vim.api.nvim_get_current_buf()

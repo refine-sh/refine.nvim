@@ -1,0 +1,189 @@
+{
+  "formatVersion": 1,
+  "cases": [
+    {
+      "id": "event-document-accepted",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "event", "sequence": 1, "epoch": "epoch-fixture", "causeCommandId": "command-open",
+        "event": { "type": "documentAccepted", "revision": "revision-0" }
+      }
+    },
+    {
+      "id": "event-resync-required",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "event", "sequence": 2, "epoch": "epoch-fixture",
+        "event": { "type": "resyncRequired", "reason": "reusedRevision" }
+      }
+    },
+    {
+      "id": "event-presentation-content-replaced",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "event", "sequence": 3, "epoch": "epoch-fixture", "causeCommandId": "command-check",
+        "event": {
+          "type": "presentationContentReplaced", "checkId": "check-1",
+          "content": {
+            "documentRevision": "revision-0", "status": "complete", "coverage": "full",
+            "suggestions": [{
+              "id": "suggestion-1", "sourceId": "document", "kind": "grammar",
+              "attribution": {
+                "languageDisplayName": "English (American)", "textDirection": "ltr",
+                "checkModelDisplayName": "On-Device"
+              },
+              "activationRange": { "location": 0, "length": 5 },
+              "highlightRanges": [{ "location": 0, "length": 5 }],
+              "diff": [
+                { "kind": "delete", "text": "Helo" },
+                { "kind": "insert", "text": "Hello" }
+              ],
+              "availableActions": ["apply", "dismiss", "explain", "report"]
+            }],
+            "appearance": {
+              "highlight": { "style": "underline", "grammarColor": "#FF2D55", "fluencyColor": "#007AFF" },
+              "diff": { "additionColor": "#34C759", "deletionColor": "#FF3B30", "showHiddenWhitespace": true }
+            },
+            "interaction": {
+              "automaticChecksEnabled": true,
+              "quickApply": { "enabled": true, "applyKey": "tab", "dismissKey": "escape", "activationStyle": "showTipAndHighlight" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "event-presentation-checking-progress",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "event", "sequence": 4, "epoch": "epoch-fixture",
+        "event": {
+          "type": "presentationContentReplaced", "checkId": "check-2",
+          "content": {
+            "documentRevision": "revision-0", "status": "checking",
+            "progress": { "completedUnitCount": 1, "totalUnitCount": 3 }, "suggestions": [],
+            "appearance": {
+              "highlight": { "style": "dashedUnderline", "grammarColor": "#FF2D55", "fluencyColor": "#007AFF" },
+              "diff": { "additionColor": "#34C759", "deletionColor": "#FF3B30", "showHiddenWhitespace": false }
+            },
+            "interaction": {
+              "automaticChecksEnabled": false,
+              "quickApply": { "enabled": false, "applyKey": "return", "dismissKey": "space", "activationStyle": "highlightChanges" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "event-apply-requested",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "event", "sequence": 5, "epoch": "epoch-fixture", "causeCommandId": "command-action-apply",
+        "event": {
+          "type": "applyRequested", "actionId": "action-apply", "transactionId": "transaction-1",
+          "request": {
+            "expectedRevision": "revision-0", "sourceId": "document",
+            "edits": [
+              { "range": { "location": 4, "length": 0 }, "expectedText": "", "replacement": "l" },
+              { "range": { "location": 2, "length": 2 }, "expectedText": "xx", "replacement": "y" }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "event-explanation-started",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "event", "sequence": 6, "epoch": "epoch-fixture",
+        "event": {
+          "type": "explanationReplaced", "actionId": "action-explain",
+          "update": {
+            "status": "started",
+            "attribution": { "languageDisplayName": "English", "textDirection": "rtl", "modelDisplayName": "Local Model" }
+          }
+        }
+      }
+    },
+    {
+      "id": "event-explanation-streaming",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "event", "sequence": 7, "epoch": "epoch-fixture",
+        "event": { "type": "explanationReplaced", "actionId": "action-explain", "update": { "status": "streaming", "text": "Use the article" } }
+      }
+    },
+    {
+      "id": "event-explanation-completed",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "event", "sequence": 8, "epoch": "epoch-fixture",
+        "event": { "type": "explanationReplaced", "actionId": "action-explain", "update": { "status": "completed", "text": "Use the article a." } }
+      }
+    },
+    {
+      "id": "event-explanation-stale",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "event", "sequence": 9, "epoch": "epoch-fixture",
+        "event": { "type": "explanationReplaced", "actionId": "action-explain", "update": { "status": "stale" } }
+      }
+    },
+    {
+      "id": "event-explanation-unavailable",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "event", "sequence": 10, "epoch": "epoch-fixture",
+        "event": { "type": "explanationReplaced", "actionId": "action-explain", "update": { "status": "unavailable", "reason": "engineUnavailable" } }
+      }
+    },
+    {
+      "id": "event-action-completed",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "event", "sequence": 11, "epoch": "epoch-fixture",
+        "event": { "type": "actionCompleted", "actionId": "action-report" }
+      }
+    },
+    {
+      "id": "event-action-rejected",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "event", "sequence": 12, "epoch": "epoch-fixture",
+        "event": { "type": "actionRejected", "actionId": "action-apply", "reason": "stale" }
+      }
+    },
+    {
+      "id": "event-fault-invalid-sequence-fatal",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "event", "sequence": 13, "epoch": "epoch-fixture",
+        "event": { "type": "fault", "code": "invalidSequence", "fatal": true }
+      }
+    },
+    {
+      "id": "event-fault-malformed-nonfatal",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "event", "sequence": 14, "epoch": "epoch-fixture",
+        "event": { "type": "fault", "code": "malformedMessage", "fatal": false }
+      }
+    },
+    {
+      "id": "event-fault-resource-limit-fatal",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "event", "sequence": 15, "epoch": "epoch-fixture",
+        "event": { "type": "fault", "code": "resourceLimit", "fatal": true }
+      }
+    },
+    {
+      "id": "event-fault-invalid-document-nonfatal",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "event", "sequence": 16, "epoch": "epoch-fixture",
+        "event": { "type": "fault", "code": "invalidDocument", "fatal": false }
+      }
+    }
+  ]
+}

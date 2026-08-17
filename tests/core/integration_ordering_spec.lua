@@ -26,10 +26,10 @@ describe("integration command ordering", function()
         done(nil)
         receive_frame({
           type = "welcome",
-          protocol = { major = 2, minor = 5 },
+          protocol = { major = 1, minor = 0 },
           serverEpoch = "epoch",
           runResumed = false,
-          limits = { maxFrameBytes = 8388608, maxSources = 2 },
+          limits = { maxFrameBytes = 8388608, maxSources = 2, maxSourceBytes = 1048576 },
           capabilities = {},
         })
         return

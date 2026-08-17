@@ -31,12 +31,31 @@ function M.redact(value, fallback_message)
     type(value.message) == "string" and value.message or (fallback_message or "Refine operation failed"),
     value.recoverability or "fatal"
   )
-  redacted.required_update = value.required_update
   if type(value.received_protocol) == "table" then
     redacted.received_protocol = {
       major = value.received_protocol.major,
       minor = value.received_protocol.minor,
     }
+  end
+  if type(value.supported_protocol) == "table" then
+    redacted.supported_protocol = {
+      major = value.supported_protocol.major,
+      minor = value.supported_protocol.minor,
+    }
+  end
+  if value.kind == "HandshakeRejectedError" or value.kind == "IncompatibleProtocolError" then
+    if type(value.protocol) == "table" then
+      redacted.protocol = {
+        major = value.protocol.major,
+        minor = value.protocol.minor,
+      }
+    end
+    if type(value.reason) == "string" then
+      redacted.reason = value.reason
+    end
+    if type(value.recovery) == "string" then
+      redacted.recovery = value.recovery
+    end
   end
   return redacted
 end

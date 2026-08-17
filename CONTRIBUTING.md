@@ -19,8 +19,8 @@ Preserve these module boundaries:
 
 - `lua/refine/integration/` owns host-neutral lifecycle and action
   coordination.
-- `lua/refine/transport/` owns the editor-neutral authenticated Protocol 2.5
-  connection.
+- `lua/refine/transport/` owns the editor-neutral client for the same-UID,
+  per-launch-token public Integration Protocol 1.0 connection.
 - `lua/refine/nvim/` owns canonical buffer snapshots, native presentation,
   coordinate conversion, and one-mutation Apply behavior.
 
@@ -28,6 +28,28 @@ Keep the runtime pure Lua and compatible with Neovim 0.11 or newer. Model,
 provider, policy, appearance, interaction, entitlement, and network behavior
 belong to the Refine app. The plugin must not add its own network or telemetry
 path.
+
+## Protocol, support, and privacy
+
+Integration Protocol 1.0 is a supported public API that third-party
+writing-host clients may implement. Its schemas, vectors, state rules, fixed
+limits, and empty base capability registry are normative. Extend the wire only
+through a published capability or a successor protocol; do not silently change
+the 1.0 base contract.
+
+Refine maintains exact Protocol 1.0 compatibility throughout Refine 1.x. The
+supported production profile is a conforming writing-host client connecting to
+the shipping Refine server on macOS as the same local OS user, with Refine
+already running. Network transports, cross-user access, sandbox workarounds,
+and third-party production servers are outside that profile. Conformance is
+self-assessed and does not imply certification or endorsement.
+
+Complete canonical source snapshots cross the plugin-to-Refine boundary and
+may reach the provider selected by the user. Keep plugin logs and diagnostics
+free of source, diffs, explanations, launch tokens, and provider credentials.
+Report must remain a distinct action caused by an explicit user gesture; its
+Refine feedback-service destination and possible excerpt and context data must
+stay disclosed in user-facing documentation.
 
 ## Development workflow
 
@@ -61,6 +83,16 @@ make test-health
 make helptags-check
 ```
 
+Run every public real-socket scenario against the production transport using
+the adjacent release-candidate package:
+
+```sh
+make test-conformance REFINE_PROTOCOL_ROOT=/absolute/path/to/refine-protocol
+```
+
+This gate uses the public fake Refine peer and the nonshipping
+`tests/conformance/run.lua` adapter. It never launches the Refine app.
+
 Format the Lua source and regenerate help tags when needed:
 
 ```sh
@@ -74,9 +106,12 @@ live under `tests/health/`.
 
 ## Protocol fixture
 
-`tests/fixtures/integration-protocol-v2.json` is shared across first-party
-Refine integrations. It must remain byte-identical in every client. Coordinate
-any intentional protocol change across the Refine app and all first-party
+`tests/fixtures/refine-protocol/pin.json` identifies the content-addressed
+Protocol 1.0 artifact vendored for conformance tests. Every file covered by its
+manifest must remain byte-identical across consumers. Update the pin and
+artifact only from one immutable upstream snapshot; never recreate shared
+golden bytes in a client repository. Coordinate an intentional protocol or
+capability-registry change across the Refine app and all first-party
 integrations.
 
 ## Documentation

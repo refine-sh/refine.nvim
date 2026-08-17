@@ -1,0 +1,213 @@
+{
+  "formatVersion": 1,
+  "id": "golden-writing-session",
+  "description": "A coherent full-snapshot check, explanation, Report, host-authoritative Apply, receipt, and close session shared byte-for-byte by all first-party implementations.",
+  "socketRunnable": true,
+  "messages": {
+    "hello": {
+      "type": "hello",
+      "protocol": { "major": 1, "minor": 0 },
+      "client": { "id": "refine-obsidian", "version": "0.1.0", "host": "obsidian" },
+      "hostCapabilities": {
+        "interceptableSuggestionActionKeys": [
+          "tab", "escape", "return", "space", "delete",
+          "leftArrow", "rightArrow", "upArrow", "downArrow",
+          "leftShift", "rightShift", "leftOption", "rightOption",
+          "leftControl", "rightControl"
+        ]
+      },
+      "runId": "run-fixture",
+      "launchToken": "${launchToken}",
+      "capabilities": []
+    },
+    "rejection": {
+      "type": "rejected",
+      "reason": "incompatibleProtocol",
+      "recovery": "none",
+      "protocol": { "major": 1, "minor": 0 },
+      "receivedProtocol": { "major": 2, "minor": 5 }
+    },
+    "welcome": {
+      "type": "welcome",
+      "protocol": { "major": 1, "minor": 0 },
+      "serverEpoch": "${serverEpoch}",
+      "runResumed": false,
+      "limits": { "maxFrameBytes": 8388608, "maxSources": 2, "maxSourceBytes": 1048576 },
+      "capabilities": []
+    },
+    "openDocument": {
+      "type": "command", "sequence": 1, "id": "command-open",
+      "command": {
+        "type": "openDocument",
+        "snapshot": { "revision": "fixture:0", "sources": [
+          { "sourceId": "document", "text": "[create an link](URL)or 😀", "sourceSyntax": "markdownDocument" }
+        ] }
+      }
+    },
+    "documentAccepted": {
+      "type": "event", "sequence": 1, "epoch": "${serverEpoch}", "causeCommandId": "command-open",
+      "event": { "type": "documentAccepted", "revision": "fixture:0" }
+    },
+    "updateAttention": {
+      "type": "command", "sequence": 2, "id": "command-attention",
+      "command": {
+        "type": "updateAttention", "revision": "fixture:0",
+        "attention": { "sourceId": "document", "caretOffset": 21, "visibleRanges": [{ "location": 0, "length": 23 }] }
+      }
+    },
+    "selectionCheck": {
+      "type": "command", "sequence": 3, "id": "command-selection-check",
+      "command": {
+        "type": "requestCheck", "revision": "fixture:0",
+        "intent": { "selection": { "sourceId": "document", "range": { "location": 8, "length": 2 } } }
+      }
+    },
+    "checkingPresentation": {
+      "type": "event", "sequence": 2, "epoch": "${serverEpoch}", "causeCommandId": "command-selection-check",
+      "event": {
+        "type": "presentationContentReplaced", "checkId": "check-fixture",
+        "content": {
+          "documentRevision": "fixture:0", "status": "checking",
+          "progress": { "completedUnitCount": 1, "totalUnitCount": 3 },
+          "appearance": {
+            "highlight": { "style": "underline", "grammarColor": "#FF2D55", "fluencyColor": "#007AFF" },
+            "diff": { "additionColor": "#34C759", "deletionColor": "#FF3B30", "showHiddenWhitespace": true }
+          },
+          "interaction": {
+            "automaticChecksEnabled": true,
+            "quickApply": { "enabled": true, "applyKey": "tab", "dismissKey": "escape", "activationStyle": "showTipAndHighlight" }
+          },
+          "suggestions": []
+        }
+      }
+    },
+    "presentation": {
+      "type": "event", "sequence": 3, "epoch": "${serverEpoch}", "causeCommandId": "command-selection-check",
+      "event": {
+        "type": "presentationContentReplaced", "checkId": "check-fixture",
+        "content": {
+          "documentRevision": "fixture:0", "status": "complete", "coverage": "partial",
+          "appearance": {
+            "highlight": { "style": "underline", "grammarColor": "#FF2D55", "fluencyColor": "#007AFF" },
+            "diff": { "additionColor": "#34C759", "deletionColor": "#FF3B30", "showHiddenWhitespace": true }
+          },
+          "interaction": {
+            "automaticChecksEnabled": false,
+            "quickApply": { "enabled": true, "applyKey": "tab", "dismissKey": "escape", "activationStyle": "showTipAndHighlight" }
+          },
+          "suggestions": [
+            {
+              "id": "suggestion-article", "sourceId": "document", "kind": "grammar",
+              "attribution": { "languageDisplayName": "English (American)", "textDirection": "ltr", "checkModelDisplayName": "On-Device (Gemma)" },
+              "activationRange": { "location": 8, "length": 2 },
+              "highlightRanges": [{ "location": 8, "length": 2 }],
+              "diff": [{ "kind": "delete", "text": "an" }, { "kind": "insert", "text": "a" }],
+              "availableActions": ["apply", "dismiss", "explain", "report"]
+            },
+            {
+              "id": "suggestion-space", "sourceId": "document", "kind": "grammar",
+              "attribution": { "languageDisplayName": "English (American)", "textDirection": "ltr", "checkModelDisplayName": "On-Device (Gemma)" },
+              "activationRange": { "location": 11, "length": 12 },
+              "highlightRanges": [{ "location": 21, "length": 1 }],
+              "diff": [
+                { "kind": "unchanged", "text": "link" },
+                { "kind": "insert", "text": " " },
+                { "kind": "unchanged", "text": "or" }
+              ],
+              "availableActions": ["apply", "dismiss", "explain", "report"]
+            }
+          ]
+        }
+      }
+    },
+    "performExplain": {
+      "type": "command", "sequence": 4, "id": "command-explain",
+      "command": {
+        "type": "performAction", "actionId": "action-explain", "kind": "explain",
+        "suggestion": { "id": "suggestion-article", "documentRevision": "fixture:0" }
+      }
+    },
+    "explanationStarted": {
+      "type": "event", "sequence": 4, "epoch": "${serverEpoch}", "causeCommandId": "command-explain",
+      "event": {
+        "type": "explanationReplaced", "actionId": "action-explain",
+        "update": {
+          "status": "started",
+          "attribution": { "languageDisplayName": "English (American)", "textDirection": "ltr", "modelDisplayName": "OpenRouter (GPT-5.6)" }
+        }
+      }
+    },
+    "performReport": {
+      "type": "command", "sequence": 5, "id": "command-report",
+      "command": {
+        "type": "performAction", "actionId": "action-report", "kind": "report",
+        "suggestion": { "id": "suggestion-article", "documentRevision": "fixture:0" }
+      }
+    },
+    "reportCompleted": {
+      "type": "event", "sequence": 5, "epoch": "${serverEpoch}", "causeCommandId": "command-report",
+      "event": { "type": "actionCompleted", "actionId": "action-report" }
+    },
+    "performApply": {
+      "type": "command", "sequence": 6, "id": "command-apply",
+      "command": {
+        "type": "performAction", "actionId": "action-apply", "kind": "apply",
+        "suggestion": { "id": "suggestion-space", "documentRevision": "fixture:0" }
+      }
+    },
+    "applyRequested": {
+      "type": "event", "sequence": 6, "epoch": "${serverEpoch}", "causeCommandId": "command-apply",
+      "event": {
+        "type": "applyRequested", "actionId": "action-apply", "transactionId": "transaction-fixture",
+        "request": {
+          "expectedRevision": "fixture:0", "sourceId": "document",
+          "edits": [{ "range": { "location": 21, "length": 0 }, "expectedText": "", "replacement": " " }]
+        }
+      }
+    },
+    "completeApply": {
+      "type": "command", "sequence": 7, "id": "command-receipt",
+      "command": {
+        "type": "completeApply", "transactionId": "transaction-fixture",
+        "outcome": {
+          "status": "applied",
+          "snapshot": { "revision": "fixture:1", "sources": [
+            { "sourceId": "document", "text": "[create an link](URL) or 😀", "sourceSyntax": "markdownDocument" }
+          ] }
+        }
+      }
+    },
+    "applyCompleted": {
+      "type": "event", "sequence": 7, "epoch": "${serverEpoch}", "causeCommandId": "command-receipt",
+      "event": { "type": "actionCompleted", "actionId": "action-apply" }
+    },
+    "closeDocument": {
+      "type": "command", "sequence": 8, "id": "command-close",
+      "command": { "type": "closeDocument" }
+    }
+  },
+  "connections": [
+    {
+      "steps": [
+        { "direction": "client", "messageRef": "hello" },
+        { "direction": "server", "messageRef": "welcome" },
+        { "direction": "client", "messageRef": "openDocument" },
+        { "direction": "server", "messageRef": "documentAccepted" },
+        { "direction": "client", "messageRef": "updateAttention" },
+        { "direction": "client", "messageRef": "selectionCheck" },
+        { "direction": "server", "messageRef": "checkingPresentation" },
+        { "direction": "server", "messageRef": "presentation" },
+        { "direction": "client", "messageRef": "performExplain" },
+        { "direction": "server", "messageRef": "explanationStarted" },
+        { "direction": "client", "messageRef": "performReport" },
+        { "direction": "server", "messageRef": "reportCompleted" },
+        { "direction": "client", "messageRef": "performApply" },
+        { "direction": "server", "messageRef": "applyRequested" },
+        { "direction": "client", "messageRef": "completeApply" },
+        { "direction": "server", "messageRef": "applyCompleted" },
+        { "direction": "client", "messageRef": "closeDocument" },
+        { "direction": "client", "close": true }
+      ]
+    }
+  ]
+}

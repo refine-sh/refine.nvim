@@ -147,6 +147,11 @@ local function connection_for(pipe)
           return
         end
       end
+      local pending_decode_error = decoder:take_error()
+      if pending_decode_error ~= nil then
+        finish(pending_decode_error)
+        self:close()
+      end
     end
     local queue_error = errors.new("EngineConnectionError", "Refine socket read queue is full", "recoverable")
     local enqueue = ordered_main_queue(function()

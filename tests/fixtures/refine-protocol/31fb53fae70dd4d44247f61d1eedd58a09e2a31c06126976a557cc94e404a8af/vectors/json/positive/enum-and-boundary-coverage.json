@@ -1,0 +1,54 @@
+{
+  "formatVersion": 1,
+  "cases": [
+    { "id": "safe-integer-minimum", "schema": "schema/shared.schema.json#/$defs/safeInteger", "value": 0 },
+    { "id": "safe-integer-maximum", "schema": "schema/shared.schema.json#/$defs/safeInteger", "value": 9007199254740991 },
+    { "id": "uint16-minimum", "schema": "schema/shared.schema.json#/$defs/uint16", "value": 0 },
+    { "id": "uint16-maximum", "schema": "schema/shared.schema.json#/$defs/uint16", "value": 65535 },
+    { "id": "sequence-minimum", "schema": "schema/shared.schema.json#/$defs/sequence", "value": 1 },
+    { "id": "sequence-maximum", "schema": "schema/shared.schema.json#/$defs/sequence", "value": 4294967295 },
+    { "id": "identifier-one-byte", "schema": "schema/shared.schema.json#/$defs/identifier", "value": "!" },
+    { "id": "identifier-128-bytes", "schema": "schema/shared.schema.json#/$defs/identifier", "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" },
+
+    { "id": "source-syntax-plain", "schema": "schema/shared.schema.json#/$defs/sourceSnapshot/properties/sourceSyntax", "value": "plainText" },
+    { "id": "source-syntax-markdown", "schema": "schema/shared.schema.json#/$defs/sourceSnapshot/properties/sourceSyntax", "value": "markdownDocument" },
+    { "id": "source-syntax-latex", "schema": "schema/shared.schema.json#/$defs/sourceSnapshot/properties/sourceSyntax", "value": "latexDocument" },
+
+    { "id": "suggestion-kind-grammar", "schema": "schema/shared.schema.json#/$defs/presentedSuggestion/properties/kind", "value": "grammar" },
+    { "id": "suggestion-kind-fluency", "schema": "schema/shared.schema.json#/$defs/presentedSuggestion/properties/kind", "value": "fluency" },
+    { "id": "suggestion-kind-mixed", "schema": "schema/shared.schema.json#/$defs/presentedSuggestion/properties/kind", "value": "mixed" },
+    { "id": "diff-kind-unchanged", "schema": "schema/shared.schema.json#/$defs/diffRun/properties/kind", "value": "unchanged" },
+    { "id": "diff-kind-delete", "schema": "schema/shared.schema.json#/$defs/diffRun/properties/kind", "value": "delete" },
+    { "id": "diff-kind-insert", "schema": "schema/shared.schema.json#/$defs/diffRun/properties/kind", "value": "insert" },
+    { "id": "text-direction-ltr", "schema": "schema/shared.schema.json#/$defs/attribution/properties/textDirection", "value": "ltr" },
+    { "id": "text-direction-rtl", "schema": "schema/shared.schema.json#/$defs/attribution/properties/textDirection", "value": "rtl" },
+
+    { "id": "highlight-underline", "schema": "schema/shared.schema.json#/$defs/appearance/properties/highlight/properties/style", "value": "underline" },
+    { "id": "highlight-dashed", "schema": "schema/shared.schema.json#/$defs/appearance/properties/highlight/properties/style", "value": "dashedUnderline" },
+    { "id": "highlight-solid", "schema": "schema/shared.schema.json#/$defs/appearance/properties/highlight/properties/style", "value": "highlight" },
+    { "id": "activation-highlight", "schema": "schema/shared.schema.json#/$defs/interaction/properties/quickApply/properties/activationStyle", "value": "highlightChanges" },
+    { "id": "activation-tip", "schema": "schema/shared.schema.json#/$defs/interaction/properties/quickApply/properties/activationStyle", "value": "showTipAndHighlight" },
+
+    { "id": "presentation-pending", "schema": "schema/shared.schema.json#/$defs/presentationContent/properties/status", "value": "pending" },
+    { "id": "presentation-checking", "schema": "schema/shared.schema.json#/$defs/presentationContent/properties/status", "value": "checking" },
+    { "id": "presentation-complete", "schema": "schema/shared.schema.json#/$defs/presentationContent/properties/status", "value": "complete" },
+    { "id": "presentation-unavailable", "schema": "schema/shared.schema.json#/$defs/presentationContent/properties/status", "value": "unavailable" },
+    { "id": "presentation-closed", "schema": "schema/shared.schema.json#/$defs/presentationContent/properties/status", "value": "closed" },
+    { "id": "coverage-full", "schema": "schema/shared.schema.json#/$defs/presentationContent/properties/coverage", "value": "full" },
+    { "id": "coverage-partial", "schema": "schema/shared.schema.json#/$defs/presentationContent/properties/coverage", "value": "partial" },
+
+    { "id": "resync-document-not-open", "schema": "schema/event.schema.json#/$defs/resyncRequired/properties/reason", "value": "documentNotOpen" },
+    { "id": "resync-conflicting-revision", "schema": "schema/event.schema.json#/$defs/resyncRequired/properties/reason", "value": "conflictingRevision" },
+    { "id": "resync-reused-revision", "schema": "schema/event.schema.json#/$defs/resyncRequired/properties/reason", "value": "reusedRevision" },
+    { "id": "resync-invalid-document", "schema": "schema/event.schema.json#/$defs/resyncRequired/properties/reason", "value": "invalidDocument" },
+
+    { "id": "apply-rejection-stale", "schema": "schema/shared.schema.json#/$defs/applyOutcome/oneOf/1/properties/reason", "value": "staleRevision" },
+    { "id": "apply-rejection-text", "schema": "schema/shared.schema.json#/$defs/applyOutcome/oneOf/1/properties/reason", "value": "textMismatch" },
+    { "id": "apply-unsupported-read-only", "schema": "schema/shared.schema.json#/$defs/applyOutcome/oneOf/2/properties/reason", "value": "readOnly" },
+    { "id": "apply-unsupported-non-atomic", "schema": "schema/shared.schema.json#/$defs/applyOutcome/oneOf/2/properties/reason", "value": "nonAtomic" },
+
+    { "id": "exact-source-byte-limit", "schema": "schema/envelope.schema.json", "generate": { "kind": "sourceBytes", "bytes": 1048576 } },
+    { "id": "exact-capability-count-limit", "schema": "schema/handshake.schema.json", "generate": { "kind": "helloCapabilities", "count": 64 } }
+  ]
+}
+

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "capability-registry.schema.json",
+  "title": "Integration Protocol capability registry",
+  "type": "object",
+  "required": ["schemaVersion", "protocol", "capabilities"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "protocol": { "$ref": "shared.schema.json#/$defs/protocolVersion" },
+    "capabilities": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "required": ["id", "specification", "digest"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.){2,}[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.v[1-9][0-9]*$",
+            "maxLength": 128
+          },
+          "specification": { "type": "string", "minLength": 1 },
+          "digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        }
+      }
+    }
+  }
+}

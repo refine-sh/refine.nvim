@@ -298,7 +298,7 @@ The report covers:
 - Neovim version and macOS platform
 - redacted configuration
 - same-user endpoint permissions
-- exact Integration Protocol 2.5 compatibility
+- exact local and remote Integration Protocol 1.0 versions
 - detected or generic frontend state
 - semantic integration state
 - configured action-key compatibility
@@ -318,20 +318,38 @@ current file plus one rotated file. Health output and persistent diagnostics
 never include source text, suggestion diffs, explanations, launch tokens,
 credentials, or other secrets.
 
-## Privacy and compatibility
+## Privacy, protocol, and support
 
-The plugin talks only to the local Refine app over an authenticated, same-user
-Unix-domain socket. It makes no direct network, telemetry, analytics, or
-update-check requests. Plugin managers own plugin updates.
+The plugin talks only to the local Refine app over a same-UID Unix-domain socket
+using Refine's current per-launch token. This excludes network clients and other
+OS users, but does not identify a specific plugin or protect against another
+process already running as you. The plugin makes no direct network, telemetry,
+analytics, or update-check requests. Plugin managers own plugin updates.
 
-Refine may use the local model or remote provider selected in the app under
-its privacy and consent controls. See [Local AI and privacy](../README.md#local-ai-and-privacy)
-for the user-facing summary.
+The plugin sends complete canonical source snapshots to Refine. Refine may use
+the local model or a remote provider selected in the app under its privacy and
+consent controls; that provider may therefore receive the source. See
+[Local AI and privacy](../README.md#local-ai-and-privacy) for the user-facing
+summary.
 
-`:RefineReport` sends suggestion feedback through the Refine app only when you
-invoke it. The [Refine privacy policy](https://refine.sh/privacy-policy)
-describes the reported context and metadata.
+`:RefineReport` is distinct from writing checks and sends feedback through the
+Refine app only after you invoke it. Refine's feedback service may receive
+original and revised excerpts plus suggestion, model, language,
+custom-instruction, Refine-version, and macOS-version context. The
+[Refine privacy policy](https://refine.sh/privacy-policy) describes that
+processing.
 
-The current integration requires exact Protocol 2.5 compatibility. A mismatch
-fails before source text is sent and reports whether the plugin or Refine must
-be updated.
+Integration Protocol 1.0 is a supported public API that third-party
+writing-host clients may implement. This plugin requires exact Protocol 1.0;
+there is no Protocol 2.5 alias. Refine maintains exact 1.0 compatibility
+throughout Refine 1.x.
+
+The supported production profile connects a conforming writing-host client to
+the shipping Refine server on macOS as the same local OS user, with Refine
+already running. Network transports, cross-user access, and third-party
+production servers are outside that profile. Technical conformance is
+self-assessed and does not imply certification or endorsement.
+
+A mismatch fails before source is sent and reports the exact local and remote
+versions. It does not infer an update direction from their numeric ordering;
+install a compatible Refine app and plugin pair, then reconnect.

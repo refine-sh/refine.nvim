@@ -1,0 +1,449 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "shared.schema.json",
+  "title": "Integration Protocol 1.0 shared values",
+  "$defs": {
+    "safeInteger": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "uint16": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 65535
+    },
+    "uint32": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 4294967295
+    },
+    "identifier": {
+      "type": "string",
+      "pattern": "^[!-~]{1,128}$"
+    },
+    "launchToken": {
+      "type": "string",
+      "pattern": "^[0-9A-F]{64}$"
+    },
+    "protocolVersion": {
+      "type": "object",
+      "required": ["major", "minor"],
+      "properties": {
+        "major": { "const": 1 },
+        "minor": { "const": 0 }
+      }
+    },
+    "anyProtocolVersion": {
+      "type": "object",
+      "required": ["major", "minor"],
+      "properties": {
+        "major": { "$ref": "#/$defs/uint16" },
+        "minor": { "$ref": "#/$defs/uint16" }
+      }
+    },
+    "capabilitySet": {
+      "type": "array",
+      "maxItems": 64,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/identifier" }
+    },
+    "utf16Range": {
+      "type": "object",
+      "required": ["location", "length"],
+      "properties": {
+        "location": { "$ref": "#/$defs/safeInteger" },
+        "length": { "$ref": "#/$defs/safeInteger" }
+      }
+    },
+    "nonEmptyUTF16Range": {
+      "allOf": [
+        { "$ref": "#/$defs/utf16Range" },
+        {
+          "properties": {
+            "length": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            }
+          }
+        }
+      ]
+    },
+    "sourceSnapshot": {
+      "type": "object",
+      "required": ["sourceId", "text", "sourceSyntax"],
+      "properties": {
+        "sourceId": { "$ref": "#/$defs/identifier" },
+        "text": { "type": "string" },
+        "sourceSyntax": {
+          "enum": ["plainText", "markdownDocument", "latexDocument"]
+        }
+      }
+    },
+    "documentSnapshot": {
+      "type": "object",
+      "required": ["revision", "sources"],
+      "properties": {
+        "revision": { "$ref": "#/$defs/identifier" },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "items": { "$ref": "#/$defs/sourceSnapshot" }
+        }
+      }
+    },
+    "writingAttention": {
+      "type": "object",
+      "required": ["sourceId", "visibleRanges"],
+      "properties": {
+        "sourceId": { "$ref": "#/$defs/identifier" },
+        "caretOffset": { "$ref": "#/$defs/safeInteger" },
+        "visibleRanges": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyUTF16Range" }
+        }
+      }
+    },
+    "checkSelection": {
+      "type": "object",
+      "required": ["sourceId", "range"],
+      "properties": {
+        "sourceId": { "$ref": "#/$defs/identifier" },
+        "range": { "$ref": "#/$defs/nonEmptyUTF16Range" }
+      }
+    },
+    "checkIntent": {
+      "type": "object",
+      "properties": {
+        "forcedLanguageTag": { "$ref": "#/$defs/identifier" },
+        "sourceIds": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/identifier" }
+        },
+        "selection": { "$ref": "#/$defs/checkSelection" }
+      },
+      "not": { "required": ["sourceIds", "selection"] }
+    },
+    "suggestionReference": {
+      "type": "object",
+      "required": ["id", "documentRevision"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "documentRevision": { "$ref": "#/$defs/identifier" }
+      }
+    },
+    "hostEdit": {
+      "type": "object",
+      "required": ["range", "expectedText", "replacement"],
+      "properties": {
+        "range": { "$ref": "#/$defs/utf16Range" },
+        "expectedText": { "type": "string" },
+        "replacement": { "type": "string" }
+      }
+    },
+    "hostApplyRequest": {
+      "type": "object",
+      "required": ["expectedRevision", "sourceId", "edits"],
+      "properties": {
+        "expectedRevision": { "$ref": "#/$defs/identifier" },
+        "sourceId": { "$ref": "#/$defs/identifier" },
+        "edits": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/hostEdit" }
+        }
+      }
+    },
+    "applyOutcome": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["status", "snapshot"],
+          "properties": {
+            "status": { "const": "applied" },
+            "snapshot": { "$ref": "#/$defs/documentSnapshot" }
+          },
+          "not": { "required": ["reason"] }
+        },
+        {
+          "type": "object",
+          "required": ["status", "reason", "snapshot"],
+          "properties": {
+            "status": { "const": "rejected" },
+            "reason": { "enum": ["staleRevision", "textMismatch"] },
+            "snapshot": { "$ref": "#/$defs/documentSnapshot" }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["status", "reason"],
+          "properties": {
+            "status": { "const": "unsupported" },
+            "reason": { "enum": ["readOnly", "nonAtomic"] },
+            "snapshot": { "$ref": "#/$defs/documentSnapshot" }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["status"],
+          "properties": {
+            "status": { "enum": ["unavailable", "indeterminate"] },
+            "snapshot": { "$ref": "#/$defs/documentSnapshot" }
+          },
+          "not": { "required": ["reason"] }
+        }
+      ]
+    },
+    "sRGBHex": {
+      "type": "string",
+      "pattern": "^#[0-9A-F]{6}$"
+    },
+    "appearance": {
+      "type": "object",
+      "required": ["highlight", "diff"],
+      "properties": {
+        "highlight": {
+          "type": "object",
+          "required": ["style", "grammarColor", "fluencyColor"],
+          "properties": {
+            "style": { "enum": ["underline", "dashedUnderline", "highlight"] },
+            "grammarColor": { "$ref": "#/$defs/sRGBHex" },
+            "fluencyColor": { "$ref": "#/$defs/sRGBHex" }
+          }
+        },
+        "diff": {
+          "type": "object",
+          "required": ["additionColor", "deletionColor", "showHiddenWhitespace"],
+          "properties": {
+            "additionColor": { "$ref": "#/$defs/sRGBHex" },
+            "deletionColor": { "$ref": "#/$defs/sRGBHex" },
+            "showHiddenWhitespace": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "actionKey": {
+      "enum": [
+        "tab", "escape", "return", "space", "delete",
+        "leftArrow", "rightArrow", "upArrow", "downArrow",
+        "leftShift", "rightShift", "leftOption", "rightOption",
+        "leftControl", "rightControl"
+      ]
+    },
+    "interaction": {
+      "type": "object",
+      "required": ["automaticChecksEnabled", "quickApply"],
+      "properties": {
+        "automaticChecksEnabled": { "type": "boolean" },
+        "quickApply": {
+          "type": "object",
+          "required": ["enabled", "applyKey", "dismissKey", "activationStyle"],
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "applyKey": { "$ref": "#/$defs/actionKey" },
+            "dismissKey": { "$ref": "#/$defs/actionKey" },
+            "activationStyle": {
+              "enum": ["highlightChanges", "showTipAndHighlight"]
+            }
+          }
+        }
+      }
+    },
+    "attribution": {
+      "type": "object",
+      "required": ["languageDisplayName", "textDirection", "checkModelDisplayName"],
+      "properties": {
+        "languageDisplayName": { "type": "string", "minLength": 1 },
+        "textDirection": { "enum": ["ltr", "rtl"] },
+        "checkModelDisplayName": { "type": "string", "minLength": 1 }
+      }
+    },
+    "diffRun": {
+      "type": "object",
+      "required": ["kind", "text"],
+      "properties": {
+        "kind": { "enum": ["unchanged", "delete", "insert"] },
+        "text": { "type": "string" }
+      }
+    },
+    "presentedSuggestion": {
+      "type": "object",
+      "required": [
+        "id", "sourceId", "kind", "attribution", "activationRange",
+        "highlightRanges", "diff", "availableActions"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "sourceId": { "$ref": "#/$defs/identifier" },
+        "kind": { "enum": ["grammar", "fluency", "mixed"] },
+        "attribution": { "$ref": "#/$defs/attribution" },
+        "activationRange": { "$ref": "#/$defs/utf16Range" },
+        "highlightRanges": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/utf16Range" }
+        },
+        "diff": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/diffRun" }
+        },
+        "availableActions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "enum": ["apply", "dismiss", "explain", "report"] }
+        }
+      }
+    },
+    "progress": {
+      "type": "object",
+      "required": ["completedUnitCount", "totalUnitCount"],
+      "properties": {
+        "completedUnitCount": { "$ref": "#/$defs/safeInteger" },
+        "totalUnitCount": { "$ref": "#/$defs/safeInteger" }
+      }
+    },
+    "presentationContent": {
+      "type": "object",
+      "required": [
+        "documentRevision", "status", "suggestions", "appearance", "interaction"
+      ],
+      "properties": {
+        "documentRevision": { "$ref": "#/$defs/identifier" },
+        "status": {
+          "enum": ["pending", "checking", "complete", "unavailable", "closed"]
+        },
+        "coverage": { "enum": ["full", "partial"] },
+        "unavailableReason": {
+          "enum": [
+            "disconnected", "checkFailed", "engineUnavailable", "invalidDocument",
+            "unsupportedSource", "resourceLimit", "writingCheckEntitlementRequired"
+          ]
+        },
+        "progress": { "$ref": "#/$defs/progress" },
+        "suggestions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/presentedSuggestion" }
+        },
+        "appearance": { "$ref": "#/$defs/appearance" },
+        "interaction": { "$ref": "#/$defs/interaction" }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "status": { "const": "pending" },
+            "suggestions": { "maxItems": 0 }
+          },
+          "not": {
+            "anyOf": [
+              { "required": ["coverage"] },
+              { "required": ["unavailableReason"] },
+              { "required": ["progress"] }
+            ]
+          }
+        },
+        {
+          "properties": { "status": { "const": "checking" } },
+          "not": {
+            "anyOf": [
+              { "required": ["coverage"] },
+              { "required": ["unavailableReason"] }
+            ]
+          }
+        },
+        {
+          "required": ["coverage"],
+          "properties": { "status": { "const": "complete" } },
+          "not": {
+            "anyOf": [
+              { "required": ["unavailableReason"] },
+              { "required": ["progress"] }
+            ]
+          }
+        },
+        {
+          "required": ["unavailableReason"],
+          "properties": {
+            "status": { "const": "unavailable" },
+            "suggestions": { "maxItems": 0 }
+          },
+          "not": {
+            "anyOf": [
+              { "required": ["coverage"] },
+              { "required": ["progress"] }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "status": { "const": "closed" },
+            "suggestions": { "maxItems": 0 }
+          },
+          "not": {
+            "anyOf": [
+              { "required": ["coverage"] },
+              { "required": ["unavailableReason"] },
+              { "required": ["progress"] }
+            ]
+          }
+        }
+      ]
+    },
+    "explanationAttribution": {
+      "type": "object",
+      "required": ["languageDisplayName", "textDirection", "modelDisplayName"],
+      "properties": {
+        "languageDisplayName": { "type": "string", "minLength": 1 },
+        "textDirection": { "enum": ["ltr", "rtl"] },
+        "modelDisplayName": { "type": "string", "minLength": 1 }
+      }
+    },
+    "explanationUpdate": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["status", "attribution"],
+          "properties": {
+            "status": { "const": "started" },
+            "attribution": { "$ref": "#/$defs/explanationAttribution" }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["status", "text"],
+          "properties": {
+            "status": { "enum": ["streaming", "completed"] },
+            "text": { "type": "string" }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["status"],
+          "properties": { "status": { "const": "stale" } }
+        },
+        {
+          "type": "object",
+          "required": ["status", "reason"],
+          "properties": {
+            "status": { "const": "unavailable" },
+            "reason": {
+              "enum": [
+                "disconnected", "engineUnavailable", "validationUnavailable",
+                "readOnly", "nonAtomic", "mutationUnavailable",
+                "mutationIndeterminate", "applyNotProven", "reportingUnavailable"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}

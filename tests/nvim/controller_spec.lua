@@ -302,7 +302,8 @@ harness.test("retries a terminal integration only from explicit work", function(
     state = "stopped",
     error = {
       kind = "IncompatibleProtocolError",
-      required_update = "client",
+      received_protocol = { major = 2, minor = 5 },
+      supported_protocol = { major = 1, minor = 0 },
     },
   })
 
@@ -433,8 +434,8 @@ harness.test("keeps fatal protocol incompatibility in the public unavailable sta
             kind = "IncompatibleProtocolError",
             message = "incompatible protocol",
             recoverability = "fatal",
-            required_update = "client",
-            received_protocol = { major = 2, minor = 6 },
+            received_protocol = { major = 2, minor = 5 },
+            supported_protocol = { major = 1, minor = 0 },
           })
         end,
       }
@@ -446,8 +447,9 @@ harness.test("keeps fatal protocol incompatibility in the public unavailable sta
   local status = controller:status(bufnr)
   harness.equal("unavailable", status.state)
   harness.equal("incompatible_protocol", status.reason)
-  harness.equal("client", status.required_update)
-  harness.equal({ major = 2, minor = 6 }, status.received_protocol)
+  harness.equal(nil, status.required_update)
+  harness.equal({ major = 2, minor = 5 }, status.received_protocol)
+  harness.equal({ major = 1, minor = 0 }, status.supported_protocol)
   assert_public_status_states(observed_states)
 end)
 

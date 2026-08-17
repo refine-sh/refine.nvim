@@ -185,7 +185,7 @@ describe("writing-attention integration runtime", function()
     assert_equal(2, commands[4].attention.caretOffset)
   end)
 
-  it("replays matching attention before a pending check after reconnect", function()
+  it("replays snapshot and attention before a pending check after a lost run", function()
     local sessions = {}
     local reconnect
     local observe
@@ -203,7 +203,7 @@ describe("writing-attention integration runtime", function()
       return value
     end
     local first = session(false)
-    local second = session(true)
+    local second = session(false)
     local connects = 0
     local host = {}
     function host:observe(emit)

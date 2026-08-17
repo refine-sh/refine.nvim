@@ -144,18 +144,43 @@ harness.test("verifies the private endpoint without exposing credentials", funct
           locate = function(_, callback)
             callback(nil, {
               launchToken = "secret-token",
-              protocolMajor = 2,
-              protocolMinor = 5,
+              protocolMajor = 1,
+              protocolMinor = 0,
             })
           end,
         }
       end,
     },
-    ["refine.transport.wire"] = { PROTOCOL_MAJOR = 2, PROTOCOL_MINOR = 5 },
+    ["refine.transport.wire"] = { PROTOCOL_MAJOR = 1, PROTOCOL_MINOR = 0 },
   })
 
-  harness.equal(true, has_call(calls, "ok", "endpoint is secure and uses protocol 2%.5"))
+  harness.equal(true, has_call(calls, "ok", "endpoint is secure and uses protocol 1%.0"))
   harness.equal(false, messages(calls):find("secret%-token") ~= nil)
+end)
+
+harness.test("does not infer an update direction from endpoint protocol numbers", function()
+  local calls = capture_health(function()
+    require("refine.health").check()
+  end, {
+    ["refine.transport.endpoint"] = {
+      locator = function()
+        return {
+          locate = function(_, callback)
+            callback({
+              kind = "EndpointProtocolVersionError",
+              message = "Refine protocol 2.5 is incompatible with protocol 1.0",
+              received_protocol = { major = 2, minor = 5 },
+              supported_protocol = { major = 1, minor = 0 },
+            })
+          end,
+        }
+      end,
+    },
+  })
+
+  harness.equal(true, has_advice(calls, "Install a compatible Refine app and plugin pair"))
+  harness.equal(false, has_advice(calls, "Update Refine for Neovim"))
+  harness.equal(false, has_advice(calls, "Update the Refine app"))
 end)
 
 harness.test("turns endpoint inspection failures into actionable health output", function()

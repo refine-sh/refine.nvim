@@ -1,0 +1,47 @@
+{
+  "formatVersion": 1,
+  "id": "sequence-exhaustion",
+  "description": "A direction may send UInt32.max once, then closes and reconnects instead of wrapping to zero.",
+  "socketRunnable": true,
+  "connections": [
+    {
+      "expectedOutcome": "sequenceExhausted",
+      "sequenceStarts": { "client": 4294967295, "server": 1 },
+      "steps": [
+        { "direction": "client", "message": {
+          "type": "hello", "protocol": { "major": 1, "minor": 0 },
+          "client": { "id": "com.runjuu.refine.reference", "version": "1.0.0-rc", "host": "reference-cli" },
+          "hostCapabilities": { "interceptableSuggestionActionKeys": [] },
+          "runId": "sequence-run", "launchToken": "${launchToken}", "capabilities": []
+        } },
+        { "direction": "server", "message": {
+          "type": "welcome", "protocol": { "major": 1, "minor": 0 }, "serverEpoch": "${serverEpoch}", "runResumed": false,
+          "limits": { "maxFrameBytes": 8388608, "maxSources": 2, "maxSourceBytes": 1048576 }, "capabilities": []
+        } },
+        { "direction": "client", "message": {
+          "type": "command", "sequence": 4294967295, "id": "last-command", "command": { "type": "closeDocument" }
+        }, "exhaustsSequence": true },
+        { "direction": "client", "close": true }
+      ]
+    },
+    {
+      "steps": [
+        { "direction": "client", "message": {
+          "type": "hello", "protocol": { "major": 1, "minor": 0 },
+          "client": { "id": "com.runjuu.refine.reference", "version": "1.0.0-rc", "host": "reference-cli" },
+          "hostCapabilities": { "interceptableSuggestionActionKeys": [] },
+          "runId": "sequence-run", "launchToken": "${launchToken}", "capabilities": []
+        } },
+        { "direction": "server", "message": {
+          "type": "welcome", "protocol": { "major": 1, "minor": 0 }, "serverEpoch": "${serverEpoch}", "runResumed": true,
+          "limits": { "maxFrameBytes": 8388608, "maxSources": 2, "maxSourceBytes": 1048576 }, "capabilities": []
+        } },
+        { "direction": "client", "message": {
+          "type": "command", "sequence": 1, "id": "first-after-reconnect", "command": { "type": "closeDocument" }
+        } },
+        { "direction": "client", "close": true }
+      ]
+    }
+  ],
+  "wrappedToZero": false
+}

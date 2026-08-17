@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "endpoint-descriptor.schema.json",
+  "title": "Refine endpoint-descriptor schema 1",
+  "type": "object",
+  "required": [
+    "version", "socketPath", "launchToken", "serverEpoch",
+    "protocolMajor", "protocolMinor", "pid"
+  ],
+  "properties": {
+    "version": { "const": 1 },
+    "socketPath": { "type": "string", "pattern": "^/", "minLength": 1 },
+    "launchToken": { "$ref": "shared.schema.json#/$defs/launchToken" },
+    "serverEpoch": { "$ref": "shared.schema.json#/$defs/identifier" },
+    "protocolMajor": { "const": 1 },
+    "protocolMinor": { "const": 0 },
+    "pid": { "type": "integer", "minimum": 1, "maximum": 2147483647 }
+  }
+}

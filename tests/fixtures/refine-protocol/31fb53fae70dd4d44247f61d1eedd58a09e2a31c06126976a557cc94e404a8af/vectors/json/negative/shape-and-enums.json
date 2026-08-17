@@ -1,0 +1,247 @@
+{
+  "formatVersion": 1,
+  "cases": [
+    {
+      "id": "descriptor-minor-is-required",
+      "schema": "schema/endpoint-descriptor.schema.json",
+      "value": {
+        "version": 1,
+        "socketPath": "/tmp/refine/socket",
+        "launchToken": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "serverEpoch": "epoch",
+        "protocolMajor": 1,
+        "pid": 42
+      },
+      "error": "schema"
+    },
+    {
+      "id": "descriptor-socket-path-is-absolute",
+      "schema": "schema/endpoint-descriptor.schema.json",
+      "value": {
+        "version": 1,
+        "socketPath": "relative/refine.sock",
+        "launchToken": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "serverEpoch": "epoch",
+        "protocolMajor": 1,
+        "protocolMinor": 0,
+        "pid": 42
+      },
+      "error": "schema"
+    },
+    {
+      "id": "hello-capabilities-are-required",
+      "schema": "schema/handshake.schema.json",
+      "value": {
+        "type": "hello", "protocol": { "major": 1, "minor": 0 },
+        "client": { "id": "com.example.writer", "version": "1", "host": "host" },
+        "hostCapabilities": { "interceptableSuggestionActionKeys": [] },
+        "runId": "run", "launchToken": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      },
+      "error": "schema"
+    },
+    {
+      "id": "hello-requires-exact-protocol-1.0",
+      "schema": "schema/handshake.schema.json",
+      "value": {
+        "type": "hello", "protocol": { "major": 1, "minor": 1 },
+        "client": { "id": "com.example.writer", "version": "1", "host": "host" },
+        "hostCapabilities": { "interceptableSuggestionActionKeys": [] },
+        "runId": "run", "launchToken": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "capabilities": []
+      },
+      "error": "schema"
+    },
+    {
+      "id": "null-does-not-substitute-for-absent-optional-intent",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 1, "id": "command-check",
+        "command": { "type": "requestCheck", "revision": "revision", "intent": null }
+      },
+      "error": "null-value"
+    },
+    {
+      "id": "unknown-command-discriminator",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 1, "id": "command-future",
+        "command": { "type": "patchDocument" }
+      },
+      "error": "schema"
+    },
+    {
+      "id": "unknown-event-discriminator",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "event", "sequence": 1, "epoch": "epoch",
+        "event": { "type": "futureEvent" }
+      },
+      "error": "schema"
+    },
+    {
+      "id": "unknown-source-syntax",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 1, "id": "command-open",
+        "command": { "type": "openDocument", "snapshot": {
+          "revision": "revision", "sources": [
+            { "sourceId": "document", "text": "text", "sourceSyntax": "htmlDocument" }
+          ]
+        } }
+      },
+      "error": "schema"
+    },
+    {
+      "id": "identifier-must-be-visible-ascii",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 1, "id": "commande-accentuée",
+        "command": { "type": "closeDocument" }
+      },
+      "error": "schema"
+    },
+    {
+      "id": "identifier-over-128-bytes",
+      "schema": "schema/shared.schema.json#/$defs/identifier",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "error": "schema"
+    },
+    {
+      "id": "identifier-cannot-end-with-newline",
+      "schema": "schema/shared.schema.json#/$defs/identifier",
+      "value": "identifier\n",
+      "error": "schema"
+    },
+    {
+      "id": "capability-id-requires-reverse-domain-publisher",
+      "schema": "schema/capability-registry.schema.json",
+      "value": {
+        "schemaVersion": 1,
+        "protocol": { "major": 1, "minor": 0 },
+        "capabilities": [{
+          "id": "feature.v1",
+          "specification": "https://example.com/feature-v1",
+          "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }]
+      },
+      "error": "schema"
+    },
+    {
+      "id": "command-sequence-zero",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 0, "id": "command-zero",
+        "command": { "type": "closeDocument" }
+      },
+      "error": "schema"
+    },
+    {
+      "id": "negative-integer-is-outside-sequence-range",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": -1, "id": "command-negative",
+        "command": { "type": "closeDocument" }
+      },
+      "error": "negative-number-token"
+    },
+    {
+      "id": "command-sequence-over-uint32",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 4294967296, "id": "command-overflow",
+        "command": { "type": "closeDocument" }
+      },
+      "error": "schema"
+    },
+    {
+      "id": "invalid-fault-severity-pair",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "event", "sequence": 1, "epoch": "epoch",
+        "event": { "type": "fault", "code": "invalidSequence", "fatal": false }
+      },
+      "error": "schema"
+    },
+    {
+      "id": "suggestion-language-display-name-is-nonempty",
+      "schema": "schema/shared.schema.json#/$defs/attribution",
+      "value": {
+        "languageDisplayName": "",
+        "textDirection": "ltr",
+        "checkModelDisplayName": "Model"
+      },
+      "error": "schema"
+    },
+    {
+      "id": "suggestion-check-model-display-name-is-nonempty",
+      "schema": "schema/shared.schema.json#/$defs/attribution",
+      "value": {
+        "languageDisplayName": "English",
+        "textDirection": "ltr",
+        "checkModelDisplayName": ""
+      },
+      "error": "schema"
+    },
+    {
+      "id": "explanation-model-display-name-is-nonempty",
+      "schema": "schema/shared.schema.json#/$defs/explanationAttribution",
+      "value": {
+        "languageDisplayName": "English",
+        "textDirection": "ltr",
+        "modelDisplayName": ""
+      },
+      "error": "schema"
+    },
+    {
+      "id": "explanation-language-display-name-is-nonempty",
+      "schema": "schema/shared.schema.json#/$defs/explanationAttribution",
+      "value": {
+        "languageDisplayName": "",
+        "textDirection": "ltr",
+        "modelDisplayName": "Model"
+      },
+      "error": "schema"
+    },
+    {
+      "id": "handshake-recovery-pair-is-closed",
+      "schema": "schema/handshake.schema.json",
+      "value": {
+        "type": "rejected", "reason": "serverBusy", "recovery": "none",
+        "protocol": { "major": 1, "minor": 0 }
+      },
+      "error": "schema"
+    },
+    {
+      "id": "received-protocol-is-only-for-version-rejection",
+      "schema": "schema/handshake.schema.json",
+      "value": {
+        "type": "rejected", "reason": "invalidClient", "recovery": "none",
+        "protocol": { "major": 1, "minor": 0 },
+        "receivedProtocol": { "major": 1, "minor": 0 }
+      },
+      "error": "schema"
+    },
+    {
+      "id": "typed-rejection-reports-server-protocol-1-0",
+      "schema": "schema/handshake.schema.json",
+      "value": {
+        "type": "rejected", "reason": "incompatibleProtocol", "recovery": "none",
+        "protocol": { "major": 2, "minor": 0 },
+        "receivedProtocol": { "major": 1, "minor": 0 }
+      },
+      "error": "schema"
+    },
+    {
+      "id": "optional-apply-snapshot-does-not-accept-null",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 1, "id": "command-receipt",
+        "command": {
+          "type": "completeApply", "transactionId": "transaction",
+          "outcome": { "status": "unavailable", "snapshot": null }
+        }
+      },
+      "error": "null-value"
+    }
+  ]
+}

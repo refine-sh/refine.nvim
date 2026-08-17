@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "event.schema.json",
+  "title": "Integration Protocol 1.0 event payload",
+  "oneOf": [
+    { "$ref": "#/$defs/documentAccepted" },
+    { "$ref": "#/$defs/resyncRequired" },
+    { "$ref": "#/$defs/presentationContentReplaced" },
+    { "$ref": "#/$defs/applyRequested" },
+    { "$ref": "#/$defs/explanationReplaced" },
+    { "$ref": "#/$defs/actionCompleted" },
+    { "$ref": "#/$defs/actionRejected" },
+    { "$ref": "#/$defs/fault" }
+  ],
+  "$defs": {
+    "documentAccepted": {
+      "type": "object",
+      "required": ["type", "revision"],
+      "properties": {
+        "type": { "const": "documentAccepted" },
+        "revision": { "$ref": "shared.schema.json#/$defs/identifier" }
+      }
+    },
+    "resyncRequired": {
+      "type": "object",
+      "required": ["type", "reason"],
+      "properties": {
+        "type": { "const": "resyncRequired" },
+        "reason": {
+          "enum": [
+            "documentNotOpen", "conflictingRevision", "reusedRevision", "invalidDocument"
+          ]
+        }
+      }
+    },
+    "presentationContentReplaced": {
+      "type": "object",
+      "required": ["type", "checkId", "content"],
+      "properties": {
+        "type": { "const": "presentationContentReplaced" },
+        "checkId": { "$ref": "shared.schema.json#/$defs/identifier" },
+        "content": { "$ref": "shared.schema.json#/$defs/presentationContent" }
+      }
+    },
+    "applyRequested": {
+      "type": "object",
+      "required": ["type", "actionId", "transactionId", "request"],
+      "properties": {
+        "type": { "const": "applyRequested" },
+        "actionId": { "$ref": "shared.schema.json#/$defs/identifier" },
+        "transactionId": { "$ref": "shared.schema.json#/$defs/identifier" },
+        "request": { "$ref": "shared.schema.json#/$defs/hostApplyRequest" }
+      }
+    },
+    "explanationReplaced": {
+      "type": "object",
+      "required": ["type", "actionId", "update"],
+      "properties": {
+        "type": { "const": "explanationReplaced" },
+        "actionId": { "$ref": "shared.schema.json#/$defs/identifier" },
+        "update": { "$ref": "shared.schema.json#/$defs/explanationUpdate" }
+      }
+    },
+    "actionCompleted": {
+      "type": "object",
+      "required": ["type", "actionId"],
+      "properties": {
+        "type": { "const": "actionCompleted" },
+        "actionId": { "$ref": "shared.schema.json#/$defs/identifier" }
+      }
+    },
+    "actionRejected": {
+      "type": "object",
+      "required": ["type", "actionId", "reason"],
+      "properties": {
+        "type": { "const": "actionRejected" },
+        "actionId": { "$ref": "shared.schema.json#/$defs/identifier" },
+        "reason": {
+          "enum": [
+            "stale", "disconnected", "engineUnavailable", "validationUnavailable",
+            "readOnly", "nonAtomic", "mutationUnavailable", "mutationIndeterminate",
+            "applyNotProven", "reportingUnavailable", "unsupportedAction"
+          ]
+        }
+      }
+    },
+    "fault": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["type", "code", "fatal"],
+          "properties": {
+            "type": { "const": "fault" },
+            "code": { "const": "invalidSequence" },
+            "fatal": { "const": true }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["type", "code", "fatal"],
+          "properties": {
+            "type": { "const": "fault" },
+            "code": { "enum": ["malformedMessage", "resourceLimit", "internalError"] },
+            "fatal": { "type": "boolean" }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["type", "code", "fatal"],
+          "properties": {
+            "type": { "const": "fault" },
+            "code": { "enum": ["invalidDocument", "unsupportedSource", "engineUnavailable"] },
+            "fatal": { "const": false }
+          }
+        }
+      ]
+    }
+  }
+}
+

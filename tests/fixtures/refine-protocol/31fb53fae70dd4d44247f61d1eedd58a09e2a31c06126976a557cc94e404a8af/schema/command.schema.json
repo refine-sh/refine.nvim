@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "command.schema.json",
+  "title": "Integration Protocol 1.0 command payload",
+  "oneOf": [
+    { "$ref": "#/$defs/openDocument" },
+    { "$ref": "#/$defs/replaceDocument" },
+    { "$ref": "#/$defs/updateAttention" },
+    { "$ref": "#/$defs/requestCheck" },
+    { "$ref": "#/$defs/performAction" },
+    { "$ref": "#/$defs/completeApply" },
+    { "$ref": "#/$defs/closeDocument" }
+  ],
+  "$defs": {
+    "openDocument": {
+      "type": "object",
+      "required": ["type", "snapshot"],
+      "properties": {
+        "type": { "const": "openDocument" },
+        "snapshot": { "$ref": "shared.schema.json#/$defs/documentSnapshot" }
+      }
+    },
+    "replaceDocument": {
+      "type": "object",
+      "required": ["type", "snapshot"],
+      "properties": {
+        "type": { "const": "replaceDocument" },
+        "snapshot": { "$ref": "shared.schema.json#/$defs/documentSnapshot" }
+      }
+    },
+    "updateAttention": {
+      "type": "object",
+      "required": ["type", "revision", "attention"],
+      "properties": {
+        "type": { "const": "updateAttention" },
+        "revision": { "$ref": "shared.schema.json#/$defs/identifier" },
+        "attention": { "$ref": "shared.schema.json#/$defs/writingAttention" }
+      }
+    },
+    "requestCheck": {
+      "type": "object",
+      "required": ["type", "revision"],
+      "properties": {
+        "type": { "const": "requestCheck" },
+        "revision": { "$ref": "shared.schema.json#/$defs/identifier" },
+        "intent": { "$ref": "shared.schema.json#/$defs/checkIntent" }
+      }
+    },
+    "performAction": {
+      "type": "object",
+      "required": ["type", "actionId", "kind", "suggestion"],
+      "properties": {
+        "type": { "const": "performAction" },
+        "actionId": { "$ref": "shared.schema.json#/$defs/identifier" },
+        "kind": { "enum": ["apply", "dismiss", "explain", "report"] },
+        "suggestion": { "$ref": "shared.schema.json#/$defs/suggestionReference" }
+      }
+    },
+    "completeApply": {
+      "type": "object",
+      "required": ["type", "transactionId", "outcome"],
+      "properties": {
+        "type": { "const": "completeApply" },
+        "transactionId": { "$ref": "shared.schema.json#/$defs/identifier" },
+        "outcome": { "$ref": "shared.schema.json#/$defs/applyOutcome" }
+      }
+    },
+    "closeDocument": {
+      "type": "object",
+      "required": ["type"],
+      "properties": { "type": { "const": "closeDocument" } }
+    }
+  }
+}
+

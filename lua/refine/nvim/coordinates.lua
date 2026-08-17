@@ -2,7 +2,7 @@ local Coordinates = {}
 Coordinates.__index = Coordinates
 
 local function boundary_error()
-  error("refine.nvim: offset is not a composed-character boundary", 3)
+  error("refine.nvim: offset is not a Unicode-scalar boundary", 3)
 end
 
 local function line_index(text, start_utf16)
@@ -10,8 +10,8 @@ local function line_index(text, start_utf16)
   local byte_to_utf16 = { [0] = 0 }
   local byte_col = 0
 
-  for grapheme = 0, vim.fn.strchars(text, true) - 1 do
-    local value = vim.fn.strcharpart(text, grapheme, 1, true)
+  for scalar = 0, vim.fn.strchars(text) - 1 do
+    local value = vim.fn.strcharpart(text, scalar, 1)
     byte_col = byte_col + #value
     local utf16_col = vim.str_utfindex(text, "utf-16", byte_col, true)
     utf16_to_byte[utf16_col] = byte_col

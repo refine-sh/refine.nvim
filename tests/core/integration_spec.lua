@@ -670,6 +670,21 @@ describe("host-neutral Refine integration runtime", function()
     )
   end)
 
+  it("uses fault.fatal rather than the fault code to decide whether the run stops", function()
+    local nonfatal = runtime_fixture()
+    nonfatal.event(1, { type = "fault", code = "malformedMessage", fatal = false })
+    assert_equal(true, nonfatal.handle.is_running())
+    assert_equal({}, nonfatal.errors)
+    assert_equal(false, nonfatal.session.closed == true)
+
+    local fatal = runtime_fixture()
+    fatal.event(1, { type = "fault", code = "malformedMessage", fatal = true })
+    assert_equal(false, fatal.handle.is_running())
+    assert_equal(1, #fatal.errors)
+    assert_matches("malformedMessage", fatal.errors[1].message)
+    assert_equal(true, fatal.session.closed)
+  end)
+
   it("finishes proof for a host mutation dispatched before entitlement loss", function()
     local fixture = runtime_fixture()
     local finish_apply

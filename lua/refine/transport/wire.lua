@@ -1,11 +1,16 @@
 local errors = require("refine.transport.errors")
 
 local M = {
-  PROTOCOL_MAJOR = 2,
-  PROTOCOL_MINOR = 5,
+  PROTOCOL_MAJOR = 1,
+  PROTOCOL_MINOR = 0,
   MAX_FRAME_BYTES = 8 * 1024 * 1024,
   MAX_SOURCES = 2,
+  MAX_SOURCE_BYTES = 1024 * 1024,
+  MAX_CAPABILITIES = 64,
+  KNOWN_CAPABILITIES = {},
 }
+
+local MAX_SAFE_INTEGER = 9007199254740991
 
 M.SUGGESTION_ACTION_KEYS = {
   "tab",
@@ -69,6 +74,15 @@ local action_unavailable_reasons = {
   applyNotProven = true,
   reportingUnavailable = true,
 }
+local fault_severities = {
+  invalidSequence = { [true] = true },
+  malformedMessage = { [false] = true, [true] = true },
+  resourceLimit = { [false] = true, [true] = true },
+  internalError = { [false] = true, [true] = true },
+  invalidDocument = { [false] = true },
+  unsupportedSource = { [false] = true },
+  engineUnavailable = { [false] = true },
+}
 
 local function fail(message)
   errors.raise("TransportProtocolError", message, "fatal", nil, 3)
@@ -107,17 +121,21 @@ local function nonempty_string(value, label)
   return value
 end
 
-local function exact_keys(value, expected, label)
-  local allowed = {}
+local function identifier(value, label)
+  if type(value) ~= "string" or #value == 0 or #value > 128 or value:find("[^!-~]") then
+    fail(label .. " must be a 1-to-128-byte visible ASCII identifier")
+  end
+  return value
+end
+
+function M.validate_identifier(value, label)
+  return identifier(value, label or "identifier")
+end
+
+local function required_keys(value, expected, label)
   for _, key in ipairs(expected) do
-    allowed[key] = true
     if value[key] == nil then
       fail(label .. " is missing " .. key)
-    end
-  end
-  for key in pairs(value) do
-    if not allowed[key] then
-      fail(label .. " contains an unknown field")
     end
   end
 end
@@ -136,9 +154,48 @@ local function string_list(value, label, require_unique)
   return value
 end
 
+local function capability_list(value, label, enforce_limit)
+  value = string_list(value, label, true)
+  if enforce_limit ~= false and #value > M.MAX_CAPABILITIES then
+    fail(label .. " must contain at most 64 entries")
+  end
+  for _, capability in ipairs(value) do
+    identifier(capability, label .. " item")
+  end
+  return value
+end
+
+local function value_set(values)
+  local result = {}
+  for _, value in ipairs(values) do
+    result[value] = true
+  end
+  return result
+end
+
+function M.capability_offers(value, known_capabilities)
+  local offers = capability_list(value, "hello.capabilities")
+  local known = value_set(capability_list(known_capabilities or M.KNOWN_CAPABILITIES, "known capabilities", false))
+  local result = {}
+  for _, capability in ipairs(offers) do
+    if known[capability] then
+      result[#result + 1] = capability
+    end
+  end
+  return result
+end
+
 local function range(value, label, require_nonempty)
   value = record(value, label)
-  if not is_integer(value.location) or not is_integer(value.length) or value.location < 0 or value.length < 0 then
+  if
+    not is_integer(value.location)
+    or not is_integer(value.length)
+    or value.location < 0
+    or value.length < 0
+    or value.location > MAX_SAFE_INTEGER
+    or value.length > MAX_SAFE_INTEGER
+    or value.location > MAX_SAFE_INTEGER - value.length
+  then
     fail(label .. " coordinates must be nonnegative integers")
   end
   if require_nonempty and value.length == 0 then
@@ -149,7 +206,7 @@ end
 
 local function snapshot(value, label)
   value = record(value, label)
-  nonempty_string(value.revision, label .. ".revision")
+  identifier(value.revision, label .. ".revision")
   local sources = list(value.sources, label .. ".sources")
   if #sources == 0 or #sources > M.MAX_SOURCES then
     fail(label .. " must contain between one and two sources")
@@ -157,13 +214,16 @@ local function snapshot(value, label)
   local ids = {}
   for _, source in ipairs(sources) do
     source = record(source, label .. ".source")
-    local source_id = nonempty_string(source.sourceId, label .. ".sourceId")
+    local source_id = identifier(source.sourceId, label .. ".sourceId")
     if ids[source_id] then
       fail(label .. " source IDs must be unique")
     end
     ids[source_id] = true
     if type(source.text) ~= "string" then
       fail(label .. ".text must be a string")
+    end
+    if #source.text > M.MAX_SOURCE_BYTES then
+      fail(label .. ".text must be at most 1048576 UTF-8 bytes")
     end
     if not source_syntaxes[source.sourceSyntax] then
       fail(label .. ".sourceSyntax is unsupported")
@@ -175,7 +235,7 @@ end
 local function check_intent(value)
   value = record(value, "check intent")
   if value.forcedLanguageTag ~= nil then
-    nonempty_string(value.forcedLanguageTag, "intent.forcedLanguageTag")
+    identifier(value.forcedLanguageTag, "intent.forcedLanguageTag")
   end
   if value.sourceIds ~= nil and value.selection ~= nil then
     fail("check intent selection and sourceIds are mutually exclusive")
@@ -185,13 +245,16 @@ local function check_intent(value)
     if #ids == 0 then
       fail("intent.sourceIds must be nonempty")
     end
+    if #ids > M.MAX_SOURCES then
+      fail("intent.sourceIds must contain at most 2 entries")
+    end
     for _, id in ipairs(ids) do
-      nonempty_string(id, "intent.sourceIds item")
+      identifier(id, "intent.sourceIds item")
     end
   end
   if value.selection ~= nil then
     local selection = record(value.selection, "intent.selection")
-    nonempty_string(selection.sourceId, "intent.selection.sourceId")
+    identifier(selection.sourceId, "intent.selection.sourceId")
     range(selection.range, "intent.selection.range", true)
   end
   return value
@@ -199,13 +262,7 @@ end
 
 local function writing_attention(value)
   value = record(value, "writing attention")
-  local allowed = { sourceId = true, caretOffset = true, visibleRanges = true }
-  for key in pairs(value) do
-    if not allowed[key] then
-      fail("writing attention contains an unknown field")
-    end
-  end
-  nonempty_string(value.sourceId, "writing attention.sourceId")
+  identifier(value.sourceId, "writing attention.sourceId")
   if value.caretOffset ~= nil and (not is_integer(value.caretOffset) or value.caretOffset < 0) then
     fail("writing attention.caretOffset must be a nonnegative integer")
   end
@@ -224,6 +281,9 @@ end
 local function apply_outcome(value)
   value = record(value, "Apply outcome")
   if value.status == "applied" then
+    if value.reason ~= nil then
+      fail("malformed applied Apply outcome")
+    end
     snapshot(value.snapshot, "Apply outcome snapshot")
   elseif value.status == "rejected" then
     if value.reason ~= "staleRevision" and value.reason ~= "textMismatch" then
@@ -238,6 +298,9 @@ local function apply_outcome(value)
       snapshot(value.snapshot, "Apply outcome snapshot")
     end
   elseif value.status == "unavailable" or value.status == "indeterminate" then
+    if value.reason ~= nil then
+      fail("malformed " .. value.status .. " Apply outcome")
+    end
     if value.snapshot ~= nil then
       snapshot(value.snapshot, "Apply outcome snapshot")
     end
@@ -252,23 +315,23 @@ function M.validate_command(value)
   if value.type == "openDocument" or value.type == "replaceDocument" then
     snapshot(value.snapshot, value.type .. ".snapshot")
   elseif value.type == "updateAttention" then
-    nonempty_string(value.revision, "updateAttention.revision")
+    identifier(value.revision, "updateAttention.revision")
     writing_attention(value.attention)
   elseif value.type == "requestCheck" then
-    nonempty_string(value.revision, "requestCheck.revision")
+    identifier(value.revision, "requestCheck.revision")
     if value.intent ~= nil then
       check_intent(value.intent)
     end
   elseif value.type == "performAction" then
-    nonempty_string(value.actionId, "performAction.actionId")
+    identifier(value.actionId, "performAction.actionId")
     if not action_kinds[value.kind] then
       fail("malformed performAction.kind")
     end
     local suggestion = record(value.suggestion, "performAction.suggestion")
-    nonempty_string(suggestion.id, "performAction.suggestion.id")
-    nonempty_string(suggestion.documentRevision, "performAction.suggestion.documentRevision")
+    identifier(suggestion.id, "performAction.suggestion.id")
+    identifier(suggestion.documentRevision, "performAction.suggestion.documentRevision")
   elseif value.type == "completeApply" then
-    nonempty_string(value.transactionId, "completeApply.transactionId")
+    identifier(value.transactionId, "completeApply.transactionId")
     apply_outcome(value.outcome)
   elseif value.type ~= "closeDocument" then
     fail("unknown client command type")
@@ -287,14 +350,43 @@ function M.validate_host_capabilities(value)
   return value
 end
 
-function M.decode_handshake(value)
+function M.decode_handshake(value, offered_capabilities, known_capabilities)
   value = record(value, "handshake response")
   if value.type == "rejected" then
     local protocol = record(value.protocol, "rejected.protocol")
-    if value.reason ~= "incompatibleProtocol" or not is_uint16(protocol.major) or not is_uint16(protocol.minor) then
+    local recoveries = {
+      incompatibleProtocol = { none = true },
+      invalidClient = { none = true },
+      runUnavailable = { newRun = true, retry = true },
+      serverBusy = { retry = true },
+      engineUnavailable = { retry = true },
+    }
+    if
+      not is_uint16(protocol.major)
+      or not is_uint16(protocol.minor)
+      or protocol.major ~= M.PROTOCOL_MAJOR
+      or protocol.minor ~= M.PROTOCOL_MINOR
+      or not recoveries[value.reason]
+      or not recoveries[value.reason][value.recovery]
+    then
       fail("malformed handshake rejection")
     end
-    return value
+    local rejection = {
+      type = "rejected",
+      reason = value.reason,
+      recovery = value.recovery,
+      protocol = { major = protocol.major, minor = protocol.minor },
+    }
+    if value.reason == "incompatibleProtocol" then
+      local received = record(value.receivedProtocol, "rejected.receivedProtocol")
+      if not is_uint16(received.major) or not is_uint16(received.minor) then
+        fail("malformed handshake rejection")
+      end
+      rejection.receivedProtocol = { major = received.major, minor = received.minor }
+    elseif value.receivedProtocol ~= nil then
+      fail("malformed handshake rejection")
+    end
+    return rejection
   end
   if value.type ~= "welcome" then
     fail("unknown handshake response")
@@ -304,9 +396,6 @@ function M.decode_handshake(value)
     fail("malformed welcome protocol version")
   end
   if protocol.major ~= M.PROTOCOL_MAJOR or protocol.minor ~= M.PROTOCOL_MINOR then
-    local server_is_newer = protocol.major > M.PROTOCOL_MAJOR
-      or (protocol.major == M.PROTOCOL_MAJOR and protocol.minor > M.PROTOCOL_MINOR)
-    local required_update = server_is_newer and "client" or "server"
     errors.raise(
       "IncompatibleProtocolError",
       ("Refine protocol %d.%d is incompatible with protocol %d.%d"):format(
@@ -316,30 +405,55 @@ function M.decode_handshake(value)
         M.PROTOCOL_MINOR
       ),
       "fatal",
-      { required_update = required_update, received_protocol = protocol },
+      {
+        received_protocol = protocol,
+        supported_protocol = { major = M.PROTOCOL_MAJOR, minor = M.PROTOCOL_MINOR },
+      },
       2
     )
   end
   local limits = record(value.limits, "welcome.limits")
-  nonempty_string(value.serverEpoch, "welcome.serverEpoch")
+  identifier(value.serverEpoch, "welcome.serverEpoch")
   if
     type(value.runResumed) ~= "boolean"
     or limits.maxFrameBytes ~= M.MAX_FRAME_BYTES
     or limits.maxSources ~= M.MAX_SOURCES
+    or limits.maxSourceBytes ~= M.MAX_SOURCE_BYTES
   then
     fail("malformed or incompatible welcome frame")
   end
-  string_list(value.capabilities, "welcome.capabilities", true)
-  return value
+  local activated = capability_list(value.capabilities, "welcome.capabilities")
+  local offered = value_set(capability_list(offered_capabilities or {}, "offered capabilities"))
+  local known = value_set(capability_list(known_capabilities or M.KNOWN_CAPABILITIES, "known capabilities", false))
+  for _, capability in ipairs(activated) do
+    if not known[capability] then
+      fail("welcome.capabilities contains an unknown activation")
+    end
+    if not offered[capability] then
+      fail("welcome.capabilities contains an unoffered activation")
+    end
+  end
+  return {
+    type = "welcome",
+    protocol = { major = protocol.major, minor = protocol.minor },
+    serverEpoch = value.serverEpoch,
+    runResumed = value.runResumed,
+    limits = {
+      maxFrameBytes = limits.maxFrameBytes,
+      maxSources = limits.maxSources,
+      maxSourceBytes = limits.maxSourceBytes,
+    },
+    capabilities = vim.deepcopy(activated),
+  }
 end
 
 local function appearance(value)
   value = record(value, "presentation.appearance")
   local highlight = record(value.highlight, "presentation.appearance.highlight")
   local diff = record(value.diff, "presentation.appearance.diff")
-  exact_keys(value, { "highlight", "diff" }, "presentation.appearance")
-  exact_keys(highlight, { "style", "grammarColor", "fluencyColor" }, "presentation.appearance.highlight")
-  exact_keys(diff, { "additionColor", "deletionColor", "showHiddenWhitespace" }, "presentation.appearance.diff")
+  required_keys(value, { "highlight", "diff" }, "presentation.appearance")
+  required_keys(highlight, { "style", "grammarColor", "fluencyColor" }, "presentation.appearance.highlight")
+  required_keys(diff, { "additionColor", "deletionColor", "showHiddenWhitespace" }, "presentation.appearance.diff")
   if highlight.style ~= "underline" and highlight.style ~= "dashedUnderline" and highlight.style ~= "highlight" then
     fail("malformed presentation highlight style")
   end
@@ -368,8 +482,12 @@ end
 local function interaction(value)
   value = record(value, "presentation.interaction")
   local quick = record(value.quickApply, "presentation.interaction.quickApply")
-  exact_keys(value, { "automaticChecksEnabled", "quickApply" }, "presentation.interaction")
-  exact_keys(quick, { "enabled", "applyKey", "dismissKey", "activationStyle" }, "presentation.interaction.quickApply")
+  required_keys(value, { "automaticChecksEnabled", "quickApply" }, "presentation.interaction")
+  required_keys(
+    quick,
+    { "enabled", "applyKey", "dismissKey", "activationStyle" },
+    "presentation.interaction.quickApply"
+  )
   if type(value.automaticChecksEnabled) ~= "boolean" or type(quick.enabled) ~= "boolean" then
     fail("malformed presentation interaction")
   end
@@ -392,7 +510,7 @@ end
 
 local function attribution(value, label, model_key)
   value = record(value, label)
-  exact_keys(value, { "languageDisplayName", "textDirection", model_key }, label)
+  required_keys(value, { "languageDisplayName", "textDirection", model_key }, label)
   nonempty_string(value.languageDisplayName, label .. ".languageDisplayName")
   if value.textDirection ~= "ltr" and value.textDirection ~= "rtl" then
     fail(label .. ".textDirection must be ltr or rtl")
@@ -408,14 +526,14 @@ end
 
 local function suggestion(value)
   value = record(value, "presented suggestion")
-  nonempty_string(value.id, "suggestion.id")
-  nonempty_string(value.sourceId, "suggestion.sourceId")
+  identifier(value.id, "suggestion.id")
+  identifier(value.sourceId, "suggestion.sourceId")
   if value.kind ~= "grammar" and value.kind ~= "fluency" and value.kind ~= "mixed" then
     fail("malformed suggestion kind")
   end
   local decoded_attribution = attribution(value.attribution, "suggestion.attribution", "checkModelDisplayName")
   local activation_range = record(value.activationRange, "suggestion.activationRange")
-  exact_keys(activation_range, { "location", "length" }, "suggestion.activationRange")
+  required_keys(activation_range, { "location", "length" }, "suggestion.activationRange")
   activation_range = range(activation_range, "suggestion.activationRange", false)
   local highlight_ranges = {}
   for _, item in ipairs(list(value.highlightRanges, "suggestion.highlightRanges")) do
@@ -455,7 +573,7 @@ end
 
 local function presentation_content(value)
   value = record(value, "presentation content")
-  nonempty_string(value.documentRevision, "presentation.documentRevision")
+  identifier(value.documentRevision, "presentation.documentRevision")
   local decoded_appearance = appearance(value.appearance)
   local decoded_interaction = interaction(value.interaction)
   local suggestions = list(value.suggestions, "presentation.suggestions")
@@ -465,9 +583,12 @@ local function presentation_content(value)
   end
   local decoded_progress
   if value.status == "checking" then
+    if value.coverage ~= nil or value.unavailableReason ~= nil then
+      fail("checking presentation cannot contain coverage or unavailableReason")
+    end
     if value.progress ~= nil then
       local progress = record(value.progress, "presentation.progress")
-      exact_keys(progress, { "completedUnitCount", "totalUnitCount" }, "presentation.progress")
+      required_keys(progress, { "completedUnitCount", "totalUnitCount" }, "presentation.progress")
       if
         not is_integer(progress.completedUnitCount)
         or not is_integer(progress.totalUnitCount)
@@ -486,15 +607,22 @@ local function presentation_content(value)
     if value.coverage ~= "full" and value.coverage ~= "partial" then
       fail("complete presentation requires coverage")
     end
+    if value.unavailableReason ~= nil or value.progress ~= nil then
+      fail("complete presentation cannot contain unavailableReason or progress")
+    end
   elseif value.status == "unavailable" then
     if not unavailable_reasons[value.unavailableReason] then
       fail("unavailable presentation requires unavailableReason")
     end
+    if value.coverage ~= nil or value.progress ~= nil then
+      fail("unavailable presentation cannot contain coverage or progress")
+    end
+  elseif value.status == "pending" or value.status == "closed" then
+    if value.coverage ~= nil or value.unavailableReason ~= nil or value.progress ~= nil then
+      fail(value.status .. " presentation cannot contain coverage, unavailableReason, or progress")
+    end
   elseif value.status ~= "pending" and value.status ~= "closed" then
     fail("malformed presentation status")
-  end
-  if value.progress ~= nil and value.status ~= "checking" then
-    fail("presentation progress requires checking status")
   end
   if (value.status == "pending" or value.status == "unavailable" or value.status == "closed") and #suggestions ~= 0 then
     fail(value.status .. " presentation cannot contain suggestions")
@@ -519,19 +647,30 @@ end
 
 local function apply_request(value)
   value = record(value, "apply request")
-  nonempty_string(value.expectedRevision, "apply.expectedRevision")
-  nonempty_string(value.sourceId, "apply.sourceId")
+  identifier(value.expectedRevision, "apply.expectedRevision")
+  identifier(value.sourceId, "apply.sourceId")
   local edits = list(value.edits, "apply.edits")
   if #edits == 0 then
     fail("Apply request requires edits")
   end
   local decoded_edits = {}
+  local next_higher_start = math.huge
   for _, edit in ipairs(edits) do
     edit = record(edit, "host edit")
     local decoded_range = range(edit.range, "host edit range", false)
     if type(edit.expectedText) ~= "string" or type(edit.replacement) ~= "string" then
       fail("malformed host edit")
     end
+    if decoded_range.location + decoded_range.length > next_higher_start then
+      fail("Apply edits must be descending, untied, and non-overlapping")
+    end
+    if decoded_range.location == next_higher_start then
+      fail("Apply edits must be descending, untied, and non-overlapping")
+    end
+    if edit.expectedText == edit.replacement then
+      fail("Apply edits must change text")
+    end
+    next_higher_start = decoded_range.location
     decoded_edits[#decoded_edits + 1] = {
       range = decoded_range,
       expectedText = edit.expectedText,
@@ -571,7 +710,7 @@ end
 local function server_event(value)
   value = record(value, "server event")
   if value.type == "documentAccepted" then
-    nonempty_string(value.revision, "documentAccepted.revision")
+    identifier(value.revision, "documentAccepted.revision")
     return { type = "documentAccepted", revision = value.revision }
   elseif value.type == "resyncRequired" then
     if
@@ -584,15 +723,15 @@ local function server_event(value)
     end
     return { type = "resyncRequired", reason = value.reason }
   elseif value.type == "presentationContentReplaced" then
-    nonempty_string(value.checkId, "presentationContentReplaced.checkId")
+    identifier(value.checkId, "presentationContentReplaced.checkId")
     return {
       type = "presentationContentReplaced",
       checkId = value.checkId,
       content = presentation_content(value.content),
     }
   elseif value.type == "applyRequested" then
-    nonempty_string(value.actionId, "applyRequested.actionId")
-    nonempty_string(value.transactionId, "applyRequested.transactionId")
+    identifier(value.actionId, "applyRequested.actionId")
+    identifier(value.transactionId, "applyRequested.transactionId")
     return {
       type = "applyRequested",
       actionId = value.actionId,
@@ -600,25 +739,28 @@ local function server_event(value)
       request = apply_request(value.request),
     }
   elseif value.type == "explanationReplaced" then
-    nonempty_string(value.actionId, "explanationReplaced.actionId")
+    identifier(value.actionId, "explanationReplaced.actionId")
     return {
       type = "explanationReplaced",
       actionId = value.actionId,
       update = explanation_update(value.update),
     }
   elseif value.type == "actionCompleted" then
-    nonempty_string(value.actionId, "actionCompleted.actionId")
+    identifier(value.actionId, "actionCompleted.actionId")
     return { type = "actionCompleted", actionId = value.actionId }
   elseif value.type == "actionRejected" then
-    nonempty_string(value.actionId, "actionRejected.actionId")
+    identifier(value.actionId, "actionRejected.actionId")
     if not action_rejections[value.reason] then
       fail("malformed actionRejected.reason")
     end
     return { type = "actionRejected", actionId = value.actionId, reason = value.reason }
   elseif value.type == "fault" then
-    nonempty_string(value.code, "fault.code")
-    if type(value.fatal) ~= "boolean" then
-      fail("fault.fatal must be a boolean")
+    if
+      type(value.fatal) ~= "boolean"
+      or not fault_severities[value.code]
+      or not fault_severities[value.code][value.fatal]
+    then
+      fail("malformed fault code and severity")
     end
     return { type = "fault", code = value.code, fatal = value.fatal }
   else
@@ -628,15 +770,12 @@ end
 
 function M.decode_event(value)
   value = record(value, "event envelope")
-  if
-    value.type ~= "event"
-    or not is_uint32(value.sequence)
-    or value.sequence == 0
-    or type(value.epoch) ~= "string"
-    or value.epoch == ""
-    or (value.causeCommandId ~= nil and type(value.causeCommandId) ~= "string")
-  then
+  if value.type ~= "event" or not is_uint32(value.sequence) or value.sequence == 0 then
     fail("malformed server event envelope")
+  end
+  identifier(value.epoch, "event.epoch")
+  if value.causeCommandId ~= nil then
+    identifier(value.causeCommandId, "event.causeCommandId")
   end
   local decoded = {
     type = "event",

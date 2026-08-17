@@ -1,4 +1,5 @@
 local errors = require("refine.transport.errors")
+local json = require("refine.transport.json")
 local utf8 = require("refine.utf8")
 
 local M = {}
@@ -33,6 +34,10 @@ function M.encode(value)
   if not utf8.valid(body) then
     protocol_error("frame body is not valid UTF-8")
   end
+  local valid, failure = pcall(json.decode_object, body)
+  if not valid then
+    protocol_error("frame body is not valid JSON: " .. tostring(failure))
+  end
   if #body == 0 or #body > M.MAX_FRAME_BYTES then
     protocol_error(("frame body must be between 1 and %d bytes"):format(M.MAX_FRAME_BYTES))
   end
@@ -43,10 +48,16 @@ function M.decoder()
   local decoder = {
     buffered = "",
     failed = false,
+    pending_error = nil,
   }
 
   function decoder:push(chunk)
     if self.failed then
+      if self.pending_error ~= nil then
+        local pending = self.pending_error
+        self.pending_error = nil
+        error(pending, 0)
+      end
       protocol_error("frame decoder cannot continue after a protocol error")
     end
     if type(chunk) ~= "string" then
@@ -72,9 +83,9 @@ function M.decoder()
         if not utf8.valid(body) then
           protocol_error("frame body is not valid UTF-8")
         end
-        local parsed, value = pcall(vim.json.decode, body, { luanil = { object = true, array = true } })
+        local parsed, value = pcall(json.decode_object, body)
         if not parsed then
-          protocol_error("frame body is not valid JSON")
+          protocol_error("frame body is not valid JSON: " .. tostring(value))
         end
         decoded[#decoded + 1] = value
         self.buffered = self.buffered:sub(HEADER_BYTES + length + 1)
@@ -83,12 +94,27 @@ function M.decoder()
     if not ok then
       self.failed = true
       self.buffered = ""
+      if #decoded > 0 then
+        self.pending_error = failure
+        return decoded
+      end
       error(failure, 0)
     end
     return decoded
   end
 
+  function decoder:take_error()
+    local pending = self.pending_error
+    self.pending_error = nil
+    return pending
+  end
+
   function decoder:finish()
+    if self.pending_error ~= nil then
+      local pending = self.pending_error
+      self.pending_error = nil
+      error(pending, 0)
+    end
     if #self.buffered ~= 0 then
       self.failed = true
       self.buffered = ""

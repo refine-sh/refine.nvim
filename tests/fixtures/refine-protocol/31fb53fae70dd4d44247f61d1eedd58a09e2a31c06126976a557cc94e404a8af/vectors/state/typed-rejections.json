@@ -1,0 +1,89 @@
+{
+  "formatVersion": 1,
+  "id": "typed-rejections",
+  "description": "A client accepts every closed authenticated rejection reason/recovery pair without inferring update direction.",
+  "socketRunnable": true,
+  "messages": {
+    "hello": {
+      "type": "hello", "protocol": { "major": 1, "minor": 0 },
+      "client": { "id": "com.runjuu.refine.reference", "version": "1.0.0-rc", "host": "reference-cli" },
+      "hostCapabilities": { "interceptableSuggestionActionKeys": [] },
+      "runId": "typed-rejection-run", "launchToken": "${launchToken}", "capabilities": []
+    },
+    "incompatible": {
+      "type": "rejected", "reason": "incompatibleProtocol", "recovery": "none",
+      "protocol": { "major": 1, "minor": 0 },
+      "receivedProtocol": { "major": 2, "minor": 5 }
+    },
+    "invalidClient": {
+      "type": "rejected", "reason": "invalidClient", "recovery": "none",
+      "protocol": { "major": 1, "minor": 0 }
+    },
+    "runNew": {
+      "type": "rejected", "reason": "runUnavailable", "recovery": "newRun",
+      "protocol": { "major": 1, "minor": 0 }
+    },
+    "runRetry": {
+      "type": "rejected", "reason": "runUnavailable", "recovery": "retry",
+      "protocol": { "major": 1, "minor": 0 }
+    },
+    "serverBusy": {
+      "type": "rejected", "reason": "serverBusy", "recovery": "retry",
+      "protocol": { "major": 1, "minor": 0 }
+    },
+    "engineUnavailable": {
+      "type": "rejected", "reason": "engineUnavailable", "recovery": "retry",
+      "protocol": { "major": 1, "minor": 0 }
+    }
+  },
+  "connections": [
+    {
+      "expectedOutcome": "handshakeRejected",
+      "steps": [
+        { "direction": "client", "messageRef": "hello" },
+        { "direction": "server", "messageRef": "incompatible" },
+        { "direction": "server", "close": true }
+      ]
+    },
+    {
+      "expectedOutcome": "handshakeRejected",
+      "steps": [
+        { "direction": "client", "messageRef": "hello" },
+        { "direction": "server", "messageRef": "invalidClient" },
+        { "direction": "server", "close": true }
+      ]
+    },
+    {
+      "expectedOutcome": "handshakeRejected",
+      "steps": [
+        { "direction": "client", "messageRef": "hello" },
+        { "direction": "server", "messageRef": "runNew" },
+        { "direction": "server", "close": true }
+      ]
+    },
+    {
+      "expectedOutcome": "handshakeRejected",
+      "steps": [
+        { "direction": "client", "messageRef": "hello" },
+        { "direction": "server", "messageRef": "runRetry" },
+        { "direction": "server", "close": true }
+      ]
+    },
+    {
+      "expectedOutcome": "handshakeRejected",
+      "steps": [
+        { "direction": "client", "messageRef": "hello" },
+        { "direction": "server", "messageRef": "serverBusy" },
+        { "direction": "server", "close": true }
+      ]
+    },
+    {
+      "expectedOutcome": "handshakeRejected",
+      "steps": [
+        { "direction": "client", "messageRef": "hello" },
+        { "direction": "server", "messageRef": "engineUnavailable" },
+        { "direction": "server", "close": true }
+      ]
+    }
+  ]
+}

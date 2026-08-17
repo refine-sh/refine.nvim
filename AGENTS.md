@@ -12,8 +12,8 @@ Preserve these module seams:
 
 - `lua/refine/integration/` owns host-neutral lifecycle and action
   coordination.
-- `lua/refine/transport/` owns the editor-neutral authenticated Protocol 2.5
-  connection.
+- `lua/refine/transport/` owns the editor-neutral client for the same-UID,
+  per-launch-token public Integration Protocol 1.0 connection.
 - `lua/refine/nvim/` owns canonical buffer snapshots, native presentation,
   coordinate conversion, and one-mutation Apply.
 
@@ -24,4 +24,6 @@ Refine app; the plugin owns no direct network or telemetry path.
 
 Use `apply_patch` for edits. Add behavior through a public seam with a red test
 first, then run `make check`. Leave the app stopped unless a task explicitly
-requires manual integration validation.
+requires manual integration validation. For protocol-contract changes, also
+run `make test-conformance REFINE_PROTOCOL_ROOT=/absolute/path/to/refine-protocol`;
+that gate uses a fake peer and does not launch the app.

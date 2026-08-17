@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "envelope.schema.json",
+  "title": "Integration Protocol 1.0 connected envelope",
+  "oneOf": [
+    { "$ref": "#/$defs/commandEnvelope" },
+    { "$ref": "#/$defs/eventEnvelope" }
+  ],
+  "$defs": {
+    "commandEnvelope": {
+      "type": "object",
+      "required": ["type", "sequence", "id", "command"],
+      "properties": {
+        "type": { "const": "command" },
+        "sequence": { "$ref": "shared.schema.json#/$defs/sequence" },
+        "id": { "$ref": "shared.schema.json#/$defs/identifier" },
+        "command": { "$ref": "command.schema.json" }
+      }
+    },
+    "eventEnvelope": {
+      "type": "object",
+      "required": ["type", "sequence", "epoch", "event"],
+      "properties": {
+        "type": { "const": "event" },
+        "sequence": { "$ref": "shared.schema.json#/$defs/sequence" },
+        "epoch": { "$ref": "shared.schema.json#/$defs/identifier" },
+        "causeCommandId": { "$ref": "shared.schema.json#/$defs/identifier" },
+        "event": { "$ref": "event.schema.json" }
+      }
+    }
+  }
+}

@@ -1,0 +1,467 @@
+{
+  "formatVersion": 1,
+  "releaseCandidate": "1.0.0-rc.1",
+  "protocol": {
+    "major": 1,
+    "minor": 0
+  },
+  "artifactDigest": "31fb53fae70dd4d44247f61d1eedd58a09e2a31c06126976a557cc94e404a8af",
+  "baseArtifactDigest": "ff2d9d9badae0457515390ced22601d441766629543d37957dbd222f459195d0",
+  "capabilityRegistryDigest": "c36bc7945b37764c7594d526be7a038e6b4dd3bf4238be661e5f8aad00d6dc24",
+  "jsonPositiveCaseIds": [
+    "command-open-document",
+    "command-replace-document-two-sources",
+    "command-update-attention",
+    "command-update-attention-with-no-visible-range",
+    "command-request-full-check",
+    "command-request-selection-check",
+    "command-request-source-check",
+    "command-perform-apply",
+    "command-perform-dismiss",
+    "command-perform-explain",
+    "command-perform-report",
+    "command-complete-applied",
+    "command-complete-rejected",
+    "command-complete-unsupported-without-snapshot",
+    "command-complete-unavailable",
+    "command-complete-indeterminate",
+    "command-close-document",
+    "descriptor-exact-1.0",
+    "hello-empty-base-capabilities",
+    "hello-unknown-offer-is-well-formed",
+    "welcome-first-attach",
+    "welcome-retained-run",
+    "rejected-incompatible-protocol",
+    "rejected-invalid-client",
+    "rejected-run-needs-new-id",
+    "rejected-run-retry",
+    "rejected-server-busy",
+    "rejected-engine-unavailable",
+    "unknown-members-are-ignored",
+    "future-registry-can-exceed-negotiation-limit",
+    "safe-integer-minimum",
+    "safe-integer-maximum",
+    "uint16-minimum",
+    "uint16-maximum",
+    "sequence-minimum",
+    "sequence-maximum",
+    "identifier-one-byte",
+    "identifier-128-bytes",
+    "source-syntax-plain",
+    "source-syntax-markdown",
+    "source-syntax-latex",
+    "suggestion-kind-grammar",
+    "suggestion-kind-fluency",
+    "suggestion-kind-mixed",
+    "diff-kind-unchanged",
+    "diff-kind-delete",
+    "diff-kind-insert",
+    "text-direction-ltr",
+    "text-direction-rtl",
+    "highlight-underline",
+    "highlight-dashed",
+    "highlight-solid",
+    "activation-highlight",
+    "activation-tip",
+    "presentation-pending",
+    "presentation-checking",
+    "presentation-complete",
+    "presentation-unavailable",
+    "presentation-closed",
+    "coverage-full",
+    "coverage-partial",
+    "resync-document-not-open",
+    "resync-conflicting-revision",
+    "resync-reused-revision",
+    "resync-invalid-document",
+    "apply-rejection-stale",
+    "apply-rejection-text",
+    "apply-unsupported-read-only",
+    "apply-unsupported-non-atomic",
+    "exact-source-byte-limit",
+    "exact-capability-count-limit",
+    "event-document-accepted",
+    "event-resync-required",
+    "event-presentation-content-replaced",
+    "event-presentation-checking-progress",
+    "event-apply-requested",
+    "event-explanation-started",
+    "event-explanation-streaming",
+    "event-explanation-completed",
+    "event-explanation-stale",
+    "event-explanation-unavailable",
+    "event-action-completed",
+    "event-action-rejected",
+    "event-fault-invalid-sequence-fatal",
+    "event-fault-malformed-nonfatal",
+    "event-fault-resource-limit-fatal",
+    "event-fault-invalid-document-nonfatal",
+    "fault-invalid-sequence-fatal",
+    "fault-malformed-nonfatal",
+    "fault-malformed-fatal",
+    "fault-resource-nonfatal",
+    "fault-resource-fatal",
+    "fault-internal-nonfatal",
+    "fault-internal-fatal",
+    "fault-document-nonfatal",
+    "fault-source-nonfatal",
+    "fault-engine-nonfatal",
+    "action-key-tab",
+    "action-key-escape",
+    "action-key-return",
+    "action-key-space",
+    "action-key-delete",
+    "action-key-left-arrow",
+    "action-key-right-arrow",
+    "action-key-up-arrow",
+    "action-key-down-arrow",
+    "action-key-left-shift",
+    "action-key-right-shift",
+    "action-key-left-option",
+    "action-key-right-option",
+    "action-key-left-control",
+    "action-key-right-control",
+    "presentation-unavailable-disconnected",
+    "presentation-unavailable-check-failed",
+    "presentation-unavailable-engine",
+    "presentation-unavailable-document",
+    "presentation-unavailable-source",
+    "presentation-unavailable-resource",
+    "presentation-unavailable-entitlement",
+    "explanation-unavailable-disconnected",
+    "explanation-unavailable-engine",
+    "explanation-unavailable-validation",
+    "explanation-unavailable-read-only",
+    "explanation-unavailable-non-atomic",
+    "explanation-unavailable-mutation",
+    "explanation-unavailable-indeterminate",
+    "explanation-unavailable-apply-proof",
+    "explanation-unavailable-reporting",
+    "action-rejected-stale",
+    "action-rejected-disconnected",
+    "action-rejected-engine",
+    "action-rejected-validation",
+    "action-rejected-read-only",
+    "action-rejected-non-atomic",
+    "action-rejected-mutation",
+    "action-rejected-indeterminate",
+    "action-rejected-apply-proof",
+    "action-rejected-reporting",
+    "action-rejected-unsupported"
+  ],
+  "jsonNegativeCaseIds": [
+    "duplicate-root-member",
+    "duplicate-nested-member",
+    "fractional-integer",
+    "exponent-integer",
+    "unknown-member-null-is-still-invalid",
+    "unknown-member-negative-is-still-invalid",
+    "unknown-member-fraction-is-still-invalid",
+    "unknown-member-exponent-is-still-invalid",
+    "unknown-member-unsafe-integer-is-still-invalid",
+    "unpaired-high-surrogate",
+    "root-array-is-not-a-message",
+    "duplicate-capability-offer",
+    "more-than-64-capabilities",
+    "registry-ids-must-be-unique",
+    "welcome-cannot-activate-unpublished-capability",
+    "source-over-utf8-byte-limit",
+    "range-sum-must-be-safe",
+    "duplicate-source-id",
+    "progress-completed-exceeds-total",
+    "complete-presentation-requires-coverage",
+    "unavailable-presentation-requires-reason",
+    "progress-is-only-valid-while-checking",
+    "pending-presentation-has-no-suggestions",
+    "closed-presentation-forbids-status-members",
+    "available-actions-are-duplicate-free",
+    "selection-and-source-ids-are-mutually-exclusive",
+    "selection-must-be-nonempty",
+    "visible-ranges-must-be-nonempty",
+    "visible-ranges-must-be-ordered",
+    "visible-ranges-must-not-overlap",
+    "apply-edits-must-descend",
+    "apply-edits-must-not-share-an-anchor",
+    "apply-edits-must-not-overlap",
+    "apply-edits-must-change-text",
+    "zero-length-apply-edit-must-change-text",
+    "unavailable-apply-outcome-forbids-reason",
+    "descriptor-minor-is-required",
+    "descriptor-socket-path-is-absolute",
+    "hello-capabilities-are-required",
+    "hello-requires-exact-protocol-1.0",
+    "null-does-not-substitute-for-absent-optional-intent",
+    "unknown-command-discriminator",
+    "unknown-event-discriminator",
+    "unknown-source-syntax",
+    "identifier-must-be-visible-ascii",
+    "identifier-over-128-bytes",
+    "identifier-cannot-end-with-newline",
+    "capability-id-requires-reverse-domain-publisher",
+    "command-sequence-zero",
+    "negative-integer-is-outside-sequence-range",
+    "command-sequence-over-uint32",
+    "invalid-fault-severity-pair",
+    "suggestion-language-display-name-is-nonempty",
+    "suggestion-check-model-display-name-is-nonempty",
+    "explanation-model-display-name-is-nonempty",
+    "explanation-language-display-name-is-nonempty",
+    "handshake-recovery-pair-is-closed",
+    "received-protocol-is-only-for-version-rejection",
+    "typed-rejection-reports-server-protocol-1-0",
+    "optional-apply-snapshot-does-not-accept-null"
+  ],
+  "frameCaseIds": [
+    "exact-hello-frame",
+    "maximum-payload-length",
+    "zero-length-frame",
+    "length-over-limit",
+    "truncated-payload",
+    "invalid-utf8",
+    "non-object-root",
+    "malformed-json",
+    "unknown-null-value",
+    "unknown-negative-number",
+    "unknown-fraction-number",
+    "unknown-exponent-number",
+    "unknown-unsafe-integer"
+  ],
+  "stateScenarioIds": [
+    "base-handshake",
+    "fatal-fault",
+    "golden-writing-session",
+    "invalid-server-inputs",
+    "reconnect-lost-state",
+    "reconnect-resumed",
+    "sequence-exhaustion",
+    "typed-rejections",
+    "unicode-scalar-coordinates"
+  ],
+  "artifacts": [
+    {
+      "path": ".gitignore",
+      "sha256": "679a0e83148ae771d229adfc6db2dc1fa4ea9ca22b5a80a2e17979b5a39dd3f2",
+      "kind": "documentation"
+    },
+    {
+      "path": "COMPATIBILITY-CLAIMS.md",
+      "sha256": "9918c2a25901b56d431c5503ae87985ac649ef91e8f58bb838c7367a3985fb24",
+      "kind": "documentation"
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "f59f35a3441f9cbcfc514af638d7091bcf1610a7a25bc10a5845c02f9b2a68f1",
+      "kind": "license"
+    },
+    {
+      "path": "README.md",
+      "sha256": "0493ef93e8927b4c3818efa3b07baa028d05c863bca92494051c0b515ed03b8f",
+      "kind": "documentation"
+    },
+    {
+      "path": "SECURITY.md",
+      "sha256": "bcacf711e04928dbcdac3c8ee7bc57ea0a5f194ce21a95a633fdd9016515df96",
+      "kind": "documentation"
+    },
+    {
+      "path": "SUPPORT.md",
+      "sha256": "b0b0cf7de56217bb95223a7f8159228fdd296a6f8d6d19681945133ad8d2336f",
+      "kind": "documentation"
+    },
+    {
+      "path": "reference/typescript/README.md",
+      "sha256": "ab5e350c3e3c668d12ee447b595d8c9c1bf935901f1d9a6000e198bbb507e222",
+      "kind": "reference"
+    },
+    {
+      "path": "reference/typescript/cli.ts",
+      "sha256": "ec843639acfcc825583e27d5c9941f2c8127f47a62b066ae3ad2558e26f9d33b",
+      "kind": "reference"
+    },
+    {
+      "path": "reference/typescript/package.json",
+      "sha256": "f7621929ebc9da9a1686c5e397bc26312463972a115728d0045e3439fe0cf9c0",
+      "kind": "reference"
+    },
+    {
+      "path": "reference/typescript/transport-session.ts",
+      "sha256": "408938c64167e73972caa41eb713b48d225ffaa98c9a6b3057bb07f7a73233e8",
+      "kind": "reference"
+    },
+    {
+      "path": "reference/typescript/tsconfig.json",
+      "sha256": "93d4f3e8ea2a9d0b36529690927b4896d1974cb018d7a84feedb5304e97d73df",
+      "kind": "reference"
+    },
+    {
+      "path": "registry/README.md",
+      "sha256": "8c6a696cc2a68d1501284ed1ade1b7e42bfd097bc174f9dbd815e0d1ade512ec",
+      "kind": "registry"
+    },
+    {
+      "path": "registry/capabilities.json",
+      "sha256": "c36bc7945b37764c7594d526be7a038e6b4dd3bf4238be661e5f8aad00d6dc24",
+      "kind": "registry"
+    },
+    {
+      "path": "runner/README.md",
+      "sha256": "d085b4a6d6a4879aa3c5466aa581f38cab53d7d36da1b1bc65dd26af36b424d0",
+      "kind": "runner"
+    },
+    {
+      "path": "runner/conformance.py",
+      "sha256": "b37f53c2261e4d743c3578920faf4b6106f1f356ddd3598fc1aa78d9b425a652",
+      "kind": "runner"
+    },
+    {
+      "path": "runner/update_manifest.py",
+      "sha256": "e94935ff1fa8ebacbe01444eb47fce4d5d6b0c77e019b909538beab083a922aa",
+      "kind": "runner"
+    },
+    {
+      "path": "schema/capability-registry.schema.json",
+      "sha256": "763f5a6ab23cce91396218a7bd612ed58dcee8e569e37b19ba988952c1115d17",
+      "kind": "schema"
+    },
+    {
+      "path": "schema/command.schema.json",
+      "sha256": "7c81e6229dd16b6ba1ca2b3d73208db5c4f85f7f8ce707a2f33eefd75e561cd0",
+      "kind": "schema"
+    },
+    {
+      "path": "schema/endpoint-descriptor.schema.json",
+      "sha256": "b6474f39e07e56adc9163d3a4656bd48e72ced12b2e9e1146411f8666c315381",
+      "kind": "schema"
+    },
+    {
+      "path": "schema/envelope.schema.json",
+      "sha256": "ce4a84c098d45fb2b43ab8e45c79e6be7484aee0adff7a3bc916e65c3848bbdd",
+      "kind": "schema"
+    },
+    {
+      "path": "schema/event.schema.json",
+      "sha256": "19ac7202abfac3ae847524d439a48cc32e0989966e9747d0cd4f36f6b5317eb7",
+      "kind": "schema"
+    },
+    {
+      "path": "schema/handshake.schema.json",
+      "sha256": "376a137330eda2b8a78abd5d4b6a065828b62163599652c658219beda72e74af",
+      "kind": "schema"
+    },
+    {
+      "path": "schema/shared.schema.json",
+      "sha256": "1b2fc078280ba1dd6ad9fcd91759243f4d9246fdd7157ed38a41961d3a9fe76b",
+      "kind": "schema"
+    },
+    {
+      "path": "spec/protocol.md",
+      "sha256": "0cc315e016ab7a7d82e16c56790831cef4dd167901bdf83ea771b857441082b5",
+      "kind": "spec"
+    },
+    {
+      "path": "tests/fake_server_adapter.py",
+      "sha256": "a5a27d63355acbfa0d08ea07eb0f54756c9ffc377ef9cfd01ec24d31d5e558bd",
+      "kind": "documentation"
+    },
+    {
+      "path": "tests/test_public_seam.py",
+      "sha256": "7842cccf10d7c6f380d86db6c2f0f304f96f3fae3c8b3b8ab15484a636dc3d4d",
+      "kind": "documentation"
+    },
+    {
+      "path": "vectors/frames/framing.json",
+      "sha256": "4320f5c6fffd907d3e3e78f451c4ce2d832a95be15249a1f6b7f0acc4c623126",
+      "kind": "vectors"
+    },
+    {
+      "path": "vectors/json/negative/portable-json.json",
+      "sha256": "2d110d876b0e653999338241616f244368b69dab04cdab2ea8366c27f855582c",
+      "kind": "vectors"
+    },
+    {
+      "path": "vectors/json/negative/semantic-boundaries.json",
+      "sha256": "6389988e1b485c1ff5c552a2d6a18612990d6ac81dcbd156459594c3153de3b0",
+      "kind": "vectors"
+    },
+    {
+      "path": "vectors/json/negative/shape-and-enums.json",
+      "sha256": "558fc9bb04b3036da5aa4f42cec87812ba83207fe4d524e3fe47ea9cf4d5a98a",
+      "kind": "vectors"
+    },
+    {
+      "path": "vectors/json/positive/commands.json",
+      "sha256": "13ea4f1fd87c7e2e08256c9baa57209016f51e0e138c3b3ae2ac7ef7ecdf7223",
+      "kind": "vectors"
+    },
+    {
+      "path": "vectors/json/positive/discovery-and-handshake.json",
+      "sha256": "ff5e48e6d6f983943cd25c1783b161f61016ef6e58a9f92994f8e5c3d85ea265",
+      "kind": "vectors"
+    },
+    {
+      "path": "vectors/json/positive/enum-and-boundary-coverage.json",
+      "sha256": "f4058fa88058be9f3e5a2f07790d7165a8a6ccd4803d310d92923899df71ab3f",
+      "kind": "vectors"
+    },
+    {
+      "path": "vectors/json/positive/events.json",
+      "sha256": "c505d858b0b15c49979dcef4492f2682017f598d4c7bb02b94a58b4cf36e28ff",
+      "kind": "vectors"
+    },
+    {
+      "path": "vectors/json/positive/fault-severity-pairs.json",
+      "sha256": "71b5041d8ba8c19363e4218c8e07e45f7ac9e5628c28129078efc99c6b0c3618",
+      "kind": "vectors"
+    },
+    {
+      "path": "vectors/json/positive/remaining-enums.json",
+      "sha256": "01cd59e8101b860c564991e539d5afe00f9a7c1cb5e80cd64c84db03e7c333eb",
+      "kind": "vectors"
+    },
+    {
+      "path": "vectors/state/base-handshake.json",
+      "sha256": "92795e8552bcf3d079095a1f052954480ae56407d32f161e5927f7b56bc6934d",
+      "kind": "vectors"
+    },
+    {
+      "path": "vectors/state/fatal-fault.json",
+      "sha256": "5567aa01969d9b825b3b4a808050181a41d46f568a73bb3a7303c4ca9a5b7ac4",
+      "kind": "vectors"
+    },
+    {
+      "path": "vectors/state/golden-writing-session.json",
+      "sha256": "a4f62e6c8060d7e748451a01126d161668bb88c1a6a9b2ea1f05854ebda11e73",
+      "kind": "vectors"
+    },
+    {
+      "path": "vectors/state/invalid-server-inputs.json",
+      "sha256": "e9022c0dab0bad56e5be80c0894919cb855c2e4025b9fe4c1abd5d6936f5aee9",
+      "kind": "vectors"
+    },
+    {
+      "path": "vectors/state/reconnect-lost-state.json",
+      "sha256": "857e06815c355fee9a9d941335fc34670a3e6a6f58746f8cb22158bd04b78a97",
+      "kind": "vectors"
+    },
+    {
+      "path": "vectors/state/reconnect-resumed.json",
+      "sha256": "25791c80131469a35b9ae9dd0a50b38508ee6d6955a6159e73a5dcd98f2a34ba",
+      "kind": "vectors"
+    },
+    {
+      "path": "vectors/state/sequence-exhaustion.json",
+      "sha256": "68faa3ac1cf81f5b53df052a5f3c7badf94f571fe87749da5906301ba4264154",
+      "kind": "vectors"
+    },
+    {
+      "path": "vectors/state/typed-rejections.json",
+      "sha256": "07ad518239d1ea5a63ed6eb622b1d53e1345b9502a6d43b34f5da184f7d96dfc",
+      "kind": "vectors"
+    },
+    {
+      "path": "vectors/state/unicode-scalar-coordinates.json",
+      "sha256": "7ab4430f30e6b6d69bda033386cc3841216aa84c0d679b8087972dcca12d1a4e",
+      "kind": "vectors"
+    }
+  ]
+}

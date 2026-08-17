@@ -1,0 +1,309 @@
+{
+  "formatVersion": 1,
+  "cases": [
+    {
+      "id": "duplicate-capability-offer",
+      "schema": "schema/handshake.schema.json",
+      "value": {
+        "type": "hello", "protocol": { "major": 1, "minor": 0 },
+        "client": { "id": "com.example.writer", "version": "1", "host": "host" },
+        "hostCapabilities": { "interceptableSuggestionActionKeys": [] },
+        "runId": "run", "launchToken": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "capabilities": ["com.example.feature.v1", "com.example.feature.v1"]
+      },
+      "error": "schema"
+    },
+    {
+      "id": "more-than-64-capabilities",
+      "schema": "schema/handshake.schema.json",
+      "generate": { "kind": "helloCapabilities", "count": 65 },
+      "error": "schema"
+    },
+    {
+      "id": "registry-ids-must-be-unique",
+      "schema": "schema/capability-registry.schema.json",
+      "value": {
+        "schemaVersion": 1,
+        "protocol": { "major": 1, "minor": 0 },
+        "capabilities": [
+          {
+            "id": "com.example.feature.v1",
+            "specification": "https://example.com/feature-v1",
+            "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          },
+          {
+            "id": "com.example.feature.v1",
+            "specification": "https://mirror.example/feature-v1",
+            "digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        ]
+      },
+      "error": "duplicate-capability-id"
+    },
+    {
+      "id": "welcome-cannot-activate-unpublished-capability",
+      "schema": "schema/handshake.schema.json",
+      "value": {
+        "type": "welcome", "protocol": { "major": 1, "minor": 0 },
+        "serverEpoch": "epoch", "runResumed": false,
+        "limits": { "maxFrameBytes": 8388608, "maxSources": 2, "maxSourceBytes": 1048576 },
+        "capabilities": ["com.example.feature.v1"]
+      },
+      "error": "unpublished-capability"
+    },
+    {
+      "id": "source-over-utf8-byte-limit",
+      "schema": "schema/envelope.schema.json",
+      "generate": { "kind": "sourceBytes", "bytes": 1048577 },
+      "error": "source-byte-limit"
+    },
+    {
+      "id": "range-sum-must-be-safe",
+      "schema": "schema/shared.schema.json#/$defs/utf16Range",
+      "value": { "location": 9007199254740991, "length": 1 },
+      "error": "range-overflow"
+    },
+    {
+      "id": "duplicate-source-id",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 1, "id": "command-open",
+        "command": { "type": "openDocument", "snapshot": {
+          "revision": "revision", "sources": [
+            { "sourceId": "same", "text": "first", "sourceSyntax": "plainText" },
+            { "sourceId": "same", "text": "second", "sourceSyntax": "plainText" }
+          ]
+        } }
+      },
+      "error": "duplicate-source-id"
+    },
+    {
+      "id": "progress-completed-exceeds-total",
+      "schema": "schema/envelope.schema.json",
+      "generate": { "kind": "invalidProgress" },
+      "error": "progress-order"
+    },
+    {
+      "id": "complete-presentation-requires-coverage",
+      "schema": "schema/envelope.schema.json",
+      "generate": { "kind": "invalidPresentation", "status": "complete", "defect": "missingCoverage" },
+      "error": "schema"
+    },
+    {
+      "id": "unavailable-presentation-requires-reason",
+      "schema": "schema/envelope.schema.json",
+      "generate": { "kind": "invalidPresentation", "status": "unavailable", "defect": "missingReason" },
+      "error": "schema"
+    },
+    {
+      "id": "progress-is-only-valid-while-checking",
+      "schema": "schema/envelope.schema.json",
+      "generate": { "kind": "invalidPresentation", "status": "pending", "defect": "progress" },
+      "error": "schema"
+    },
+    {
+      "id": "pending-presentation-has-no-suggestions",
+      "schema": "schema/envelope.schema.json",
+      "generate": { "kind": "invalidPresentation", "status": "pending", "defect": "suggestion" },
+      "error": "schema"
+    },
+    {
+      "id": "closed-presentation-forbids-status-members",
+      "schema": "schema/envelope.schema.json",
+      "generate": { "kind": "invalidPresentation", "status": "closed", "defect": "closedMembers" },
+      "error": "schema"
+    },
+    {
+      "id": "available-actions-are-duplicate-free",
+      "schema": "schema/envelope.schema.json",
+      "generate": { "kind": "invalidPresentation", "status": "complete", "defect": "duplicateActions" },
+      "error": "schema"
+    },
+    {
+      "id": "selection-and-source-ids-are-mutually-exclusive",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 1, "id": "command-check",
+        "command": {
+          "type": "requestCheck", "revision": "revision",
+          "intent": {
+            "sourceIds": ["document"],
+            "selection": {
+              "sourceId": "document",
+              "range": { "location": 0, "length": 1 }
+            }
+          }
+        }
+      },
+      "error": "schema"
+    },
+    {
+      "id": "selection-must-be-nonempty",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 1, "id": "command-check",
+        "command": {
+          "type": "requestCheck", "revision": "revision",
+          "intent": {
+            "selection": {
+              "sourceId": "document",
+              "range": { "location": 0, "length": 0 }
+            }
+          }
+        }
+      },
+      "error": "schema"
+    },
+    {
+      "id": "visible-ranges-must-be-nonempty",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 1, "id": "command-attention",
+        "command": {
+          "type": "updateAttention", "revision": "revision",
+          "attention": {
+            "sourceId": "document",
+            "visibleRanges": [{ "location": 0, "length": 0 }]
+          }
+        }
+      },
+      "error": "schema"
+    },
+    {
+      "id": "visible-ranges-must-be-ordered",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 1, "id": "command-attention",
+        "command": {
+          "type": "updateAttention", "revision": "revision",
+          "attention": {
+            "sourceId": "document",
+            "visibleRanges": [
+              { "location": 4, "length": 1 },
+              { "location": 0, "length": 1 }
+            ]
+          }
+        }
+      },
+      "error": "visible-range"
+    },
+    {
+      "id": "visible-ranges-must-not-overlap",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 1, "id": "command-attention",
+        "command": {
+          "type": "updateAttention", "revision": "revision",
+          "attention": {
+            "sourceId": "document",
+            "visibleRanges": [
+              { "location": 0, "length": 3 },
+              { "location": 2, "length": 1 }
+            ]
+          }
+        }
+      },
+      "error": "visible-range"
+    },
+    {
+      "id": "apply-edits-must-descend",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "event", "sequence": 1, "epoch": "epoch",
+        "event": {
+          "type": "applyRequested", "actionId": "action", "transactionId": "transaction",
+          "request": {
+            "expectedRevision": "revision", "sourceId": "document",
+            "edits": [
+              { "range": { "location": 0, "length": 1 }, "expectedText": "a", "replacement": "b" },
+              { "range": { "location": 2, "length": 1 }, "expectedText": "c", "replacement": "d" }
+            ]
+          }
+        }
+      },
+      "error": "apply-edits"
+    },
+    {
+      "id": "apply-edits-must-not-share-an-anchor",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "event", "sequence": 1, "epoch": "epoch",
+        "event": {
+          "type": "applyRequested", "actionId": "action", "transactionId": "transaction",
+          "request": {
+            "expectedRevision": "revision", "sourceId": "document",
+            "edits": [
+              { "range": { "location": 2, "length": 0 }, "expectedText": "", "replacement": "x" },
+              { "range": { "location": 2, "length": 0 }, "expectedText": "", "replacement": "y" }
+            ]
+          }
+        }
+      },
+      "error": "apply-edits"
+    },
+    {
+      "id": "apply-edits-must-not-overlap",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "event", "sequence": 1, "epoch": "epoch",
+        "event": {
+          "type": "applyRequested", "actionId": "action", "transactionId": "transaction",
+          "request": {
+            "expectedRevision": "revision", "sourceId": "document",
+            "edits": [
+              { "range": { "location": 2, "length": 2 }, "expectedText": "cd", "replacement": "x" },
+              { "range": { "location": 1, "length": 2 }, "expectedText": "bc", "replacement": "y" }
+            ]
+          }
+        }
+      },
+      "error": "apply-edits"
+    },
+    {
+      "id": "apply-edits-must-change-text",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "event", "sequence": 1, "epoch": "epoch",
+        "event": {
+          "type": "applyRequested", "actionId": "action", "transactionId": "transaction",
+          "request": {
+            "expectedRevision": "revision", "sourceId": "document",
+            "edits": [
+              { "range": { "location": 0, "length": 1 }, "expectedText": "a", "replacement": "a" }
+            ]
+          }
+        }
+      },
+      "error": "apply-edits"
+    },
+    {
+      "id": "zero-length-apply-edit-must-change-text",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "event", "sequence": 1, "epoch": "epoch",
+        "event": {
+          "type": "applyRequested", "actionId": "action", "transactionId": "transaction",
+          "request": {
+            "expectedRevision": "revision", "sourceId": "document",
+            "edits": [
+              { "range": { "location": 0, "length": 0 }, "expectedText": "", "replacement": "" }
+            ]
+          }
+        }
+      },
+      "error": "apply-edits"
+    },
+    {
+      "id": "unavailable-apply-outcome-forbids-reason",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 1, "id": "command-receipt",
+        "command": {
+          "type": "completeApply", "transactionId": "transaction",
+          "outcome": { "status": "unavailable", "reason": "textMismatch" }
+        }
+      },
+      "error": "schema"
+    }
+  ]
+}

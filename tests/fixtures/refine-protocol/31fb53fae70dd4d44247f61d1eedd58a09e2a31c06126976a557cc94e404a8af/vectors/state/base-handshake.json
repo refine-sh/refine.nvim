@@ -1,0 +1,62 @@
+{
+  "formatVersion": 1,
+  "id": "base-handshake",
+  "description": "Reference transport session handshakes, sends an authoritative snapshot, consumes one event, and closes the document.",
+  "socketRunnable": true,
+  "connections": [
+    {
+      "steps": [
+        {
+          "direction": "client",
+          "message": {
+            "type": "hello",
+            "protocol": { "major": 1, "minor": 0 },
+            "client": { "id": "com.runjuu.refine.reference", "version": "1.0.0-rc", "host": "reference-cli" },
+            "hostCapabilities": { "interceptableSuggestionActionKeys": [] },
+            "runId": "reference-run",
+            "launchToken": "${launchToken}",
+            "capabilities": []
+          }
+        },
+        {
+          "direction": "server",
+          "message": {
+            "type": "welcome",
+            "protocol": { "major": 1, "minor": 0 },
+            "serverEpoch": "${serverEpoch}",
+            "runResumed": false,
+            "limits": { "maxFrameBytes": 8388608, "maxSources": 2, "maxSourceBytes": 1048576 },
+            "capabilities": []
+          }
+        },
+        {
+          "direction": "client",
+          "message": {
+            "type": "command", "sequence": 1, "id": "reference-open",
+            "command": {
+              "type": "openDocument",
+              "snapshot": { "revision": "reference-0", "sources": [
+                { "sourceId": "document", "text": "A sentence.", "sourceSyntax": "plainText" }
+              ] }
+            }
+          }
+        },
+        {
+          "direction": "server",
+          "message": {
+            "type": "event", "sequence": 1, "epoch": "${serverEpoch}", "causeCommandId": "reference-open",
+            "event": { "type": "documentAccepted", "revision": "reference-0" }
+          }
+        },
+        {
+          "direction": "client",
+          "message": {
+            "type": "command", "sequence": 2, "id": "reference-close",
+            "command": { "type": "closeDocument" }
+          }
+        }
+      ]
+    }
+  ]
+}
+

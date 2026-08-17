@@ -93,10 +93,7 @@ end
 
 local function endpoint_advice(failure)
   if type(failure) == "table" and failure.kind == "EndpointProtocolVersionError" then
-    if failure.required_update == "client" then
-      return "Update Refine for Neovim."
-    end
-    return "Update the Refine app."
+    return "Install a compatible Refine app and plugin pair."
   end
   return "Start Refine, then run :checkhealth refine again."
 end
@@ -133,16 +130,6 @@ local function report_endpoint()
     end
     return
   end
-  if descriptor.protocolMinor == nil then
-    vim.health.warn(
-      ("Refine endpoint permissions are secure; the legacy descriptor advertises protocol %d without a minor version"):format(
-        descriptor.protocolMajor
-      ),
-      "Connect once to verify exact Protocol 2.5 compatibility."
-    )
-    return
-  end
-
   vim.health.ok(("Refine endpoint is secure and uses protocol %d.%d"):format(wire.PROTOCOL_MAJOR, wire.PROTOCOL_MINOR))
 end
 

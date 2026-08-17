@@ -16,13 +16,21 @@ capability-parity release.
 - Markdown now uses the explicit `markdownDocument` source syntax, while text,
   Git commit, and mail buffers use `plainText`; this lets Refine join Markdown
   soft line breaks without changing plain-text paragraph behavior.
-- The integration now requires exact Protocol 2.5 support. The legacy `mixed`
-  source syntax is no longer accepted in configuration or buffer overrides.
+- The integration now requires the exact public Integration Protocol 1.0 wire
+  contract; Protocol 2.5 has no compatibility alias. Version mismatches report
+  both exact versions without inferring which component should update.
+- The legacy `mixed` source syntax is no longer accepted in configuration or
+  buffer overrides.
 
 ### Added
 
 - Pure Lua Refine integration runtime for Neovim 0.11 and newer on macOS.
-- Exact Protocol 2.5 transport over Refine's authenticated local Unix socket.
+- Exact Integration Protocol 1.0 transport over Refine's same-UID,
+  per-launch-token local Unix socket, with support throughout Refine 1.x.
+- Strict portable JSON, typed handshake recovery, capability negotiation,
+  Unicode-scalar coordinate validation, and reconnect-safe Apply receipts.
+- Public privacy disclosures for complete source snapshots, configured
+  providers, optional redacted diagnostics, and explicit Report feedback.
 - Full-buffer and selection-scoped writing checks.
 - Native suggestion highlights, floating cards with inline diff runs,
   combining-glyph deletion midlines, visible changed whitespace, navigation,

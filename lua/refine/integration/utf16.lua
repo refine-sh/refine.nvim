@@ -3,10 +3,10 @@ local M = {}
 function M.boundaries(text)
   local positions = { [0] = true }
   local offset = 0
-  local count = vim.fn.strchars(text, true)
+  local count = vim.fn.strchars(text)
   for index = 0, count - 1 do
-    local composed = vim.fn.strcharpart(text, index, 1, true)
-    offset = offset + vim.str_utfindex(composed, "utf-16")
+    local scalar = vim.fn.strcharpart(text, index, 1)
+    offset = offset + vim.str_utfindex(scalar, "utf-16")
     positions[offset] = true
   end
   return positions, offset

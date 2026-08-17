@@ -29,41 +29,44 @@ local function default_delay(milliseconds, callback)
   end
 end
 
-local function nonempty_string(value, label)
-  if type(value) ~= "string" or value == "" then
-    errors.raise("TransportProtocolError", label .. " must be a nonempty string", "fatal", nil, 3)
-  end
-end
-
 local function validate_identity(client)
   if type(client) ~= "table" or vim.islist(client) then
     errors.raise("TransportProtocolError", "client identity must be an object", "fatal", nil, 3)
   end
-  nonempty_string(client.id, "client.id")
-  nonempty_string(client.version, "client.version")
-  nonempty_string(client.host, "client.host")
-  if #client.id > 128 or #client.version > 128 or #client.host > 128 then
-    errors.raise("TransportProtocolError", "client identity fields must be at most 128 UTF-8 bytes", "fatal", nil, 3)
-  end
+  wire.validate_identifier(client.id, "client.id")
+  wire.validate_identifier(client.version, "client.version")
+  wire.validate_identifier(client.host, "client.host")
 end
 
-local function incompatible_error(protocol)
-  local server_is_newer = protocol.major > wire.PROTOCOL_MAJOR
-    or (protocol.major == wire.PROTOCOL_MAJOR and protocol.minor > wire.PROTOCOL_MINOR)
-  return errors.new(
-    "IncompatibleProtocolError",
-    ("Refine protocol %d.%d is incompatible with protocol %d.%d"):format(
-      protocol.major,
-      protocol.minor,
-      wire.PROTOCOL_MAJOR,
-      wire.PROTOCOL_MINOR
-    ),
-    "fatal",
-    {
-      required_update = server_is_newer and "client" or "server",
-      received_protocol = protocol,
-    }
-  )
+local function handshake_rejection_error(rejection)
+  local data = {
+    reason = rejection.reason,
+    recovery = rejection.recovery,
+    protocol = vim.deepcopy(rejection.protocol),
+  }
+  local recoverability = rejection.recovery == "none" and "fatal" or "recoverable"
+  if rejection.reason == "incompatibleProtocol" then
+    data.received_protocol = vim.deepcopy(rejection.receivedProtocol)
+    data.supported_protocol = vim.deepcopy(rejection.protocol)
+    return errors.new(
+      "IncompatibleProtocolError",
+      ("Refine received Integration Protocol %d.%d; Refine requires Integration Protocol %d.%d"):format(
+        rejection.receivedProtocol.major,
+        rejection.receivedProtocol.minor,
+        rejection.protocol.major,
+        rejection.protocol.minor
+      ),
+      recoverability,
+      data
+    )
+  end
+  local messages = {
+    invalidClient = "Refine rejected the client identity or host contract",
+    runUnavailable = "The Refine run is unavailable",
+    serverBusy = "Refine is busy",
+    engineUnavailable = "The Refine engine is unavailable",
+  }
+  return errors.new("HandshakeRejectedError", messages[rejection.reason], recoverability, data)
 end
 
 local Session = {}
@@ -74,6 +77,7 @@ function Session.new(connection, welcome, id_generator)
     connection = connection,
     server_epoch = welcome.serverEpoch,
     run_resumed = welcome.runResumed,
+    capabilities = vim.deepcopy(welcome.capabilities),
     id_generator = id_generator,
     command_sequence = 0,
     expected_event_sequence = 1,
@@ -151,9 +155,13 @@ function Session:_accept_frame(value)
     )
     return
   end
-  self.expected_event_sequence = self.expected_event_sequence + 1
+  local sequence_exhausted = envelope.sequence == 0xffffffff
+  self.expected_event_sequence = sequence_exhausted and nil or envelope.sequence + 1
   if self.event_listener then
     self.event_listener(envelope)
+    if sequence_exhausted then
+      self:_end(errors.new("EngineConnectionError", "Server event sequence exhausted", "recoverable"))
+    end
     return
   end
   if #self.buffered_events >= 128 then
@@ -161,6 +169,9 @@ function Session:_accept_frame(value)
     return
   end
   self.buffered_events[#self.buffered_events + 1] = envelope
+  if sequence_exhausted then
+    self:_end(errors.new("EngineConnectionError", "Server event sequence exhausted", "recoverable"))
+  end
 end
 
 function Session:events(on_event, on_end)
@@ -198,7 +209,7 @@ function Session:_send_next()
     return
   end
   if self.command_sequence >= 0xffffffff then
-    local exhausted = errors.new("TransportProtocolError", "Client command sequence exhausted", "fatal")
+    local exhausted = errors.new("EngineConnectionError", "Client command sequence exhausted", "recoverable")
     self.in_flight = pending
     self.sending = true
     self:_end(exhausted)
@@ -226,6 +237,10 @@ function Session:_send_next()
     self.sending = false
     self.command_sequence = sequence
     self:_complete_send(pending, nil, { sequence = sequence, id = pending.id })
+    if sequence == 0xffffffff then
+      self:_end(errors.new("EngineConnectionError", "Client command sequence exhausted", "recoverable"))
+      return
+    end
     self:_send_next()
   end
   local sent, send_error = pcall(self.connection.send, self.connection, envelope, wrote)
@@ -245,7 +260,7 @@ function Session:send(command, command_id, callback)
     return
   end
   local id = command_id or self.id_generator()
-  local valid_id, id_error = pcall(nonempty_string, id, "command id")
+  local valid_id, id_error = pcall(wire.validate_identifier, id, "command id")
   if not valid_id then
     callback(id_error)
     return
@@ -289,20 +304,21 @@ function M.new(options)
   validate_identity(options.client)
   local host_capabilities = options.host_capabilities or { interceptableSuggestionActionKeys = {} }
   wire.validate_host_capabilities(host_capabilities)
+  local known_capabilities = options.known_capabilities or wire.KNOWN_CAPABILITIES
+  local capabilities = wire.capability_offers(options.capabilities or {}, known_capabilities)
   if options.frontend ~= nil then
     if type(options.frontend) ~= "table" or vim.islist(options.frontend) then
       errors.raise("TransportProtocolError", "frontend must be an object", "fatal", nil, 2)
     end
-    nonempty_string(options.frontend.id, "frontend.id")
-    if #options.frontend.id > 128 then
-      errors.raise("TransportProtocolError", "frontend.id is too long", "fatal", nil, 2)
-    end
+    wire.validate_identifier(options.frontend.id, "frontend.id")
   end
 
   local transport = {
     client = vim.deepcopy(options.client),
     frontend = options.frontend and vim.deepcopy(options.frontend) or nil,
     host_capabilities = vim.deepcopy(host_capabilities),
+    known_capabilities = vim.deepcopy(known_capabilities),
+    capabilities = capabilities,
     endpoint_locator = options.endpoint_locator or endpoint.locator(),
     connector = options.connector or unix.connector(),
     delay = options.delay or default_delay,
@@ -313,10 +329,7 @@ function M.new(options)
     connect_options = connect_options or {}
     callback = callback or function() end
     local run_id = connect_options.run_id or self.id_generator()
-    nonempty_string(run_id, "run_id")
-    if #run_id > 128 then
-      errors.raise("TransportProtocolError", "run_id must be at most 128 UTF-8 bytes", "fatal", nil, 2)
-    end
+    wire.validate_identifier(run_id, "run_id")
     local callback_used = false
     local cancel_handshake_timeout = function() end
     local function finish(err, session)
@@ -364,7 +377,7 @@ function M.new(options)
             session:_accept_frame(frame)
             return
           end
-          local decoded, response = pcall(wire.decode_handshake, frame)
+          local decoded, response = pcall(wire.decode_handshake, frame, self.capabilities, self.known_capabilities)
           if not decoded then
             connection:close()
             finish(response)
@@ -372,7 +385,7 @@ function M.new(options)
           end
           if response.type == "rejected" then
             connection:close()
-            finish(incompatible_error(response.protocol))
+            finish(handshake_rejection_error(response))
             return
           end
           if response.serverEpoch ~= descriptor.serverEpoch then
@@ -406,7 +419,7 @@ function M.new(options)
           hostCapabilities = vim.deepcopy(self.host_capabilities),
           runId = run_id,
           launchToken = descriptor.launchToken,
-          capabilities = {},
+          capabilities = vim.deepcopy(self.capabilities),
         }
         if self.frontend then
           hello.frontend = vim.deepcopy(self.frontend)

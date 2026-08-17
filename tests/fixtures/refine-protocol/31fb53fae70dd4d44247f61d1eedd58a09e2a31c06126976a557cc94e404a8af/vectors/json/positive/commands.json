@@ -1,0 +1,205 @@
+{
+  "formatVersion": 1,
+  "cases": [
+    {
+      "id": "command-open-document",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 1, "id": "command-open",
+        "command": {
+          "type": "openDocument",
+          "snapshot": { "revision": "revision-0", "sources": [
+            { "sourceId": "document", "text": "Hello 😀", "sourceSyntax": "plainText" }
+          ] }
+        }
+      }
+    },
+    {
+      "id": "command-replace-document-two-sources",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 2, "id": "command-replace",
+        "command": {
+          "type": "replaceDocument",
+          "snapshot": { "revision": "revision-1", "sources": [
+            { "sourceId": "body", "text": "# Hello", "sourceSyntax": "markdownDocument" },
+            { "sourceId": "notes", "text": "\\\\text{note}", "sourceSyntax": "latexDocument" }
+          ] }
+        }
+      }
+    },
+    {
+      "id": "command-update-attention",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 3, "id": "command-attention",
+        "command": {
+          "type": "updateAttention", "revision": "revision-1",
+          "attention": {
+            "sourceId": "body", "caretOffset": 3,
+            "visibleRanges": [{ "location": 0, "length": 7 }]
+          }
+        }
+      }
+    },
+    {
+      "id": "command-update-attention-with-no-visible-range",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 3, "id": "command-attention-empty",
+        "command": {
+          "type": "updateAttention", "revision": "revision-1",
+          "attention": { "sourceId": "body", "visibleRanges": [] }
+        }
+      }
+    },
+    {
+      "id": "command-request-full-check",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 4, "id": "command-check-full",
+        "command": { "type": "requestCheck", "revision": "revision-1" }
+      }
+    },
+    {
+      "id": "command-request-selection-check",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 5, "id": "command-check-selection",
+        "command": {
+          "type": "requestCheck", "revision": "revision-1",
+          "intent": {
+            "forcedLanguageTag": "en-US",
+            "selection": { "sourceId": "body", "range": { "location": 2, "length": 5 } }
+          }
+        }
+      }
+    },
+    {
+      "id": "command-request-source-check",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 5, "id": "command-check-sources",
+        "command": {
+          "type": "requestCheck", "revision": "revision-1",
+          "intent": { "forcedLanguageTag": "en-US", "sourceIds": ["body"] }
+        }
+      }
+    },
+    {
+      "id": "command-perform-apply",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 6, "id": "command-action-apply",
+        "command": {
+          "type": "performAction", "actionId": "action-apply", "kind": "apply",
+          "suggestion": { "id": "suggestion-1", "documentRevision": "revision-1" }
+        }
+      }
+    },
+    {
+      "id": "command-perform-dismiss",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 7, "id": "command-action-dismiss",
+        "command": {
+          "type": "performAction", "actionId": "action-dismiss", "kind": "dismiss",
+          "suggestion": { "id": "suggestion-1", "documentRevision": "revision-1" }
+        }
+      }
+    },
+    {
+      "id": "command-perform-explain",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 8, "id": "command-action-explain",
+        "command": {
+          "type": "performAction", "actionId": "action-explain", "kind": "explain",
+          "suggestion": { "id": "suggestion-1", "documentRevision": "revision-1" }
+        }
+      }
+    },
+    {
+      "id": "command-perform-report",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 9, "id": "command-action-report",
+        "command": {
+          "type": "performAction", "actionId": "action-report", "kind": "report",
+          "suggestion": { "id": "suggestion-1", "documentRevision": "revision-1" }
+        }
+      }
+    },
+    {
+      "id": "command-complete-applied",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 10, "id": "command-receipt-applied",
+        "command": {
+          "type": "completeApply", "transactionId": "transaction-1",
+          "outcome": { "status": "applied", "snapshot": {
+            "revision": "revision-2", "sources": [
+              { "sourceId": "body", "text": "Hello", "sourceSyntax": "plainText" }
+            ]
+          } }
+        }
+      }
+    },
+    {
+      "id": "command-complete-rejected",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 11, "id": "command-receipt-rejected",
+        "command": {
+          "type": "completeApply", "transactionId": "transaction-2",
+          "outcome": { "status": "rejected", "reason": "textMismatch", "snapshot": {
+            "revision": "revision-3", "sources": [
+              { "sourceId": "body", "text": "Different", "sourceSyntax": "plainText" }
+            ]
+          } }
+        }
+      }
+    },
+    {
+      "id": "command-complete-unsupported-without-snapshot",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 12, "id": "command-receipt-unsupported",
+        "command": {
+          "type": "completeApply", "transactionId": "transaction-3",
+          "outcome": { "status": "unsupported", "reason": "nonAtomic" }
+        }
+      }
+    },
+    {
+      "id": "command-complete-unavailable",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 13, "id": "command-receipt-unavailable",
+        "command": {
+          "type": "completeApply", "transactionId": "transaction-4",
+          "outcome": { "status": "unavailable" }
+        }
+      }
+    },
+    {
+      "id": "command-complete-indeterminate",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 14, "id": "command-receipt-indeterminate",
+        "command": {
+          "type": "completeApply", "transactionId": "transaction-5",
+          "outcome": { "status": "indeterminate" }
+        }
+      }
+    },
+    {
+      "id": "command-close-document",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 15, "id": "command-close",
+        "command": { "type": "closeDocument" }
+      }
+    }
+  ]
+}

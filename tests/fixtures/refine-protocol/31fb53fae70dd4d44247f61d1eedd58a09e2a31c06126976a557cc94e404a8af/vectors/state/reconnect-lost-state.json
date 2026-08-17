@@ -1,0 +1,44 @@
+{
+  "formatVersion": 1,
+  "id": "reconnect-lost-state",
+  "description": "Lost coordinator discards historical receipts and restores snapshot, attention, then pending check.",
+  "socketRunnable": true,
+  "connections": [
+    {
+      "steps": [
+        { "direction": "client", "message": {
+          "type": "hello", "protocol": { "major": 1, "minor": 0 },
+          "client": { "id": "com.runjuu.refine.reference", "version": "1.0.0-rc", "host": "reference-cli" },
+          "hostCapabilities": { "interceptableSuggestionActionKeys": [] },
+          "runId": "reconnect-lost-run", "launchToken": "${launchToken}", "capabilities": []
+        } },
+        { "direction": "server", "message": {
+          "type": "welcome", "protocol": { "major": 1, "minor": 0 }, "serverEpoch": "${serverEpoch}", "runResumed": false,
+          "limits": { "maxFrameBytes": 8388608, "maxSources": 2, "maxSourceBytes": 1048576 }, "capabilities": []
+        } },
+        { "direction": "client", "restore": "snapshot", "message": {
+          "type": "command", "sequence": 1, "id": "restore-snapshot", "command": {
+            "type": "openDocument", "snapshot": { "revision": "revision-2", "sources": [
+              { "sourceId": "document", "text": "Corrected.", "sourceSyntax": "plainText" }
+            ] }
+          }
+        } },
+        { "direction": "client", "restore": "attention", "message": {
+          "type": "command", "sequence": 2, "id": "restore-attention", "command": {
+            "type": "updateAttention", "revision": "revision-2",
+            "attention": { "sourceId": "document", "caretOffset": 10, "visibleRanges": [{ "location": 0, "length": 10 }] }
+          }
+        } },
+        { "direction": "client", "restore": "check", "message": {
+          "type": "command", "sequence": 3, "id": "restore-check", "command": {
+            "type": "requestCheck", "revision": "revision-2"
+          }
+        } },
+        { "direction": "client", "close": true }
+      ]
+    }
+  ],
+  "discardedBeforeReconnect": ["transaction-lost"],
+  "expectedRestoreOrder": ["snapshot", "attention", "check"],
+  "mutationRetried": false
+}

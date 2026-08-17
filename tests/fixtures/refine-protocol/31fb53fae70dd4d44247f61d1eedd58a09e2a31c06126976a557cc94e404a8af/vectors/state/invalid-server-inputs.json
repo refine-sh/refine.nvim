@@ -1,0 +1,243 @@
+{
+  "formatVersion": 1,
+  "id": "invalid-server-inputs",
+  "description": "A client closes on every malformed frame, handshake, envelope, closed union, range, and Apply invariant exercised here.",
+  "socketRunnable": true,
+  "messages": {
+    "hello": {
+      "type": "hello", "protocol": { "major": 1, "minor": 0 },
+      "client": { "id": "com.runjuu.refine.reference", "version": "1.0.0-rc", "host": "reference-cli" },
+      "hostCapabilities": { "interceptableSuggestionActionKeys": [] },
+      "runId": "invalid-input-run", "launchToken": "${launchToken}", "capabilities": []
+    },
+    "welcome": {
+      "type": "welcome", "protocol": { "major": 1, "minor": 0 },
+      "serverEpoch": "${serverEpoch}", "runResumed": false,
+      "limits": { "maxFrameBytes": 8388608, "maxSources": 2, "maxSourceBytes": 1048576 },
+      "capabilities": []
+    }
+  },
+  "connections": [
+    {
+      "expectedOutcome": "protocolError",
+      "steps": [
+        { "direction": "client", "messageRef": "hello" },
+        { "direction": "server", "messageRef": "welcome" },
+        {
+          "direction": "server",
+          "rawFrameHex": "0000001f7b2274797065223a226576656e74222c2274797065223a226576656e74227d"
+        },
+        { "direction": "client", "close": true }
+      ]
+    },
+    {
+      "expectedOutcome": "protocolError",
+      "steps": [
+        { "direction": "client", "messageRef": "hello" },
+        { "direction": "server", "messageRef": "welcome" },
+        { "direction": "server", "rawFrameHex": "00000000" },
+        { "direction": "client", "close": true }
+      ]
+    },
+    {
+      "expectedOutcome": "protocolError",
+      "steps": [
+        { "direction": "client", "messageRef": "hello" },
+        { "direction": "server", "messageRef": "welcome" },
+        { "direction": "server", "invalid": "eventSequence", "message": {
+          "type": "event", "sequence": 2, "epoch": "${serverEpoch}",
+          "event": { "type": "documentAccepted", "revision": "revision" }
+        } },
+        { "direction": "client", "close": true }
+      ]
+    },
+    {
+      "expectedOutcome": "protocolError",
+      "steps": [
+        { "direction": "client", "messageRef": "hello" },
+        { "direction": "server", "messageRef": "welcome" },
+        { "direction": "server", "invalid": "eventEpoch", "message": {
+          "type": "event", "sequence": 1, "epoch": "wrong-epoch",
+          "event": { "type": "documentAccepted", "revision": "revision" }
+        } },
+        { "direction": "client", "close": true }
+      ]
+    },
+    {
+      "expectedOutcome": "protocolError",
+      "steps": [
+        { "direction": "client", "messageRef": "hello" },
+        { "direction": "server", "messageRef": "welcome" },
+        { "direction": "server", "invalid": "faultUnion", "message": {
+          "type": "event", "sequence": 1, "epoch": "${serverEpoch}",
+          "event": { "type": "fault", "code": "invalidSequence", "fatal": false }
+        } },
+        { "direction": "client", "close": true }
+      ]
+    },
+    {
+      "expectedOutcome": "protocolError",
+      "steps": [
+        { "direction": "client", "messageRef": "hello" },
+        { "direction": "server", "messageRef": "welcome" },
+        { "direction": "server", "invalid": "serverEnvelope", "message": {
+          "type": "command", "sequence": 1, "id": "server-command",
+          "command": { "type": "closeDocument" }
+        } },
+        { "direction": "client", "close": true }
+      ]
+    },
+    {
+      "expectedOutcome": "protocolError",
+      "steps": [
+        { "direction": "client", "messageRef": "hello" },
+        { "direction": "server", "invalid": "schema", "message": {
+          "type": "rejected", "reason": "incompatibleProtocol", "recovery": "none",
+          "protocol": { "major": 2, "minor": 0 },
+          "receivedProtocol": { "major": 1, "minor": 0 }
+        } },
+        { "direction": "server", "close": true }
+      ]
+    },
+    {
+      "expectedOutcome": "protocolError",
+      "steps": [
+        { "direction": "client", "messageRef": "hello" },
+        { "direction": "server", "messageRef": "welcome" },
+        {
+          "direction": "server",
+          "rawFrameHex": "000000597b2274797065223a22636f6d6d616e64222c2273657175656e6365223a312c226964223a2263222c22636f6d6d616e64223a7b2274797065223a22636c6f7365446f63756d656e74227d2c22667574757265223a6e756c6c7d"
+        },
+        { "direction": "client", "close": true }
+      ]
+    },
+    {
+      "expectedOutcome": "protocolError",
+      "steps": [
+        { "direction": "client", "messageRef": "hello" },
+        { "direction": "server", "messageRef": "welcome" },
+        { "direction": "server", "invalid": "schema", "message": {
+          "type": "event", "sequence": 1, "epoch": "${serverEpoch}",
+          "event": {
+            "type": "presentationContentReplaced", "checkId": "check",
+            "content": {
+              "documentRevision": "revision", "status": "closed", "coverage": "full", "suggestions": [],
+              "appearance": {
+                "highlight": { "style": "underline", "grammarColor": "#FF2D55", "fluencyColor": "#007AFF" },
+                "diff": { "additionColor": "#34C759", "deletionColor": "#FF3B30", "showHiddenWhitespace": true }
+              },
+              "interaction": {
+                "automaticChecksEnabled": true,
+                "quickApply": { "enabled": true, "applyKey": "tab", "dismissKey": "escape", "activationStyle": "showTipAndHighlight" }
+              }
+            }
+          }
+        } },
+        { "direction": "client", "close": true }
+      ]
+    },
+    {
+      "expectedOutcome": "protocolError",
+      "steps": [
+        { "direction": "client", "messageRef": "hello" },
+        { "direction": "server", "messageRef": "welcome" },
+        { "direction": "server", "invalid": "schema", "message": {
+          "type": "event", "sequence": 1, "epoch": "${serverEpoch}",
+          "event": {
+            "type": "presentationContentReplaced", "checkId": "check",
+            "content": {
+              "documentRevision": "revision", "status": "complete", "coverage": "full",
+              "suggestions": [{
+                "id": "suggestion", "sourceId": "document", "kind": "grammar",
+                "attribution": { "languageDisplayName": "English", "textDirection": "ltr", "checkModelDisplayName": "Model" },
+                "activationRange": { "location": 0, "length": 1 },
+                "highlightRanges": [{ "location": 0, "length": 1 }],
+                "diff": [{ "kind": "unchanged", "text": "a" }],
+                "availableActions": ["apply", "apply"]
+              }],
+              "appearance": {
+                "highlight": { "style": "underline", "grammarColor": "#FF2D55", "fluencyColor": "#007AFF" },
+                "diff": { "additionColor": "#34C759", "deletionColor": "#FF3B30", "showHiddenWhitespace": true }
+              },
+              "interaction": {
+                "automaticChecksEnabled": true,
+                "quickApply": { "enabled": true, "applyKey": "tab", "dismissKey": "escape", "activationStyle": "showTipAndHighlight" }
+              }
+            }
+          }
+        } },
+        { "direction": "client", "close": true }
+      ]
+    },
+    {
+      "expectedOutcome": "protocolError",
+      "steps": [
+        { "direction": "client", "messageRef": "hello" },
+        { "direction": "server", "messageRef": "welcome" },
+        { "direction": "server", "invalid": "schema", "message": {
+          "type": "event", "sequence": 1, "epoch": "${serverEpoch}",
+          "event": {
+            "type": "presentationContentReplaced", "checkId": "check",
+            "content": {
+              "documentRevision": "revision", "status": "complete", "coverage": "full",
+              "suggestions": [{
+                "id": "suggestion", "sourceId": "document", "kind": "grammar",
+                "attribution": { "languageDisplayName": "", "textDirection": "ltr", "checkModelDisplayName": "Model" },
+                "activationRange": { "location": 0, "length": 1 },
+                "highlightRanges": [], "diff": [], "availableActions": ["apply"]
+              }],
+              "appearance": {
+                "highlight": { "style": "underline", "grammarColor": "#FF2D55", "fluencyColor": "#007AFF" },
+                "diff": { "additionColor": "#34C759", "deletionColor": "#FF3B30", "showHiddenWhitespace": true }
+              },
+              "interaction": {
+                "automaticChecksEnabled": true,
+                "quickApply": { "enabled": true, "applyKey": "tab", "dismissKey": "escape", "activationStyle": "showTipAndHighlight" }
+              }
+            }
+          }
+        } },
+        { "direction": "client", "close": true }
+      ]
+    },
+    {
+      "expectedOutcome": "protocolError",
+      "steps": [
+        { "direction": "client", "messageRef": "hello" },
+        { "direction": "server", "messageRef": "welcome" },
+        { "direction": "server", "invalid": "eventSemantics", "message": {
+          "type": "event", "sequence": 1, "epoch": "${serverEpoch}",
+          "event": {
+            "type": "applyRequested", "actionId": "action", "transactionId": "transaction",
+            "request": {
+              "expectedRevision": "revision", "sourceId": "document",
+              "edits": [{ "range": { "location": 0, "length": 0 }, "expectedText": "", "replacement": "" }]
+            }
+          }
+        } },
+        { "direction": "client", "close": true }
+      ]
+    },
+    {
+      "expectedOutcome": "protocolError",
+      "steps": [
+        { "direction": "client", "messageRef": "hello" },
+        { "direction": "server", "messageRef": "welcome" },
+        { "direction": "server", "invalid": "eventSemantics", "message": {
+          "type": "event", "sequence": 1, "epoch": "${serverEpoch}",
+          "event": {
+            "type": "applyRequested", "actionId": "action", "transactionId": "transaction",
+            "request": {
+              "expectedRevision": "revision", "sourceId": "document",
+              "edits": [{
+                "range": { "location": 9007199254740991, "length": 1 },
+                "expectedText": "a", "replacement": "b"
+              }]
+            }
+          }
+        } },
+        { "direction": "client", "close": true }
+      ]
+    }
+  ]
+}

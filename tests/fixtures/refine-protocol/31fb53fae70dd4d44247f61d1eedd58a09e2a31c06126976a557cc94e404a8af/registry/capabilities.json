@@ -1,0 +1,6 @@
+{
+  "registrySchema": "../schema/capability-registry.schema.json",
+  "schemaVersion": 1,
+  "protocol": { "major": 1, "minor": 0 },
+  "capabilities": []
+}

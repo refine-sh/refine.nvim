@@ -1,0 +1,82 @@
+{
+  "formatVersion": 1,
+  "cases": [
+    {
+      "id": "exact-hello-frame",
+      "expected": "valid",
+      "schema": "schema/handshake.schema.json",
+      "hex": "0000011f7b2274797065223a2268656c6c6f222c2270726f746f636f6c223a7b226d616a6f72223a312c226d696e6f72223a307d2c22636c69656e74223a7b226964223a22636f6d2e6578616d706c652e777269746572222c2276657273696f6e223a2231222c22686f7374223a22686f7374227d2c22686f73744361706162696c6974696573223a7b22696e7465726365707461626c6553756767657374696f6e416374696f6e4b657973223a5b5d7d2c2272756e4964223a2272756e222c226c61756e6368546f6b656e223a2241414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141222c226361706162696c6974696573223a5b5d7d"
+    },
+    {
+      "id": "maximum-payload-length",
+      "expected": "valid-framing",
+      "generate": { "kind": "paddedObject", "payloadBytes": 8388608 }
+    },
+    {
+      "id": "zero-length-frame",
+      "expected": "invalid",
+      "error": "zero-length",
+      "hex": "00000000"
+    },
+    {
+      "id": "length-over-limit",
+      "expected": "invalid",
+      "error": "frame-too-large",
+      "hex": "00800001"
+    },
+    {
+      "id": "truncated-payload",
+      "expected": "invalid",
+      "error": "truncated-frame",
+      "hex": "000000057b7d"
+    },
+    {
+      "id": "invalid-utf8",
+      "expected": "invalid",
+      "error": "invalid-utf8",
+      "hex": "00000001ff"
+    },
+    {
+      "id": "non-object-root",
+      "expected": "invalid",
+      "error": "object-root-required",
+      "hex": "000000025b5d"
+    },
+    {
+      "id": "malformed-json",
+      "expected": "invalid",
+      "error": "malformed-json",
+      "hex": "000000017b"
+    },
+    {
+      "id": "unknown-null-value",
+      "expected": "invalid",
+      "error": "null-value",
+      "hex": "000000597b2274797065223a22636f6d6d616e64222c2273657175656e6365223a312c226964223a2263222c22636f6d6d616e64223a7b2274797065223a22636c6f7365446f63756d656e74227d2c22667574757265223a6e756c6c7d"
+    },
+    {
+      "id": "unknown-negative-number",
+      "expected": "invalid",
+      "error": "negative-number-token",
+      "hex": "000000577b2274797065223a22636f6d6d616e64222c2273657175656e6365223a312c226964223a2263222c22636f6d6d616e64223a7b2274797065223a22636c6f7365446f63756d656e74227d2c22667574757265223a2d317d"
+    },
+    {
+      "id": "unknown-fraction-number",
+      "expected": "invalid",
+      "error": "non-integer-number-token",
+      "hex": "000000587b2274797065223a22636f6d6d616e64222c2273657175656e6365223a312c226964223a2263222c22636f6d6d616e64223a7b2274797065223a22636c6f7365446f63756d656e74227d2c22667574757265223a312e357d"
+    },
+    {
+      "id": "unknown-exponent-number",
+      "expected": "invalid",
+      "error": "non-integer-number-token",
+      "hex": "000000587b2274797065223a22636f6d6d616e64222c2273657175656e6365223a312c226964223a2263222c22636f6d6d616e64223a7b2274797065223a22636c6f7365446f63756d656e74227d2c22667574757265223a3165307d"
+    },
+    {
+      "id": "unknown-unsafe-integer",
+      "expected": "invalid",
+      "error": "unsafe-number-token",
+      "hex": "000000657b2274797065223a22636f6d6d616e64222c2273657175656e6365223a312c226964223a2263222c22636f6d6d616e64223a7b2274797065223a22636c6f7365446f63756d656e74227d2c22667574757265223a393030373139393235343734303939327d"
+    }
+  ]
+}

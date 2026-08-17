@@ -28,7 +28,7 @@ function M.check_intent(intent, snapshot)
       return false, "selection names an unknown source"
     end
     if not utf16.valid_range(text, intent.selection.range, true) then
-      return false, "selection must be in bounds at composed-character UTF-16 boundaries"
+      return false, "selection must be in bounds at Unicode-scalar UTF-16 boundaries"
     end
   end
   return true
@@ -53,13 +53,13 @@ function M.presentation(content, snapshot)
     end
     local indexed = source_boundaries[suggestion.sourceId]
     if not utf16.range_at_boundaries(suggestion.activationRange, indexed.boundaries, indexed.length, false) then
-      return false, "suggestion activation range is out of bounds or splits a composed character"
+      return false, "suggestion activation range is out of bounds or splits a Unicode scalar"
     end
     local previous_end = -1
     local zero_anchors = {}
     for _, highlight in ipairs(suggestion.highlightRanges) do
       if not utf16.range_at_boundaries(highlight, indexed.boundaries, indexed.length, false) then
-        return false, "suggestion highlight range is out of bounds or splits a composed character"
+        return false, "suggestion highlight range is out of bounds or splits a Unicode scalar"
       end
       if highlight.location < previous_end then
         return false, "suggestion highlight ranges must be sorted and non-overlapping"

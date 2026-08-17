@@ -234,13 +234,16 @@ function Controller:_on_state(run, event)
     }
     if event.error.kind == "IncompatibleProtocolError" or event.error.kind == "EndpointProtocolVersionError" then
       status.reason = "incompatible_protocol"
-      if event.error.required_update == "client" or event.error.required_update == "server" then
-        status.required_update = event.error.required_update
-      end
       if type(event.error.received_protocol) == "table" then
         status.received_protocol = {
           major = event.error.received_protocol.major,
           minor = event.error.received_protocol.minor,
+        }
+      end
+      if type(event.error.supported_protocol) == "table" then
+        status.supported_protocol = {
+          major = event.error.supported_protocol.major,
+          minor = event.error.supported_protocol.minor,
         }
       end
     end
@@ -249,9 +252,8 @@ function Controller:_on_state(run, event)
       run.fatal_reported = true
       local message
       if event.error.kind == "IncompatibleProtocolError" or event.error.kind == "EndpointProtocolVersionError" then
-        message = event.error.required_update == "server"
-            and "Refine for Neovim requires a newer Refine app. Update Refine, then reconnect."
-          or "Refine requires a newer Refine for Neovim client. Update the plugin, then reconnect."
+        message =
+          "Refine and Refine for Neovim use incompatible integration protocol versions. Update to a compatible pair, then reconnect."
       else
         message = "Refine for Neovim stopped: " .. tostring(event.error)
       end

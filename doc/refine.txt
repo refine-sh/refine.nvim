@@ -38,7 +38,7 @@ session; focusing the current Refine card is the sole exception.
 
 - macOS 14 or newer
 - Neovim 0.11 or newer
-- Refine with exact integration Protocol 2.5 support
+- Refine with exact Integration Protocol 1.0 support
 - An active Refine trial or valid license
 
 The plugin is inactive in a headless Neovim. It activates when a UI attaches.
@@ -191,8 +191,9 @@ logical paragraph when a correction cannot retain its original soft breaks.
 
                                                       *:RefineReport*
 :RefineReport
-    Reports the current suggestion when feedback is available. Reporting keeps
-    the suggestion and card open.
+    Reports the current suggestion when feedback is available. This is a
+    separate, explicit feedback action; see |refine-privacy-compatibility|.
+    Reporting keeps the suggestion and card open.
 
                                                        *:RefineClose*
 :RefineClose
@@ -373,7 +374,7 @@ The report covers:
 - Neovim version and macOS platform
 - redacted configuration
 - same-user endpoint permissions
-- exact Protocol 2.5 versions
+- exact local and remote Protocol 1.0 versions
 - recognized or generic frontend state
 - semantic integration state
 - configured action-key compatibility
@@ -385,14 +386,37 @@ Endpoint credentials and writing source never appear in health output.
 ==============================================================================
 11. Privacy and compatibility              *refine-privacy-compatibility*
 
-The plugin connects only to the local Refine app through an authenticated,
-same-user Unix-domain socket. It makes no direct network, telemetry, analytics,
-or update-check requests. Plugin managers own updates. Refine itself may use
-the provider selected in the app under its existing privacy and consent
-controls.
+The plugin sends complete canonical source snapshots to the local Refine app
+through a same-UID Unix-domain socket using Refine's current per-launch token.
+This excludes network clients and other OS users, but does not identify a
+specific plugin or protect against another process already running as you. The
+plugin makes no direct network, telemetry, analytics, or update-check requests.
+Plugin managers own updates. Refine may use a local model or a provider selected
+in the app under its privacy and consent controls; that provider may receive the
+source.
 
-Refine for Neovim currently requires exact Protocol 2.5. A mismatch fails
-before source is sent and reports whether the plugin or Refine must be
-updated. Protocol changes are released as exact app-and-plugin pairs.
+Persistent diagnostics are disabled by default. When enabled, they retain
+only bounded, redacted metadata and never source, diffs, explanations, launch
+tokens, or provider credentials.
+
+|:RefineReport| is distinct from writing checks and sends feedback through the
+Refine app only after an explicit user action. Refine's feedback service may
+receive original and revised excerpts plus suggestion, model, language,
+custom-instruction, Refine-version, and macOS-version context.
+
+Integration Protocol 1.0 is a supported public API that third-party
+writing-host clients may implement. Refine for Neovim requires the exact 1.0
+wire contract; there is no Protocol 2.5 alias. Refine maintains exact Protocol
+1.0 compatibility throughout Refine 1.x.
+
+The supported production profile connects a conforming writing-host client to
+the shipping Refine server on macOS as the same local OS user, with Refine
+already running. Network transports, cross-user access, and third-party
+production servers are outside that profile. Technical conformance is
+self-assessed and does not imply certification or endorsement.
+
+A mismatch fails before source is sent and reports the exact local and remote
+versions. Numeric ordering does not identify which component should change;
+install a compatible Refine app and plugin pair, then reconnect.
 
  vim:tw=78:ts=8:noet:ft=help:norl:

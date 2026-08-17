@@ -33,7 +33,7 @@ Features:
 
 - macOS 14+
 - Neovim 0.11+
-- Refine with integration Protocol 2.5 support
+- Refine with exact Integration Protocol 1.0 support
 
 Refine includes a full-featured seven-day trial with no credit card required.
 
@@ -146,25 +146,51 @@ are eligible. Refine never changes file format or end-of-line settings.
 
 ## Local AI and privacy
 
-When Refine uses a downloaded local model, the checked text and model response
-stay on your Mac. Once downloaded, the model continues working offline.
+The plugin sends a complete canonical snapshot of each eligible buffer to the
+local Refine app. When Refine uses a downloaded local model, that source and
+the model response stay on your Mac. Once downloaded, the model continues
+working offline.
 
 Refine can also use a provider you connect. Those requests go directly from
-your Mac to that provider, whose terms and privacy practices apply. Downloads,
-updates, standard license services, and hosted providers still require an
-internet connection.
+your Mac to that provider and may include the source, so that provider's terms
+and privacy practices apply. Downloads, updates, standard license services,
+and hosted providers still require an internet connection.
 
-The Neovim plugin connects only to the local Refine app through an
-authenticated, same-user Unix socket. It makes no direct network, telemetry,
-analytics, or update-check requests.
+The Neovim plugin connects only to the local Refine app through a same-UID
+Unix-domain socket using Refine's current per-launch token. This boundary
+excludes network clients and other OS users, but it does not identify a
+specific plugin or protect against another process already running as you. The
+plugin makes no direct network, telemetry, analytics, or update-check requests.
+Persistent diagnostics are off by default; when enabled for troubleshooting,
+they retain only bounded, redacted metadata and never source, diffs,
+explanations, launch tokens, or provider credentials.
 
-`:RefineReport` is explicit, opt-in feedback. When you use it, Refine receives
-the relevant before-and-after excerpt, along with suggestion and diagnostic
-metadata.
+`:RefineReport` is a separate, explicit feedback action. Only when you invoke
+it, the Refine app may send original and revised excerpts plus suggestion,
+model, language, custom-instruction, Refine-version, and macOS-version context
+to Refine's feedback service.
 
 Read [How Refine works](https://refine.sh/guides/how-refine-works), the
 [offline grammar checker guide](https://refine.sh/guides/offline-grammar-checker-mac),
 and the [privacy policy](https://refine.sh/privacy-policy) for full details.
+
+## Protocol compatibility and support
+
+Integration Protocol 1.0 is a supported public API that third-party
+writing-host clients may implement. Refine for Neovim requires the exact 1.0
+wire contract; there is no Protocol 2.5 alias. Refine maintains exact Protocol
+1.0 compatibility throughout the Refine 1.x release line.
+
+The supported production profile connects a conforming writing-host client to
+the shipping Refine server on the same Mac and as the same OS user, with Refine
+already running. Network transports, cross-user access, and third-party
+production servers are outside that profile. Technical conformance is
+self-assessed and does not imply certification or endorsement.
+
+A protocol mismatch stops before source is sent and reports the exact local
+and remote versions. Because version ordering does not identify which
+component should change, the diagnostic asks for a compatible app-and-plugin
+pair without inferring an update direction.
 
 ## Troubleshooting
 

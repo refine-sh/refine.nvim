@@ -1,0 +1,28 @@
+{
+  "formatVersion": 1,
+  "id": "fatal-fault",
+  "description": "A post-welcome sequence violation produces one sequenced fatal fault, flush, and close.",
+  "socketRunnable": true,
+  "connections": [
+    {
+      "expectedOutcome": "fatalFault",
+      "steps": [
+        { "direction": "client", "message": {
+          "type": "hello", "protocol": { "major": 1, "minor": 0 },
+          "client": { "id": "com.runjuu.refine.reference", "version": "1.0.0-rc", "host": "reference-cli" },
+          "hostCapabilities": { "interceptableSuggestionActionKeys": [] },
+          "runId": "fatal-fault-run", "launchToken": "${launchToken}", "capabilities": []
+        } },
+        { "direction": "server", "message": {
+          "type": "welcome", "protocol": { "major": 1, "minor": 0 }, "serverEpoch": "${serverEpoch}", "runResumed": false,
+          "limits": { "maxFrameBytes": 8388608, "maxSources": 2, "maxSourceBytes": 1048576 }, "capabilities": []
+        } },
+        { "direction": "server", "message": {
+          "type": "event", "sequence": 1, "epoch": "${serverEpoch}",
+          "event": { "type": "fault", "code": "invalidSequence", "fatal": true }
+        } },
+        { "direction": "server", "close": true }
+      ]
+    }
+  ]
+}

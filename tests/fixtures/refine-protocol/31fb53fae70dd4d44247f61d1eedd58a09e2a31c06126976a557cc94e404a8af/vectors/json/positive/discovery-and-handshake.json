@@ -1,0 +1,156 @@
+{
+  "formatVersion": 1,
+  "cases": [
+    {
+      "id": "descriptor-exact-1.0",
+      "schema": "schema/endpoint-descriptor.schema.json",
+      "value": {
+        "version": 1,
+        "socketPath": "/tmp/refine-protocol/socket",
+        "launchToken": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "serverEpoch": "epoch-fixture",
+        "protocolMajor": 1,
+        "protocolMinor": 0,
+        "pid": 4242
+      }
+    },
+    {
+      "id": "hello-empty-base-capabilities",
+      "schema": "schema/handshake.schema.json",
+      "value": {
+        "type": "hello",
+        "protocol": { "major": 1, "minor": 0 },
+        "client": { "id": "com.example.writer", "version": "1.2.3", "host": "example-host" },
+        "frontend": { "id": "example-frontend" },
+        "hostCapabilities": { "interceptableSuggestionActionKeys": ["tab", "escape"] },
+        "runId": "run-fixture",
+        "launchToken": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "capabilities": []
+      }
+    },
+    {
+      "id": "hello-unknown-offer-is-well-formed",
+      "schema": "schema/handshake.schema.json",
+      "value": {
+        "type": "hello",
+        "protocol": { "major": 1, "minor": 0 },
+        "client": { "id": "com.example.writer", "version": "1.2.3", "host": "example-host" },
+        "hostCapabilities": { "interceptableSuggestionActionKeys": [] },
+        "runId": "run-offer",
+        "launchToken": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "capabilities": ["com.example.experimental.v1"]
+      }
+    },
+    {
+      "id": "welcome-first-attach",
+      "schema": "schema/handshake.schema.json",
+      "value": {
+        "type": "welcome",
+        "protocol": { "major": 1, "minor": 0 },
+        "serverEpoch": "epoch-fixture",
+        "runResumed": false,
+        "limits": { "maxFrameBytes": 8388608, "maxSources": 2, "maxSourceBytes": 1048576 },
+        "capabilities": []
+      }
+    },
+    {
+      "id": "welcome-retained-run",
+      "schema": "schema/handshake.schema.json",
+      "value": {
+        "type": "welcome",
+        "protocol": { "major": 1, "minor": 0 },
+        "serverEpoch": "epoch-fixture",
+        "runResumed": true,
+        "limits": { "maxFrameBytes": 8388608, "maxSources": 2, "maxSourceBytes": 1048576 },
+        "capabilities": []
+      }
+    },
+    {
+      "id": "rejected-incompatible-protocol",
+      "schema": "schema/handshake.schema.json",
+      "value": {
+        "type": "rejected",
+        "reason": "incompatibleProtocol",
+        "recovery": "none",
+        "protocol": { "major": 1, "minor": 0 },
+        "receivedProtocol": { "major": 2, "minor": 5 }
+      }
+    },
+    {
+      "id": "rejected-invalid-client",
+      "schema": "schema/handshake.schema.json",
+      "value": {
+        "type": "rejected",
+        "reason": "invalidClient",
+        "recovery": "none",
+        "protocol": { "major": 1, "minor": 0 }
+      }
+    },
+    {
+      "id": "rejected-run-needs-new-id",
+      "schema": "schema/handshake.schema.json",
+      "value": {
+        "type": "rejected",
+        "reason": "runUnavailable",
+        "recovery": "newRun",
+        "protocol": { "major": 1, "minor": 0 }
+      }
+    },
+    {
+      "id": "rejected-run-retry",
+      "schema": "schema/handshake.schema.json",
+      "value": {
+        "type": "rejected",
+        "reason": "runUnavailable",
+        "recovery": "retry",
+        "protocol": { "major": 1, "minor": 0 }
+      }
+    },
+    {
+      "id": "rejected-server-busy",
+      "schema": "schema/handshake.schema.json",
+      "value": {
+        "type": "rejected",
+        "reason": "serverBusy",
+        "recovery": "retry",
+        "protocol": { "major": 1, "minor": 0 }
+      }
+    },
+    {
+      "id": "rejected-engine-unavailable",
+      "schema": "schema/handshake.schema.json",
+      "value": {
+        "type": "rejected",
+        "reason": "engineUnavailable",
+        "recovery": "retry",
+        "protocol": { "major": 1, "minor": 0 }
+      }
+    },
+    {
+      "id": "unknown-members-are-ignored",
+      "schema": "schema/handshake.schema.json",
+      "value": {
+        "type": "welcome",
+        "protocol": { "major": 1, "minor": 0, "future": true },
+        "serverEpoch": "epoch-fixture",
+        "runResumed": false,
+        "limits": { "maxFrameBytes": 8388608, "maxSources": 2, "maxSourceBytes": 1048576, "future": 3 },
+        "capabilities": [],
+        "future": {
+          "nested": true,
+          "sources": [
+            { "sourceId": "ignored", "text": "This unknown member is not a snapshot.", "sourceSyntax": "plainText" },
+            { "sourceId": "ignored", "text": "Duplicate IDs here must also be ignored.", "sourceSyntax": "plainText" }
+          ],
+          "completedUnitCount": 2,
+          "totalUnitCount": 1
+        }
+      }
+    },
+    {
+      "id": "future-registry-can-exceed-negotiation-limit",
+      "schema": "schema/capability-registry.schema.json",
+      "generate": { "kind": "capabilityRegistry", "count": 65, "publisher": "org.example" }
+    }
+  ]
+}

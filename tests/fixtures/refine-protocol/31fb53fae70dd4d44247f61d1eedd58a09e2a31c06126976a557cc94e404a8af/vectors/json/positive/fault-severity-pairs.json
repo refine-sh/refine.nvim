@@ -1,0 +1,15 @@
+{
+  "formatVersion": 1,
+  "cases": [
+    { "id": "fault-invalid-sequence-fatal", "schema": "schema/event.schema.json#/$defs/fault", "value": { "type": "fault", "code": "invalidSequence", "fatal": true } },
+    { "id": "fault-malformed-nonfatal", "schema": "schema/event.schema.json#/$defs/fault", "value": { "type": "fault", "code": "malformedMessage", "fatal": false } },
+    { "id": "fault-malformed-fatal", "schema": "schema/event.schema.json#/$defs/fault", "value": { "type": "fault", "code": "malformedMessage", "fatal": true } },
+    { "id": "fault-resource-nonfatal", "schema": "schema/event.schema.json#/$defs/fault", "value": { "type": "fault", "code": "resourceLimit", "fatal": false } },
+    { "id": "fault-resource-fatal", "schema": "schema/event.schema.json#/$defs/fault", "value": { "type": "fault", "code": "resourceLimit", "fatal": true } },
+    { "id": "fault-internal-nonfatal", "schema": "schema/event.schema.json#/$defs/fault", "value": { "type": "fault", "code": "internalError", "fatal": false } },
+    { "id": "fault-internal-fatal", "schema": "schema/event.schema.json#/$defs/fault", "value": { "type": "fault", "code": "internalError", "fatal": true } },
+    { "id": "fault-document-nonfatal", "schema": "schema/event.schema.json#/$defs/fault", "value": { "type": "fault", "code": "invalidDocument", "fatal": false } },
+    { "id": "fault-source-nonfatal", "schema": "schema/event.schema.json#/$defs/fault", "value": { "type": "fault", "code": "unsupportedSource", "fatal": false } },
+    { "id": "fault-engine-nonfatal", "schema": "schema/event.schema.json#/$defs/fault", "value": { "type": "fault", "code": "engineUnavailable", "fatal": false } }
+  ]
+}

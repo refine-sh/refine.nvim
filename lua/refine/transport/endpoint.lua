@@ -1,4 +1,5 @@
 local errors = require("refine.transport.errors")
+local json = require("refine.transport.json")
 local wire = require("refine.transport.wire")
 
 local M = {}
@@ -31,14 +32,12 @@ local function protocol_component(value, field)
   return value
 end
 
-local function required_update(protocol)
-  if
-    protocol.major > wire.PROTOCOL_MAJOR
-    or (protocol.major == wire.PROTOCOL_MAJOR and protocol.minor ~= nil and protocol.minor > wire.PROTOCOL_MINOR)
-  then
-    return "client"
+local function protocol_identifier(value, field)
+  local ok = pcall(wire.validate_identifier, value, field)
+  if not ok then
+    descriptor_error("Endpoint " .. field .. " must be a 1-to-128-byte visible ASCII identifier")
   end
-  return "server"
+  return value
 end
 
 function M.default_path(home_directory)
@@ -54,9 +53,9 @@ function M.default_path(home_directory)
 end
 
 function M.parse(text)
-  local ok, value = pcall(vim.json.decode, text, { luanil = { object = true, array = true } })
+  local ok, value = pcall(json.decode, text)
   if not ok then
-    descriptor_error("Endpoint descriptor is not valid JSON")
+    descriptor_error("Endpoint descriptor is not valid JSON: " .. tostring(value))
   end
   if type(value) ~= "table" or vim.islist(value) then
     descriptor_error("Endpoint descriptor must be a JSON object")
@@ -67,19 +66,16 @@ function M.parse(text)
   if type(value.socketPath) ~= "string" or value.socketPath:sub(1, 1) ~= "/" then
     descriptor_error("Endpoint socketPath must be an absolute path")
   end
-  if type(value.launchToken) ~= "string" or value.launchToken == "" then
-    descriptor_error("Endpoint launchToken must be a nonempty string")
+  if type(value.launchToken) ~= "string" or not value.launchToken:match("^[0-9A-F]+$") or #value.launchToken ~= 64 then
+    descriptor_error("Endpoint launchToken must be 64 uppercase hexadecimal characters")
   end
-  if type(value.serverEpoch) ~= "string" or value.serverEpoch == "" then
-    descriptor_error("Endpoint serverEpoch must be a nonempty string")
-  end
+  protocol_identifier(value.serverEpoch, "serverEpoch")
 
   local protocol_major = protocol_component(value.protocolMajor, "protocolMajor")
-  local protocol_minor = value.protocolMinor ~= nil and protocol_component(value.protocolMinor, "protocolMinor") or nil
-  if protocol_major ~= wire.PROTOCOL_MAJOR or (protocol_minor ~= nil and protocol_minor ~= wire.PROTOCOL_MINOR) then
+  local protocol_minor = protocol_component(value.protocolMinor, "protocolMinor")
+  if protocol_major ~= wire.PROTOCOL_MAJOR or protocol_minor ~= wire.PROTOCOL_MINOR then
     local received = { major = protocol_major, minor = protocol_minor }
-    local received_version = protocol_minor ~= nil and ("%d.%d"):format(protocol_major, protocol_minor)
-      or tostring(protocol_major)
+    local received_version = ("%d.%d"):format(protocol_major, protocol_minor)
     errors.raise(
       "EndpointProtocolVersionError",
       ("Refine protocol %s is incompatible with protocol %d.%d"):format(
@@ -88,12 +84,15 @@ function M.parse(text)
         wire.PROTOCOL_MINOR
       ),
       "fatal",
-      { received_protocol = received, required_update = required_update(received) },
+      {
+        received_protocol = received,
+        supported_protocol = { major = wire.PROTOCOL_MAJOR, minor = wire.PROTOCOL_MINOR },
+      },
       2
     )
   end
-  if not is_integer(value.pid) or value.pid <= 0 then
-    descriptor_error("Endpoint pid must be a positive integer")
+  if not is_integer(value.pid) or value.pid <= 0 or value.pid > 0x7fffffff then
+    descriptor_error("Endpoint pid must be a positive 32-bit integer")
   end
 
   return {
@@ -117,7 +116,7 @@ function default_fs.stat(path, callback)
     end
     callback(nil, {
       uid = stat.uid,
-      mode = bit.band(stat.mode, 0x1ff),
+      mode = bit.band(stat.mode, 0xfff),
       kind = stat.type,
     })
   end)
@@ -158,10 +157,35 @@ local function private_entry(actual, current_uid, kind, mode, label)
     type(actual) ~= "table"
     or actual.kind ~= kind
     or actual.uid ~= current_uid
-    or bit.band(actual.mode or -1, 0x1ff) ~= mode
+    or bit.band(actual.mode or -1, 0xfff) ~= mode
   then
     return security_error(label, kind, mode)
   end
+end
+
+local function validate_private_paths(fs, current_uid, entries, callback)
+  local index = 0
+  local function advance()
+    index = index + 1
+    local entry = entries[index]
+    if entry == nil then
+      callback(nil)
+      return
+    end
+    fs.stat(entry.path, function(stat_error, stat)
+      if stat_error then
+        callback(stat_error)
+        return
+      end
+      local validation_error = private_entry(stat, current_uid, entry.kind, entry.mode, entry.label)
+      if validation_error then
+        callback(validation_error)
+        return
+      end
+      advance()
+    end)
+  end
+  advance()
 end
 
 function M.locator(options)
@@ -182,14 +206,16 @@ function M.locator(options)
       call_on_main(callback, ...)
     end
 
-    self.fs.stat(self.path, function(descriptor_stat_error, descriptor_stat)
-      if descriptor_stat_error then
-        finish(descriptor_stat_error)
-        return
-      end
-      local invalid = private_entry(descriptor_stat, self.current_uid, "file", 0x180, "endpoint descriptor")
-      if invalid then
-        finish(invalid)
+    local descriptor_directory = vim.fs.dirname(self.path)
+    local separator = descriptor_directory:sub(-1) == "/" and "" or "/"
+    local ownership_lock = descriptor_directory .. separator .. "owner.lock"
+    validate_private_paths(self.fs, self.current_uid, {
+      { path = descriptor_directory, kind = "directory", mode = 0x1c0, label = "endpoint directory" },
+      { path = ownership_lock, kind = "file", mode = 0x180, label = "endpoint ownership lock" },
+      { path = self.path, kind = "file", mode = 0x180, label = "endpoint descriptor" },
+    }, function(endpoint_error)
+      if endpoint_error then
+        finish(endpoint_error)
         return
       end
       self.fs.read_text(self.path, function(read_error, text)
@@ -202,29 +228,16 @@ function M.locator(options)
           finish(descriptor)
           return
         end
-        local directory = vim.fs.dirname(descriptor.socketPath)
-        self.fs.stat(directory, function(directory_error, directory_stat)
-          if directory_error then
-            finish(directory_error)
+        local socket_directory = vim.fs.dirname(descriptor.socketPath)
+        validate_private_paths(self.fs, self.current_uid, {
+          { path = socket_directory, kind = "directory", mode = 0x1c0, label = "socket directory" },
+          { path = descriptor.socketPath, kind = "socket", mode = 0x180, label = "integration socket" },
+        }, function(socket_error)
+          if socket_error then
+            finish(socket_error)
             return
           end
-          local bad_directory = private_entry(directory_stat, self.current_uid, "directory", 0x1c0, "socket directory")
-          if bad_directory then
-            finish(bad_directory)
-            return
-          end
-          self.fs.stat(descriptor.socketPath, function(socket_error, socket_stat)
-            if socket_error then
-              finish(socket_error)
-              return
-            end
-            local bad_socket = private_entry(socket_stat, self.current_uid, "socket", 0x180, "integration socket")
-            if bad_socket then
-              finish(bad_socket)
-              return
-            end
-            finish(nil, descriptor)
-          end)
+          finish(nil, descriptor)
         end)
       end)
     end)

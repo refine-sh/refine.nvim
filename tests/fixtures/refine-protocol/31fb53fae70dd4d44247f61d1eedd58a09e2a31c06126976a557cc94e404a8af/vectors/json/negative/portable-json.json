@@ -1,0 +1,71 @@
+{
+  "formatVersion": 1,
+  "cases": [
+    {
+      "id": "duplicate-root-member",
+      "schema": "schema/handshake.schema.json",
+      "documentText": "{\"type\":\"welcome\",\"type\":\"welcome\",\"protocol\":{\"major\":1,\"minor\":0},\"serverEpoch\":\"epoch\",\"runResumed\":false,\"limits\":{\"maxFrameBytes\":8388608,\"maxSources\":2,\"maxSourceBytes\":1048576},\"capabilities\":[]}",
+      "error": "duplicate-key"
+    },
+    {
+      "id": "duplicate-nested-member",
+      "schema": "schema/handshake.schema.json",
+      "documentText": "{\"type\":\"welcome\",\"protocol\":{\"major\":1,\"major\":1,\"minor\":0},\"serverEpoch\":\"epoch\",\"runResumed\":false,\"limits\":{\"maxFrameBytes\":8388608,\"maxSources\":2,\"maxSourceBytes\":1048576},\"capabilities\":[]}",
+      "error": "duplicate-key"
+    },
+    {
+      "id": "fractional-integer",
+      "schema": "schema/envelope.schema.json",
+      "documentText": "{\"type\":\"command\",\"sequence\":1.0,\"id\":\"command-1\",\"command\":{\"type\":\"closeDocument\"}}",
+      "error": "non-integer-number-token"
+    },
+    {
+      "id": "exponent-integer",
+      "schema": "schema/envelope.schema.json",
+      "documentText": "{\"type\":\"command\",\"sequence\":1e0,\"id\":\"command-1\",\"command\":{\"type\":\"closeDocument\"}}",
+      "error": "non-integer-number-token"
+    },
+    {
+      "id": "unknown-member-null-is-still-invalid",
+      "schema": "schema/envelope.schema.json",
+      "documentText": "{\"type\":\"command\",\"sequence\":1,\"id\":\"command-1\",\"command\":{\"type\":\"closeDocument\"},\"future\":null}",
+      "error": "null-value"
+    },
+    {
+      "id": "unknown-member-negative-is-still-invalid",
+      "schema": "schema/envelope.schema.json",
+      "documentText": "{\"type\":\"command\",\"sequence\":1,\"id\":\"command-1\",\"command\":{\"type\":\"closeDocument\"},\"future\":-1}",
+      "error": "negative-number-token"
+    },
+    {
+      "id": "unknown-member-fraction-is-still-invalid",
+      "schema": "schema/envelope.schema.json",
+      "documentText": "{\"type\":\"command\",\"sequence\":1,\"id\":\"command-1\",\"command\":{\"type\":\"closeDocument\"},\"future\":1.5}",
+      "error": "non-integer-number-token"
+    },
+    {
+      "id": "unknown-member-exponent-is-still-invalid",
+      "schema": "schema/envelope.schema.json",
+      "documentText": "{\"type\":\"command\",\"sequence\":1,\"id\":\"command-1\",\"command\":{\"type\":\"closeDocument\"},\"future\":1e0}",
+      "error": "non-integer-number-token"
+    },
+    {
+      "id": "unknown-member-unsafe-integer-is-still-invalid",
+      "schema": "schema/envelope.schema.json",
+      "documentText": "{\"type\":\"command\",\"sequence\":1,\"id\":\"command-1\",\"command\":{\"type\":\"closeDocument\"},\"future\":9007199254740992}",
+      "error": "unsafe-number-token"
+    },
+    {
+      "id": "unpaired-high-surrogate",
+      "schema": "schema/envelope.schema.json",
+      "documentText": "{\"type\":\"command\",\"sequence\":1,\"id\":\"command-1\",\"command\":{\"type\":\"openDocument\",\"snapshot\":{\"revision\":\"revision-1\",\"sources\":[{\"sourceId\":\"document\",\"text\":\"\\uD800\",\"sourceSyntax\":\"plainText\"}]}}}",
+      "error": "unpaired-surrogate"
+    },
+    {
+      "id": "root-array-is-not-a-message",
+      "schema": "schema/handshake.schema.json",
+      "value": [],
+      "error": "schema"
+    }
+  ]
+}

@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "handshake.schema.json",
+  "title": "Integration Protocol 1.0 handshake message",
+  "oneOf": [
+    { "$ref": "#/$defs/hello" },
+    { "$ref": "#/$defs/welcome" },
+    { "$ref": "#/$defs/rejectedIncompatible" },
+    { "$ref": "#/$defs/rejectedInvalidClient" },
+    { "$ref": "#/$defs/rejectedRunNew" },
+    { "$ref": "#/$defs/rejectedRunRetry" },
+    { "$ref": "#/$defs/rejectedServerBusy" },
+    { "$ref": "#/$defs/rejectedEngineUnavailable" }
+  ],
+  "$defs": {
+    "clientIdentity": {
+      "type": "object",
+      "required": ["id", "version", "host"],
+      "properties": {
+        "id": { "$ref": "shared.schema.json#/$defs/identifier" },
+        "version": { "$ref": "shared.schema.json#/$defs/identifier" },
+        "host": { "$ref": "shared.schema.json#/$defs/identifier" }
+      }
+    },
+    "frontendIdentity": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": { "$ref": "shared.schema.json#/$defs/identifier" }
+      }
+    },
+    "hostCapabilities": {
+      "type": "object",
+      "required": ["interceptableSuggestionActionKeys"],
+      "properties": {
+        "interceptableSuggestionActionKeys": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "shared.schema.json#/$defs/actionKey" }
+        }
+      }
+    },
+    "hello": {
+      "type": "object",
+      "required": [
+        "type", "protocol", "client", "hostCapabilities", "runId",
+        "launchToken", "capabilities"
+      ],
+      "properties": {
+        "type": { "const": "hello" },
+        "protocol": { "$ref": "shared.schema.json#/$defs/protocolVersion" },
+        "client": { "$ref": "#/$defs/clientIdentity" },
+        "frontend": { "$ref": "#/$defs/frontendIdentity" },
+        "hostCapabilities": { "$ref": "#/$defs/hostCapabilities" },
+        "runId": { "$ref": "shared.schema.json#/$defs/identifier" },
+        "launchToken": { "$ref": "shared.schema.json#/$defs/launchToken" },
+        "capabilities": { "$ref": "shared.schema.json#/$defs/capabilitySet" }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "required": ["maxFrameBytes", "maxSources", "maxSourceBytes"],
+      "properties": {
+        "maxFrameBytes": { "const": 8388608 },
+        "maxSources": { "const": 2 },
+        "maxSourceBytes": { "const": 1048576 }
+      }
+    },
+    "welcome": {
+      "type": "object",
+      "required": [
+        "type", "protocol", "serverEpoch", "runResumed", "limits", "capabilities"
+      ],
+      "properties": {
+        "type": { "const": "welcome" },
+        "protocol": { "$ref": "shared.schema.json#/$defs/protocolVersion" },
+        "serverEpoch": { "$ref": "shared.schema.json#/$defs/identifier" },
+        "runResumed": { "type": "boolean" },
+        "limits": { "$ref": "#/$defs/limits" },
+        "capabilities": { "$ref": "shared.schema.json#/$defs/capabilitySet" }
+      }
+    },
+    "rejectedBase": {
+      "type": "object",
+      "required": ["type", "reason", "recovery", "protocol"],
+      "properties": {
+        "type": { "const": "rejected" },
+        "reason": {
+          "enum": [
+            "incompatibleProtocol", "invalidClient", "runUnavailable",
+            "serverBusy", "engineUnavailable"
+          ]
+        },
+        "recovery": { "enum": ["none", "retry", "newRun"] },
+        "protocol": { "$ref": "shared.schema.json#/$defs/protocolVersion" },
+        "receivedProtocol": { "$ref": "shared.schema.json#/$defs/anyProtocolVersion" }
+      }
+    },
+    "rejectedIncompatible": {
+      "allOf": [
+        { "$ref": "#/$defs/rejectedBase" },
+        {
+          "required": ["receivedProtocol"],
+          "properties": {
+            "reason": { "const": "incompatibleProtocol" },
+            "recovery": { "const": "none" }
+          }
+        }
+      ]
+    },
+    "rejectedInvalidClient": {
+      "allOf": [
+        { "$ref": "#/$defs/rejectedBase" },
+        {
+          "properties": {
+            "reason": { "const": "invalidClient" },
+            "recovery": { "const": "none" }
+          },
+          "not": { "required": ["receivedProtocol"] }
+        }
+      ]
+    },
+    "rejectedRunNew": {
+      "allOf": [
+        { "$ref": "#/$defs/rejectedBase" },
+        {
+          "properties": {
+            "reason": { "const": "runUnavailable" },
+            "recovery": { "const": "newRun" }
+          },
+          "not": { "required": ["receivedProtocol"] }
+        }
+      ]
+    },
+    "rejectedRunRetry": {
+      "allOf": [
+        { "$ref": "#/$defs/rejectedBase" },
+        {
+          "properties": {
+            "reason": { "const": "runUnavailable" },
+            "recovery": { "const": "retry" }
+          },
+          "not": { "required": ["receivedProtocol"] }
+        }
+      ]
+    },
+    "rejectedServerBusy": {
+      "allOf": [
+        { "$ref": "#/$defs/rejectedBase" },
+        {
+          "properties": {
+            "reason": { "const": "serverBusy" },
+            "recovery": { "const": "retry" }
+          },
+          "not": { "required": ["receivedProtocol"] }
+        }
+      ]
+    },
+    "rejectedEngineUnavailable": {
+      "allOf": [
+        { "$ref": "#/$defs/rejectedBase" },
+        {
+          "properties": {
+            "reason": { "const": "engineUnavailable" },
+            "recovery": { "const": "retry" }
+          },
+          "not": { "required": ["receivedProtocol"] }
+        }
+      ]
+    }
+  }
+}

@@ -8,7 +8,7 @@ local function has_command(commands, kind)
 end
 
 describe("selection and presentation range validation", function()
-  it("rejects a selection that splits a composed character before transport", function()
+  it("rejects a selection that splits a surrogate pair before transport", function()
     local commands = {}
     local observe
     local host = {
@@ -63,6 +63,56 @@ describe("selection and presentation range validation", function()
     assert_equal("FatalHostError", failures[1].kind)
     assert_equal(false, handle.is_running())
     assert_equal(false, has_command(commands, "requestCheck"))
+  end)
+
+  it("sends a selection that ends between a base scalar and combining scalar", function()
+    local commands = {}
+    local observe
+    local host = {
+      observe = function(_, emit)
+        observe = emit
+        emit({
+          type = "snapshot",
+          snapshot = {
+            revision = "doc:0",
+            sources = { { sourceId = "document", text = "é", sourceSyntax = "plainText" } },
+          },
+        })
+        return function() end
+      end,
+      validate_revision = function() end,
+      apply = function() end,
+      present = function(_, _, _, done)
+        done(nil)
+      end,
+    }
+    local session = { server_epoch = "epoch", run_resumed = false }
+    function session:events() end
+    function session:send(command, id, done)
+      commands[#commands + 1] = { command = command, id = id }
+      done(nil, { sequence = #commands, id = id })
+    end
+    function session:close() end
+    local integration = require("refine.integration").new({
+      engine_port = {
+        connect = function(_, _, done)
+          done(nil, session)
+        end,
+      },
+      uuid = function()
+        return "id"
+      end,
+    })
+    local handle = integration:run({ host = host })
+
+    observe({
+      type = "checkRequested",
+      revision = "doc:0",
+      intent = { selection = { sourceId = "document", range = { location = 0, length = 1 } } },
+    })
+
+    assert_equal(true, handle.is_running())
+    assert_equal(true, has_command(commands, "requestCheck"))
   end)
 
   it("ends the run when Refine publishes an out-of-bounds suggestion", function()
