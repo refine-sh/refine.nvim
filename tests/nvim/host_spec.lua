@@ -796,37 +796,28 @@ harness.test("navigates suggestions in document order with wrapping", function()
 
   harness.equal(true, host:next())
   harness.equal({ 1, 4 }, vim.api.nvim_win_get_cursor(editor_win))
-  harness.equal(editor_win, vim.api.nvim_get_current_win())
-  local preview_lines =
-    vim.api.nvim_buf_get_lines(vim.api.nvim_win_get_buf(host.presentation:card_window()), 0, -1, true)
-  harness.equal("Preview · :RefineShow to focus for card keys", preview_lines[#preview_lines - 1])
-  harness.equal("[a] Apply  [q] Close", preview_lines[#preview_lines])
-  local preview_win = host.presentation:card_window()
-  local preview_buf = vim.api.nvim_win_get_buf(preview_win)
-  vim.api.nvim_set_current_win(preview_win)
-  harness.equal(
-    true,
-    vim.wait(1000, function()
-      return not vim.tbl_contains(
-        vim.api.nvim_buf_get_lines(preview_buf, 0, -1, true),
-        "Preview · :RefineShow to focus for card keys"
-      )
-    end)
-  )
+  local card_win = host.presentation:card_window()
+  harness.equal(card_win, vim.api.nvim_get_current_win())
+  local card_buf = vim.api.nvim_win_get_buf(card_win)
+  local focused_lines = vim.api.nvim_buf_get_lines(card_buf, 0, -1, true)
+  harness.equal(false, vim.tbl_contains(focused_lines, "Preview · :RefineShow to focus for card keys"))
+  harness.equal("[a] Apply  [q] Close", focused_lines[#focused_lines])
   vim.api.nvim_set_current_win(editor_win)
   harness.equal(
     true,
     vim.wait(1000, function()
       return vim.tbl_contains(
-        vim.api.nvim_buf_get_lines(preview_buf, 0, -1, true),
+        vim.api.nvim_buf_get_lines(card_buf, 0, -1, true),
         "Preview · :RefineShow to focus for card keys"
       )
     end)
   )
   harness.equal(true, host:show())
-  harness.equal(preview_win, vim.api.nvim_get_current_win())
-  local focused_lines = vim.api.nvim_buf_get_lines(vim.api.nvim_win_get_buf(preview_win), 0, -1, true)
-  harness.equal(false, vim.tbl_contains(focused_lines, "Preview · :RefineShow to focus for card keys"))
+  harness.equal(card_win, vim.api.nvim_get_current_win())
+  harness.equal(
+    false,
+    vim.tbl_contains(vim.api.nvim_buf_get_lines(card_buf, 0, -1, true), "Preview · :RefineShow to focus for card keys")
+  )
   vim.api.nvim_set_current_win(editor_win)
   harness.equal(true, host:next())
   harness.equal({ 1, 13 }, vim.api.nvim_win_get_cursor(editor_win))
@@ -834,6 +825,8 @@ harness.test("navigates suggestions in document order with wrapping", function()
   harness.equal({ 1, 4 }, vim.api.nvim_win_get_cursor(editor_win))
   harness.equal(true, host:previous())
   harness.equal({ 1, 13 }, vim.api.nvim_win_get_cursor(editor_win))
+  host:close()
+  harness.equal(editor_win, vim.api.nvim_get_current_win())
 end)
 
 harness.test("transient quick keys cancel activation and restore prior mappings", function()
@@ -963,7 +956,8 @@ harness.test("clears an observed navigation preview after native editing", funct
   present_navigation_preview(host, 1)
 
   harness.equal(true, host:next())
-  harness.equal(owner_win, vim.api.nvim_get_current_win())
+  harness.equal(host.presentation:card_window(), vim.api.nvim_get_current_win())
+  vim.api.nvim_set_current_win(owner_win)
   vim.api.nvim_feedkeys("aX" .. vim.keycode("<Esc>"), "xt", false)
   local closed = vim.wait(1000, function()
     return host.presentation:card_window() == nil

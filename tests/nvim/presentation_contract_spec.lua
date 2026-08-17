@@ -547,6 +547,44 @@ harness.test("lets FileType refine customize card mappings across rebinds", func
   vim.api.nvim_del_augroup_by_id(group)
 end)
 
+harness.test("focuses every card it opens so card keys act immediately", function()
+  local applied = 0
+  local host, _, _, owner_win = present({
+    open_card = false,
+    available_actions = { "apply", "dismiss" },
+    actions = {
+      apply = function(_, callback)
+        applied = applied + 1
+        callback({ status = "completed" })
+      end,
+    },
+  })
+
+  harness.equal(true, host:next())
+  local card_win = host.presentation:card_window()
+  harness.equal(card_win, vim.api.nvim_get_current_win())
+  harness.equal(
+    false,
+    vim.tbl_contains(
+      vim.api.nvim_buf_get_lines(card_buffer(host), 0, -1, true),
+      "Preview · :RefineShow to focus for card keys"
+    )
+  )
+
+  vim.api.nvim_feedkeys("a", "x", false)
+  harness.equal(
+    true,
+    vim.wait(1000, function()
+      return applied == 1 and host.presentation:card_window() == nil
+    end)
+  )
+  harness.equal(owner_win, vim.api.nvim_get_current_win())
+
+  harness.equal(true, host:previous())
+  harness.equal(host.presentation:card_window(), vim.api.nvim_get_current_win())
+  host:deactivate()
+end)
+
 harness.test("owns configured action keys while the card stays unfocused", function()
   local applied = 0
   local dismissed = 0
@@ -576,7 +614,7 @@ harness.test("owns configured action keys while the card stays unfocused", funct
   local bufnr = vim.api.nvim_win_get_buf(owner_win)
 
   harness.equal(true, host:next())
-  harness.equal(owner_win, vim.api.nvim_get_current_win())
+  vim.api.nvim_set_current_win(owner_win)
   harness.equal("Refine Apply open card", buffer_mapping(bufnr, "<Tab>").desc)
   harness.equal("Refine Dismiss open card", buffer_mapping(bufnr, "<Esc>").desc)
   vim.api.nvim_feedkeys(vim.keycode("<Tab>"), "x", false)
@@ -590,6 +628,7 @@ harness.test("owns configured action keys while the card stays unfocused", funct
   harness.equal("Prior Escape", buffer_mapping(bufnr, "<Esc>").desc)
 
   harness.equal(true, host:next())
+  vim.api.nvim_set_current_win(owner_win)
   vim.api.nvim_feedkeys(vim.keycode("<Esc>"), "x", false)
   harness.equal(
     true,
@@ -655,6 +694,7 @@ harness.test("rebinds an open busy card across same-suggestion replacements", fu
   harness.equal(true, host:next())
   local card_win = host.presentation:card_window()
   local card_buf = card_buffer(host)
+  vim.api.nvim_set_current_win(owner_win)
 
   vim.api.nvim_feedkeys(vim.keycode("<Tab>"), "x", false)
   harness.equal(

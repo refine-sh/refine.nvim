@@ -10,8 +10,10 @@ capability-parity release.
 
 ### Changed
 
-- `:RefineShow` and source-highlight clicks now focus a suggestion card
-  immediately; navigation retains unfocused previews with an explicit focus
+- Every suggestion card now opens focused, including the ones `:RefineNext` and
+  `:RefinePrevious` open, so its card keys act without a further command. The
+  caret stays on the suggestion in the owning window and closing the card
+  returns focus there. A card that loses focus still shows the explicit focus
   hint for card-local keys.
 - Markdown now uses the explicit `markdownDocument` source syntax, while text,
   Git commit, and mail buffers use `plainText`; this lets Refine join Markdown

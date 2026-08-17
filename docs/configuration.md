@@ -136,8 +136,8 @@ when needed without taking focus.
 | --- | --- |
 | `:[range]RefineCheck` | Request a fresh manual writing check for the buffer or selection. |
 | `:RefineShow` | Open and focus the suggestion under the cursor, or focus its open preview. |
-| `:RefineNext` | Move to and preview the next suggestion without taking focus. Navigation wraps. |
-| `:RefinePrevious` | Move to and preview the previous suggestion without taking focus. Navigation wraps. |
+| `:RefineNext` | Move to the next suggestion, then open and focus its card. Navigation wraps. |
+| `:RefinePrevious` | Move to the previous suggestion, then open and focus its card. Navigation wraps. |
 | `:RefineApply` | Apply the open suggestion, or the suggestion under the cursor. |
 | `:RefineDismiss` | Dismiss the open suggestion, or the suggestion under the cursor. |
 | `:RefineExplain` | Stream an explanation when that action is available. |
@@ -198,12 +198,13 @@ each pair identically. `:checkhealth refine` reports that limitation.
 
 ## Suggestion card
 
-`:RefineShow` and a source-highlight click open and focus the card immediately.
-`:RefineNext` and `:RefinePrevious` instead open an unfocused preview so editor
-navigation remains active. A preview displays
-`Preview · :RefineShow to focus for card keys`; one `:RefineShow` focuses it.
-Moving away, changing the source, switching its owning window, or superseding
-its suggestion closes it.
+`:RefineShow`, `:RefineNext`, `:RefinePrevious`, and a source-highlight click
+all open and focus the card immediately, so its card keys act without a further
+command. The cursor stays on the suggestion in the owning window, and closing
+the card returns focus there. A card that loses focus, after switching windows
+for example, displays `Preview · :RefineShow to focus for card keys`; one
+`:RefineShow` focuses it again. Moving away, changing the source, switching its
+owning window, or superseding its suggestion closes it.
 
 Diff runs follow their natural text flow inside the card, so word replacements
 appear inline and long text wraps normally. Additions are bold in the configured

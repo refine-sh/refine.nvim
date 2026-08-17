@@ -161,11 +161,13 @@ logical paragraph when a correction cannot retain its original soft breaks.
 
                                                         *:RefineNext*
 :RefineNext
-    Moves to the first visible highlight of the next suggestion in document
-    order and opens its card without taking focus. A cross-line move records a
-    jumplist entry. For a same-line column-only move, which Neovim cannot store
-    as a distinct jump, Refine retains the exact previous-context mark.
-    Navigation wraps.
+    Moves the caret to the first visible highlight of the next suggestion in
+    document order, then opens and focuses its card so the card keys act
+    immediately. The caret stays on the suggestion in the owning window, and
+    closing the card returns focus there. A cross-line move records a jumplist
+    entry. For a same-line column-only move, which Neovim cannot store as a
+    distinct jump, Refine retains the exact previous-context mark. Navigation
+    wraps.
 
                                                     *:RefinePrevious*
 :RefinePrevious
@@ -258,10 +260,10 @@ explicit Dismiss action.
 ==============================================================================
 7. Suggestion card                                *refine-suggestion-card*
 
-Show and a source-highlight click open and focus a suggestion card immediately.
-Next and Previous instead open an unfocused preview so editor navigation
-remains active. A preview displays
-`Preview · :RefineShow to focus for card keys`; invoking Show focuses it.
+Show, Next, Previous, and a source-highlight click all open and focus a
+suggestion card immediately, so its card keys act without a further command.
+A card that loses focus, after switching windows for example, displays
+`Preview · :RefineShow to focus for card keys`; invoking Show focuses it again.
 Moving away, changing the source, switching its owning window, or superseding
 the card's suggestion or check generation closes it. A replacement within the
 same source revision, check generation, and suggestion preserves the card,

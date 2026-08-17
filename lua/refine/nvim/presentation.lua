@@ -1222,9 +1222,6 @@ function Presentation:_navigate(direction)
     return false
   end
 
-  local card_focused = self.card_win
-    and vim.api.nvim_win_is_valid(self.card_win)
-    and vim.api.nvim_get_current_win() == self.card_win
   local owner_win = self.owner_win or vim.api.nvim_get_current_win()
   if not vim.api.nvim_win_is_valid(owner_win) or vim.api.nvim_win_get_buf(owner_win) ~= self.bufnr then
     return false
@@ -1289,10 +1286,11 @@ function Presentation:_navigate(direction)
   if not self:_open_card(owner_win, target) then
     return false
   end
-  if card_focused then
-    return self:_focus_card()
+  if self:_focus_card() then
+    return true
   end
-  return true
+  self:close(false)
+  return false
 end
 
 function Presentation:_card_survives(snapshot)

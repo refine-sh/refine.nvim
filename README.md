@@ -37,7 +37,7 @@ Features:
 
 Refine includes a full-featured seven-day trial with no credit card required.
 
-## Quick start
+## Quick Start
 
 ### 1. Install and set up Refine
 
@@ -117,7 +117,7 @@ available `<Plug>` target and card mapping.
 | --- | --- |
 | `:[range]RefineCheck` | Check the buffer or the complete sentences touched by a line range. |
 | `:RefineShow` | Open and focus the suggestion under the cursor, or focus its open preview. |
-| `:RefineNext` / `:RefinePrevious` | Move through suggestions and open an unfocused preview. Navigation wraps. |
+| `:RefineNext` / `:RefinePrevious` | Move through suggestions, opening and focusing each card. Navigation wraps. |
 | `:RefineApply` | Apply the open suggestion, or the suggestion under the cursor. |
 | `:RefineDismiss` | Dismiss the open suggestion, or the suggestion under the cursor. |
 | `:RefineExplain` | Request an explanation for the current suggestion. |
@@ -126,7 +126,8 @@ available `<Plug>` target and card mapping.
 | `:RefineStatus` | Show the current integration state. |
 
 A plain click on an underlined suggestion also opens and focuses its card.
-Next and Previous previews keep editor focus.
+Every card opens focused, so `a`, `d`, `e`, `r`, and `q` act immediately; the
+cursor stays on the suggestion and closing the card returns focus to it.
 
 ## Supported writing formats
 

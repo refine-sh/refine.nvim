@@ -163,7 +163,9 @@ harness.test("navigation records a real jump and preserves the target byte colum
 
   harness.equal(true, host:next())
   harness.equal({ 3, 3 }, vim.api.nvim_win_get_cursor(owner_win))
-  local jumps = vim.fn.getjumplist()[1]
+  local jumps = vim.api.nvim_win_call(owner_win, function()
+    return vim.fn.getjumplist()[1]
+  end)
   local previous = jumps[#jumps]
   harness.equal(bufnr, previous.bufnr)
   harness.equal(1, previous.lnum)
