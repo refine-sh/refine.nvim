@@ -1,14 +1,14 @@
 <div align="center">
-  <a href="https://refine.sh">
+  <a href="https://refine.sh?utm_source=refine.nvim&utm_medium=readme">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="https://refine.sh/icon-dark.png">
       <img src="https://refine.sh/icon.png" width="128" alt="Refine icon">
     </picture>
   </a>
   <h1>Refine.nvim</h1>
-  <p><strong>A native AI grammar checker and writing assistant for Neovim, powered by Refine.</strong></p>
+  <p><strong>A local-first AI grammar checker and writing assistant for Neovim, powered by <a href="https://refine.sh?utm_source=refine.nvim&utm_medium=readme">Refine</a>.</strong></p>
   <p>
-    <a href="https://refine.sh"><img src="https://img.shields.io/badge/macOS-14%2B-111111?logo=apple" alt="macOS 14 or newer"></a>
+    <a href="https://refine.sh?utm_source=refine.nvim&utm_medium=readme"><img src="https://img.shields.io/badge/macOS-14%2B-111111?logo=apple" alt="macOS 14 or newer"></a>
     <a href="https://neovim.io"><img src="https://img.shields.io/badge/Neovim-0.11%2B-57A143?logo=neovim&logoColor=white" alt="Neovim 0.11 or newer"></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT license"></a>
   </p>
@@ -33,7 +33,7 @@ Features:
 
 - macOS 14+
 - Neovim 0.11+
-- Refine with exact Integration Protocol 1.0 support
+- Refine 1.35+
 
 Refine includes a full-featured seven-day trial with no credit card required.
 
@@ -47,7 +47,8 @@ Install Refine with Homebrew:
 brew install --cask refine
 ```
 
-You can also [download Refine for Mac](https://refine.sh) directly.
+You can also [download Refine for Mac](https://refine.sh?utm_source=refine.nvim&utm_medium=readme)
+directly.
 
 ### 2. Install `refine.nvim`
 
@@ -133,14 +134,6 @@ Markdown, plain text, Git commit messages, email, TeX, and LaTeX are enabled by
 default. You can add another Neovim filetype or disable a default through
 [advanced configuration](docs/configuration.md#filetypes).
 
-The plugin identifies Markdown separately from plain text. Refine can therefore
-check Markdown soft-wrapped lines as one logical paragraph while continuing to
-treat physical line breaks in plain-text, commit-message, and email buffers as
-paragraph boundaries. TeX and LaTeX buffers use LaTeX document semantics. The
-exact buffer text is preserved when it is sent to Refine; an applied correction
-keeps existing layout where possible and may reflow only the affected logical
-paragraph when necessary.
-
 Only ordinary, editable, valid UTF-8 buffers within the configured size limit
 are eligible. Refine never changes file format or end-of-line settings.
 
@@ -170,16 +163,17 @@ it, the Refine app may send original and revised excerpts plus suggestion,
 model, language, custom-instruction, Refine-version, and macOS-version context
 to Refine's feedback service.
 
-Read [How Refine works](https://refine.sh/guides/how-refine-works), the
-[offline grammar checker guide](https://refine.sh/guides/offline-grammar-checker-mac),
-and the [privacy policy](https://refine.sh/privacy-policy) for full details.
+Read [How Refine works](https://refine.sh/guides/how-refine-works?utm_source=refine.nvim&utm_medium=readme),
+the [offline grammar checker guide](https://refine.sh/guides/offline-grammar-checker-mac?utm_source=refine.nvim&utm_medium=readme),
+and the [privacy policy](https://refine.sh/privacy-policy?utm_source=refine.nvim&utm_medium=readme)
+for full details.
 
 ## Protocol compatibility and support
 
 Integration Protocol 1.0 is a supported public API that third-party
 writing-host clients may implement. Refine for Neovim requires the exact 1.0
-wire contract; there is no Protocol 2.5 alias. Refine maintains exact Protocol
-1.0 compatibility throughout the Refine 1.x release line.
+wire contract. Refine maintains exact Protocol 1.0 compatibility throughout
+the Refine 1.x release line.
 
 The supported production profile connects a conforming writing-host client to
 the shipping Refine server on the same Mac and as the same OS user, with Refine
