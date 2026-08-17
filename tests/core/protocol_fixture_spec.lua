@@ -1,3 +1,5 @@
+local sha256 = require("support.sha256")
+
 local function read_bytes(path)
   local descriptor = assert(vim.uv.fs_open(path, "r", 438))
   local stat = assert(vim.uv.fs_fstat(descriptor))
@@ -78,7 +80,7 @@ local function load_fixture_bundle()
 
   local artifact_root = root .. "/" .. pin.artifactDirectory
   local manifest_data = read_bytes(artifact_root .. "/manifest.json")
-  assert_equal(pin.manifestDigest, vim.fn.sha256(manifest_data))
+  assert_equal(pin.manifestDigest, sha256.hex(manifest_data))
   local manifest = vim.json.decode(manifest_data, { luanil = { object = true, array = true } })
   assert_equal(1, manifest.formatVersion)
   assert_equal(pin.releaseCandidate, manifest.releaseCandidate)
@@ -93,7 +95,7 @@ local function load_fixture_bundle()
   for _, artifact in ipairs(manifest.artifacts) do
     if is_vendored_artifact(artifact, pin) then
       local data = read_bytes(artifact_root .. "/" .. artifact.path)
-      assert_equal(artifact.sha256, vim.fn.sha256(data))
+      assert_equal(artifact.sha256, sha256.hex(data))
       canonical_artifacts[#canonical_artifacts + 1] = artifact.path .. "\0" .. artifact.sha256 .. "\n"
       expected_files[#expected_files + 1] = artifact.path
       artifacts[#artifacts + 1] = artifact
@@ -101,10 +103,10 @@ local function load_fixture_bundle()
   end
   assert_equal(pin.vendoredSubset.artifactCount, #artifacts)
   assert_equal(sorted(expected_files), list_files(artifact_root))
-  assert_equal(pin.vendoredSubset.digest, vim.fn.sha256(table.concat(canonical_artifacts)))
+  assert_equal(pin.vendoredSubset.digest, sha256.hex(table.concat(canonical_artifacts)))
 
   local registry_data = read_bytes(artifact_root .. "/registry/capabilities.json")
-  assert_equal(pin.capabilityRegistryDigest, vim.fn.sha256(registry_data))
+  assert_equal(pin.capabilityRegistryDigest, sha256.hex(registry_data))
   local registry = vim.json.decode(registry_data, { luanil = { object = true, array = true } })
   assert_equal(1, registry.schemaVersion)
   assert_equal(pin.protocol, registry.protocol)
@@ -165,7 +167,7 @@ local function load_fixture_bundle()
   assert_equal(#state_ids, vim.tbl_count(states))
 
   local golden_data = read_bytes(artifact_root .. "/vectors/state/golden-writing-session.json")
-  assert_equal(pin.goldenVectorDigest, vim.fn.sha256(golden_data))
+  assert_equal(pin.goldenVectorDigest, sha256.hex(golden_data))
   local golden = states["golden-writing-session"]
   assert_equal(1, golden.formatVersion)
   assert_equal("golden-writing-session", golden.id)
