@@ -172,6 +172,22 @@ function Host:_schedule_refresh(source_may_have_changed)
   end)
 end
 
+function Host:_schedule_presentation_clear()
+  self.presentation_clear_epoch = self.presentation_epoch
+  if self.presentation_clear_scheduled then
+    return
+  end
+  self.presentation_clear_scheduled = true
+  vim.schedule(function()
+    self.presentation_clear_scheduled = false
+    local clear_epoch = self.presentation_clear_epoch
+    self.presentation_clear_epoch = nil
+    if clear_epoch == self.presentation_epoch then
+      self.presentation:clear()
+    end
+  end)
+end
+
 function Host:_clear_attention_events()
   if not self.attention_group then
     return
@@ -215,21 +231,16 @@ function Host:observe(emit, on_end)
   self.last_emitted_revision = nil
   self.last_emitted_attention = nil
 
+  local function source_changed()
+    self.source:invalidate()
+    self:_schedule_presentation_clear()
+    self.on_presentation({ state = { type = "pending" }, suggestions = {} })
+    self.on_native_change()
+    self:_schedule_refresh(true)
+  end
   local attached = vim.api.nvim_buf_attach(self.bufnr, false, {
-    on_lines = function()
-      self.source:invalidate()
-      self.presentation:clear()
-      self.on_presentation({ state = { type = "pending" }, suggestions = {} })
-      self.on_native_change()
-      self:_schedule_refresh(true)
-    end,
-    on_reload = function()
-      self.source:invalidate()
-      self.presentation:clear()
-      self.on_presentation({ state = { type = "pending" }, suggestions = {} })
-      self.on_native_change()
-      self:_schedule_refresh(true)
-    end,
+    on_lines = source_changed,
+    on_reload = source_changed,
     on_detach = function()
       if not self.active then
         return
@@ -305,6 +316,7 @@ function Host:present(snapshot, actions, callback)
   end
   local ok, err = pcall(self.presentation.replace, self.presentation, snapshot, actions)
   if ok then
+    self.presentation_epoch = self.presentation_epoch + 1
     self.on_presentation(snapshot)
   end
   callback(ok and nil or err)
@@ -378,6 +390,9 @@ function M.new(options)
     winid = options.winid or vim.api.nvim_get_current_win(),
     refresh_scheduled = false,
     presentation = presentation_module.new(options.bufnr),
+    presentation_clear_epoch = nil,
+    presentation_clear_scheduled = false,
+    presentation_epoch = 0,
     on_presentation = options.on_presentation or function() end,
     on_native_change = options.on_native_change or function() end,
     source = source,

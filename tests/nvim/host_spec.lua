@@ -8,6 +8,40 @@ package.path = table.concat({
 
 local harness = require("support.harness")
 
+local function present_navigation_preview(host, presentation_revision)
+  host:present({
+    documentRevision = host.source:snapshot().revision,
+    presentationRevision = presentation_revision,
+    checkGeneration = 1,
+    state = { type = "complete", coverage = "full" },
+    appearance = {
+      highlight = { style = "underline", grammarColor = "#FF2D55", fluencyColor = "#007AFF" },
+      diff = { additionColor = "#34C759", deletionColor = "#FF3B30", showHiddenWhitespace = true },
+    },
+    interaction = {
+      automaticChecksEnabled = true,
+      quickApply = {
+        enabled = false,
+        applyKey = "tab",
+        dismissKey = "escape",
+        activationStyle = "highlightChanges",
+      },
+    },
+    suggestions = {
+      {
+        id = "grammar-preview",
+        sourceId = "document",
+        kind = "grammar",
+        attribution = { languageDisplayName = "English", textDirection = "ltr", checkModelDisplayName = "Local" },
+        activationRange = { location = 5, length = 3 },
+        highlightRanges = { { location = 5, length = 3 } },
+        diff = { { kind = "delete", text = "are" }, { kind = "insert", text = "is" } },
+        availableActions = { "apply" },
+      },
+    },
+  }, {})
+end
+
 harness.test("reports initial active-window attention in UTF-16 source coordinates", function()
   vim.cmd.only()
   vim.cmd.enew({ bang = true })
@@ -451,7 +485,12 @@ harness.test("presents and replaces authoritative suggestion highlights", functi
   harness.equal(true, highlight.underline)
 
   vim.api.nvim_buf_set_text(bufnr, 0, 5, 0, 8, { "is" })
-  harness.equal({}, vim.api.nvim_buf_get_extmarks(bufnr, -1, 0, -1, {}))
+  harness.equal(
+    true,
+    vim.wait(1000, function()
+      return #vim.api.nvim_buf_get_extmarks(bufnr, -1, 0, -1, {}) == 0
+    end)
+  )
 
   host:present({
     documentRevision = revision,
@@ -901,6 +940,88 @@ harness.test("transient quick keys cancel activation and restore prior mappings"
       return applied == "quick-1"
     end)
   )
+end)
+
+harness.test("clears an observed navigation preview after native editing", function()
+  vim.cmd.only()
+  vim.cmd.enew({ bang = true })
+  vim.cmd("messages clear")
+  local bufnr = vim.api.nvim_get_current_buf()
+  local owner_win = vim.api.nvim_get_current_win()
+  vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, { "This are text." })
+  local statuses = {}
+  local host = require("refine.nvim.host").new({
+    bufnr = bufnr,
+    winid = owner_win,
+    source_syntax = "plainText",
+    run_id = "native-edit-preview",
+    on_presentation = function(snapshot)
+      statuses[#statuses + 1] = snapshot.state.type
+    end,
+  })
+  local detach = host:observe(function() end, function() end)
+  present_navigation_preview(host, 1)
+
+  harness.equal(true, host:next())
+  harness.equal(owner_win, vim.api.nvim_get_current_win())
+  vim.api.nvim_feedkeys("aX" .. vim.keycode("<Esc>"), "xt", false)
+  local closed = vim.wait(1000, function()
+    return host.presentation:card_window() == nil
+  end)
+  local messages = vim.api.nvim_exec2("messages", { output = true }).output
+  local outcome = {
+    buffer = vim.api.nvim_buf_get_lines(bufnr, 0, -1, true),
+    closed = closed,
+    callback_error = messages:find("Lua callback", 1, true) ~= nil,
+    textlock_error = messages:find("E565", 1, true) ~= nil,
+    status = statuses[#statuses],
+  }
+  detach()
+  host:deactivate()
+
+  harness.equal({
+    buffer = { "This aXre text." },
+    closed = true,
+    callback_error = false,
+    textlock_error = false,
+    status = "pending",
+  }, outcome)
+end)
+
+harness.test("preserves a newer presentation across deferred native-edit cleanup", function()
+  vim.cmd.only()
+  vim.cmd.enew({ bang = true })
+  local bufnr = vim.api.nvim_get_current_buf()
+  local owner_win = vim.api.nvim_get_current_win()
+  vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, { "This are text." })
+  local observations = {}
+  local host = require("refine.nvim.host").new({
+    bufnr = bufnr,
+    winid = owner_win,
+    source_syntax = "plainText",
+    run_id = "deferred-presentation",
+  })
+  local detach = host:observe(function(observation)
+    observations[#observations + 1] = observation
+  end, function() end)
+
+  present_navigation_preview(host, 1)
+  harness.equal(true, host:next())
+  vim.api.nvim_buf_set_text(bufnr, 0, 14, 0, 14, { "!" })
+  present_navigation_preview(host, 2)
+  harness.equal(true, host:next())
+  local new_card = host.presentation:card_window()
+  harness.equal(
+    true,
+    vim.wait(1000, function()
+      return #observations >= 4
+    end)
+  )
+  local survived = host.presentation:card_window() == new_card and vim.api.nvim_win_is_valid(new_card)
+  detach()
+  host:deactivate()
+
+  harness.equal(true, survived)
 end)
 
 harness.run()

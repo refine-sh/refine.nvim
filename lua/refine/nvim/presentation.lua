@@ -657,6 +657,13 @@ function Presentation:_focus_card()
   if not card_win or not vim.api.nvim_win_is_valid(card_win) then
     return false
   end
+  local mode = vim.api.nvim_get_mode().mode:sub(1, 1)
+  if mode == "i" or mode == "R" then
+    vim.cmd.stopinsert()
+  end
+  if self.card_win ~= card_win or not vim.api.nvim_win_is_valid(card_win) then
+    return false
+  end
   vim.api.nvim_set_current_win(card_win)
   self:_render_card()
   return self.card_win == card_win

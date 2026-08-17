@@ -1053,4 +1053,36 @@ harness.test("keeps only one card open when different highlights are clicked", f
   harness.equal(1, #open_cards)
 end)
 
+harness.test("focuses cards from Insert mode for card actions", function()
+  local applied = 0
+  local host = present({
+    open_card = false,
+    available_actions = { "apply" },
+    actions = {
+      apply = function(_, callback)
+        applied = applied + 1
+        callback({ status = "completed" })
+      end,
+    },
+  })
+  local bufnr = host.bufnr
+  local shown = false
+  vim.keymap.set("i", "<F5>", function()
+    shown = host:show()
+  end, { buffer = bufnr })
+
+  vim.v.errmsg = ""
+  vim.api.nvim_feedkeys(vim.keycode("i<F5>a<Esc>"), "xt", false)
+  local outcome = {
+    applied = applied,
+    card_open = host.presentation:card_window() ~= nil,
+    errmsg = vim.v.errmsg,
+    shown = shown,
+  }
+  vim.keymap.del("i", "<F5>", { buffer = bufnr })
+  host:deactivate()
+
+  harness.equal({ applied = 1, card_open = false, errmsg = "", shown = true }, outcome)
+end)
+
 harness.run()
