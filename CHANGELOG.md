@@ -4,47 +4,6 @@ All notable changes to Refine for Neovim will be documented here.
 
 The project follows [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
-
-### Added
-
-- `"markdownDocumentHardLineBreaks"` is available wherever a source syntax is
-  configured, in `setup({ filetypes = ... })` and in `configure_buffer()`. It
-  protects exactly the same Markdown syntax as `"markdownDocument"` and still
-  checks prose wrapped across source lines as one logical paragraph, but every
-  line ending is immovable: Apply reproduces each one at the same position and
-  never removes, introduces, or reflows across one. Choose it when the same
-  files are rendered somewhere that shows every line ending as a line break,
-  such as a default Obsidian vault; a correction that cannot keep the
-  paragraph's existing line endings is dropped instead of applied. The
-  `markdown` filetype default stays `"markdownDocument"`.
-
-### Changed
-
-- The suggestion card now draws as a bordered panel whose title names the
-  suggestion kind, over a background one shade off `Normal`, with a border
-  blended from the `Normal` foreground, bold title and footer action keys, and
-  dimmed attribution and preview hint. Cards used to inherit the floating-window
-  background, which several color schemes—including Neovim's default—leave close
-  enough to the editor background that a card read as buffer text. Chrome is the
-  same for every card and comes from the color scheme, so grammar and fluency
-  stay a source-highlight distinction in the configured colors. The border
-  counts against the room a card may take, so the whole panel still fits inside
-  80% of its window's width and half its height.
-- A fatal `malformedMessage` engine fault now names a Refine app update instead
-  of reporting only the raw fault code. That is what a plugin declaring a source
-  syntax an older Refine app cannot decode looks like from Neovim.
-- The suggestion card now draws as a bordered panel whose title names the
-  suggestion kind, over a background one shade off `Normal`, with a border
-  blended from the `Normal` foreground, bold title and footer action keys, and
-  dimmed attribution and preview hint. Cards used to inherit the floating-window
-  background, which several color schemes—including Neovim's default—leave close
-  enough to the editor background that a card read as buffer text. Chrome is the
-  same for every card and comes from the color scheme, so grammar and fluency
-  stay a source-highlight distinction in the configured colors. The border
-  counts against the room a card may take, so the whole panel still fits inside
-  80% of its window's width and half its height.
-
 ## [1.0.0] - 2026-08-17
 
 First public release. Refine for Neovim presents the Refine grammar checker's
@@ -67,13 +26,29 @@ Requires macOS 14 or newer, Neovim 0.11 or newer, and Refine 1.35 or newer.
 - Markdown, plain text, Git commit messages, email, TeX, and LaTeX are enabled
   by default. Markdown is checked as Markdown, so soft line breaks are joined
   rather than treated as sentence ends.
+- `"markdownDocumentHardLineBreaks"` is selectable wherever a source syntax is
+  configured, for Markdown whose every line ending is a line break. It protects
+  exactly the same Markdown syntax as `"markdownDocument"` and still checks
+  prose wrapped across source lines as one logical paragraph, but every line
+  ending is immovable: Apply reproduces each one at the same position and never
+  removes, introduces, or reflows across one. Choose it when the same files are
+  rendered somewhere that shows every line ending as a line break, such as a
+  default Obsidian vault; a correction that cannot keep the paragraph's existing
+  line endings is dropped instead of applied. The `markdown` filetype default
+  stays `"markdownDocument"`.
 - Only ordinary, editable, valid UTF-8 buffers within the configured size limit
   are checked. Refine never changes a file's format or end-of-line settings.
 
 ### Reviewing suggestions
 
 - Suggestions appear as native highlights in the buffer, with a floating card
-  showing the proposed change as an inline diff.
+  showing the proposed change as an inline diff. The card is a bordered panel
+  whose title names the suggestion kind, over a background one shade off
+  `Normal`, with a border blended from the `Normal` foreground, bold title and
+  footer action keys, and dimmed attribution and preview hint. Chrome is the
+  same for every card and comes from the color scheme, so grammar and fluency
+  stay a source-highlight distinction in the configured colors. A whole panel,
+  border included, fits inside 80% of its window's width and half its height.
 - Every card opens focused, so `a`, `d`, `e`, `r`, and `q` act immediately. The
   cursor stays on the suggestion, and closing the card returns focus to it.
 - `:RefineNext` and `:RefinePrevious` move between suggestions and wrap at the
@@ -118,6 +93,9 @@ Requires macOS 14 or newer, Neovim 0.11 or newer, and Refine 1.35 or newer.
 - `:RefineStatus` gives a short view of the current buffer's state.
 - A protocol mismatch between plugin and app stops before any source is sent and
   reports both exact versions, without guessing which side should update.
+- A fatal `malformedMessage` engine fault names a Refine app update rather than
+  reporting only the raw fault code. That is what a plugin declaring a source
+  syntax an older Refine app cannot decode looks like from Neovim.
 - Interrupted connections reconnect without applying a suggestion twice.
 - Optional debug logging is off by default. When enabled it records only
   bounded, redacted metadata, capped at 256 KiB with a single rotation.

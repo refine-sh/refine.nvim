@@ -129,6 +129,55 @@ A plain click on an underlined suggestion also opens and focuses its card.
 Every card opens focused, so `a`, `d`, `e`, `r`, and `q` act immediately; the
 cursor stays on the suggestion and closing the card returns focus to it.
 
+## Checking status in your statusline
+
+Refine can show check progress in your statusline. It never rewrites
+`'statusline'` for you, so add its component to your own.
+
+### 1. Add the component to your config
+
+Put this in your Neovim config, usually `~/.config/nvim/init.lua`:
+
+```lua
+vim.o.statusline = "%f %m%r%=%{v:lua.require'refine'.statusline()} %l:%c"
+```
+
+That is a complete statusline showing the file name, the Refine component, and
+the cursor position. If you already have a statusline you like, copy just the
+`%{v:lua.require'refine'.statusline()}` part into it.
+
+Using [lualine](https://github.com/nvim-lualine/lualine.nvim)? Add it as a
+component instead:
+
+```lua
+require("lualine").setup({
+  sections = {
+    lualine_x = {
+      { function() return require("refine").statusline() end },
+      "encoding", "fileformat", "filetype",
+    },
+  },
+})
+```
+
+### 2. Restart Neovim and write
+
+Open a Markdown or text file and type a sentence. As Refine checks it, the
+component moves through these states:
+
+| Text | Meaning |
+| --- | --- |
+| `Refine …` | Connecting to Refine. |
+| `Refine 3/7` | Checking, showing progress reported by Refine. |
+| `Refine 5` | Check complete, with the number of suggestions. |
+| `Refine !` | Refine is unavailable. |
+| `Refine ·` | Waiting for the next check. |
+
+The component is intentionally empty in any buffer Refine is not checking, so
+an unsupported filetype shows nothing at all. If it stays empty, or you want
+custom wording and icons instead of this text, see
+[Advanced configuration](docs/configuration.md#status-and-statusline-integration).
+
 ## Supported writing formats
 
 Markdown, plain text, Git commit messages, email, TeX, and LaTeX are enabled by

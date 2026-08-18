@@ -329,6 +329,77 @@ Call `statusline()` from your existing statusline component. Refine requests a
 statusline redraw and emits the `RefineStatusChanged` User event whenever its
 semantic state changes. Event data contains the affected buffer number.
 
+### Custom wording and icons
+
+`statusline()` text is presentation and may change between releases. Build your
+own component from `status()` instead, which is a stable interface:
+
+```lua
+local function refine_component()
+  local status = require("refine").status()
+  if status.state == "checking" then
+    local progress = status.progress
+    return progress and ("󰗧 %d/%d"):format(progress.completed, progress.total)
+      or "󰗧 checking"
+  elseif status.state == "complete" then
+    return ("󰗧 %d"):format(status.suggestion_count or 0)
+  elseif status.state == "connecting" then
+    return "󰗧 …"
+  elseif status.state == "unavailable" then
+    return "󰗧 !"
+  end
+  return ""
+end
+```
+
+Keep the final fallback. Minor releases may add states, reasons, and warning
+codes, and callers must tolerate unknown values.
+
+Refine already calls `redrawstatus()` on every status change, so a component
+like this needs no autocommand. Listen for `RefineStatusChanged` only to drive
+something else, such as a spinner timer or a notification:
+
+```lua
+vim.api.nvim_create_autocmd("User", {
+  pattern = "RefineStatusChanged",
+  callback = function(args)
+    local bufnr = args.data.bufnr
+    -- react to the new state for bufnr
+  end,
+})
+```
+
+### When the component stays empty
+
+`statusline()` returns an empty string for any buffer without an active
+session, so a scratch buffer or an unsupported filetype shows nothing at all.
+Ask Refine what it thinks the current buffer is doing:
+
+```vim
+:lua =vim.inspect(require("refine").status())
+```
+
+`status()` always returns a table. When `state` is `inactive`, the `reason`
+field explains why:
+
+| `reason` | Meaning |
+| --- | --- |
+| `unsupported_filetype` | The buffer's filetype is not in the configured map. |
+| `not_active_buffer` | Another buffer holds the live session. |
+| `no_ui` | No UI is attached. The plugin is inactive in headless Neovim. |
+| `unsupported_platform` | The host is not macOS. |
+| `disconnected` | Not connected to the Refine app. |
+| `incompatible_protocol` | The plugin and app protocol versions do not match. |
+
+A buffer with no filetype is the most common cause. Save the file with a `.md`
+extension or set the filetype explicitly, then check again.
+
+Note that `:lua =` prints a result while plain `:lua` does not. Running
+`:lua require("refine").statusline()` evaluates the call and discards the
+result, which looks like nothing happened.
+
+Run `:checkhealth refine` for the full report.
+
 ## Diagnostics and health
 
 Run:
