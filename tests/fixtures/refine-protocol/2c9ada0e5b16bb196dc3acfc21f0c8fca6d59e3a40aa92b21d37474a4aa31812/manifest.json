@@ -1,12 +1,12 @@
 {
   "formatVersion": 1,
-  "releaseCandidate": "1.0.0-rc.1",
+  "releaseCandidate": "1.0.0-rc.2",
   "protocol": {
     "major": 1,
     "minor": 0
   },
-  "artifactDigest": "31fb53fae70dd4d44247f61d1eedd58a09e2a31c06126976a557cc94e404a8af",
-  "baseArtifactDigest": "ff2d9d9badae0457515390ced22601d441766629543d37957dbd222f459195d0",
+  "artifactDigest": "2c9ada0e5b16bb196dc3acfc21f0c8fca6d59e3a40aa92b21d37474a4aa31812",
+  "baseArtifactDigest": "4c5fff1efacaa68728f6602449b25b482432f312afe7c556e793d4535fb9310d",
   "capabilityRegistryDigest": "c36bc7945b37764c7594d526be7a038e6b4dd3bf4238be661e5f8aad00d6dc24",
   "jsonPositiveCaseIds": [
     "command-open-document",
@@ -26,6 +26,7 @@
     "command-complete-unavailable",
     "command-complete-indeterminate",
     "command-close-document",
+    "command-open-document-hard-line-breaks",
     "descriptor-exact-1.0",
     "hello-empty-base-capabilities",
     "hello-unknown-offer-is-well-formed",
@@ -49,6 +50,7 @@
     "identifier-128-bytes",
     "source-syntax-plain",
     "source-syntax-markdown",
+    "source-syntax-markdown-hard-line-breaks",
     "source-syntax-latex",
     "suggestion-kind-grammar",
     "suggestion-kind-fluency",
@@ -194,6 +196,8 @@
     "unknown-command-discriminator",
     "unknown-event-discriminator",
     "unknown-source-syntax",
+    "near-miss-source-syntax-is-still-unknown",
+    "source-syntax-is-case-sensitive",
     "identifier-must-be-visible-ascii",
     "identifier-over-128-bytes",
     "identifier-cannot-end-with-newline",
@@ -231,6 +235,7 @@
     "fatal-fault",
     "golden-writing-session",
     "invalid-server-inputs",
+    "markdown-hard-line-breaks",
     "reconnect-lost-state",
     "reconnect-resumed",
     "sequence-exhaustion",
@@ -280,12 +285,12 @@
     },
     {
       "path": "reference/typescript/package.json",
-      "sha256": "f7621929ebc9da9a1686c5e397bc26312463972a115728d0045e3439fe0cf9c0",
+      "sha256": "4c5d37a798617c964dfb8245c8d37309421a0a9fdda2c78240bc67ded29cd813",
       "kind": "reference"
     },
     {
       "path": "reference/typescript/transport-session.ts",
-      "sha256": "408938c64167e73972caa41eb713b48d225ffaa98c9a6b3057bb07f7a73233e8",
+      "sha256": "3d68edf7c800a05fdf51bff42128a30b99dd18d3085133b64287ac2852cfd1ab",
       "kind": "reference"
     },
     {
@@ -305,7 +310,7 @@
     },
     {
       "path": "runner/README.md",
-      "sha256": "d085b4a6d6a4879aa3c5466aa581f38cab53d7d36da1b1bc65dd26af36b424d0",
+      "sha256": "b5c94f749909ee39bc2c0a579b687f49194585f3019ea9ce435098cfdc52aae1",
       "kind": "runner"
     },
     {
@@ -315,7 +320,7 @@
     },
     {
       "path": "runner/update_manifest.py",
-      "sha256": "e94935ff1fa8ebacbe01444eb47fce4d5d6b0c77e019b909538beab083a922aa",
+      "sha256": "3803058f28e947301b6dd36c84a12201f53a98949b96ef10a534862738c76ed4",
       "kind": "runner"
     },
     {
@@ -350,12 +355,12 @@
     },
     {
       "path": "schema/shared.schema.json",
-      "sha256": "1b2fc078280ba1dd6ad9fcd91759243f4d9246fdd7157ed38a41961d3a9fe76b",
+      "sha256": "67c11fa690726b1f0ecca9e4f031b0eede771127689381bef4fee6722486eb70",
       "kind": "schema"
     },
     {
       "path": "spec/protocol.md",
-      "sha256": "0cc315e016ab7a7d82e16c56790831cef4dd167901bdf83ea771b857441082b5",
+      "sha256": "af628a653f3826c0622e7cde503de883bcf5017ceb8f6ad9f35b0d1a1d187f19",
       "kind": "spec"
     },
     {
@@ -365,7 +370,7 @@
     },
     {
       "path": "tests/test_public_seam.py",
-      "sha256": "7842cccf10d7c6f380d86db6c2f0f304f96f3fae3c8b3b8ab15484a636dc3d4d",
+      "sha256": "ded519a6ff772683a057c96ff352f7feb4fc3f6db2b6a8c9872a7960b0f08ba6",
       "kind": "documentation"
     },
     {
@@ -385,12 +390,12 @@
     },
     {
       "path": "vectors/json/negative/shape-and-enums.json",
-      "sha256": "558fc9bb04b3036da5aa4f42cec87812ba83207fe4d524e3fe47ea9cf4d5a98a",
+      "sha256": "591179fe8b870f5613882705dc7d6b9c4413c8f91b0cbb9d72152552cce5c911",
       "kind": "vectors"
     },
     {
       "path": "vectors/json/positive/commands.json",
-      "sha256": "13ea4f1fd87c7e2e08256c9baa57209016f51e0e138c3b3ae2ac7ef7ecdf7223",
+      "sha256": "a4e3beddf23bb48a1cb74b74401e5c26586d20782c506cfdb9304dfd5d095b0f",
       "kind": "vectors"
     },
     {
@@ -400,7 +405,7 @@
     },
     {
       "path": "vectors/json/positive/enum-and-boundary-coverage.json",
-      "sha256": "f4058fa88058be9f3e5a2f07790d7165a8a6ccd4803d310d92923899df71ab3f",
+      "sha256": "de57b06a4c65bf6babb58be3d460c27dd2fa667276eeb530003b166abe280e14",
       "kind": "vectors"
     },
     {
@@ -436,6 +441,11 @@
     {
       "path": "vectors/state/invalid-server-inputs.json",
       "sha256": "e9022c0dab0bad56e5be80c0894919cb855c2e4025b9fe4c1abd5d6936f5aee9",
+      "kind": "vectors"
+    },
+    {
+      "path": "vectors/state/markdown-hard-line-breaks.json",
+      "sha256": "15782d7a8344dc337ee23adae4e9481ee10a69a9dee0d738882cd52d26951aaa",
       "kind": "vectors"
     },
     {

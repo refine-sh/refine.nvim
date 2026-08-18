@@ -685,6 +685,19 @@ describe("host-neutral Refine integration runtime", function()
     assert_equal(true, fatal.session.closed)
   end)
 
+  it("names a Refine update when a fatal fault reports a malformed message", function()
+    local mismatched = runtime_fixture()
+    mismatched.event(1, { type = "fault", code = "malformedMessage", fatal = true })
+    assert_equal(1, #mismatched.errors)
+    assert_matches("Update the Refine app", mismatched.errors[1].message)
+
+    local other = runtime_fixture()
+    other.event(1, { type = "fault", code = "internalError", fatal = true })
+    assert_equal(1, #other.errors)
+    assert_matches("Refine engine fault: internalError", other.errors[1].message)
+    assert_equal(nil, other.errors[1].message:match("Update the Refine app"))
+  end)
+
   it("finishes proof for a host mutation dispatched before entitlement loss", function()
     local fixture = runtime_fixture()
     local finish_apply

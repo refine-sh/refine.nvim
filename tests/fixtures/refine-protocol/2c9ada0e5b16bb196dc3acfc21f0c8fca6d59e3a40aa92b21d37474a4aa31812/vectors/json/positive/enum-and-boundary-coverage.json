@@ -12,6 +12,7 @@
 
     { "id": "source-syntax-plain", "schema": "schema/shared.schema.json#/$defs/sourceSnapshot/properties/sourceSyntax", "value": "plainText" },
     { "id": "source-syntax-markdown", "schema": "schema/shared.schema.json#/$defs/sourceSnapshot/properties/sourceSyntax", "value": "markdownDocument" },
+    { "id": "source-syntax-markdown-hard-line-breaks", "schema": "schema/shared.schema.json#/$defs/sourceSnapshot/properties/sourceSyntax", "value": "markdownDocumentHardLineBreaks" },
     { "id": "source-syntax-latex", "schema": "schema/shared.schema.json#/$defs/sourceSnapshot/properties/sourceSyntax", "value": "latexDocument" },
 
     { "id": "suggestion-kind-grammar", "schema": "schema/shared.schema.json#/$defs/presentedSuggestion/properties/kind", "value": "grammar" },

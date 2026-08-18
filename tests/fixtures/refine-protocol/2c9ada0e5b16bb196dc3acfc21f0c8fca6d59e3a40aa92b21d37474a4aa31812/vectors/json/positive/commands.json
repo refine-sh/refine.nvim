@@ -200,6 +200,19 @@
         "type": "command", "sequence": 15, "id": "command-close",
         "command": { "type": "closeDocument" }
       }
+    },
+    {
+      "id": "command-open-document-hard-line-breaks",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 16, "id": "command-open-hard-line-breaks",
+        "command": {
+          "type": "openDocument",
+          "snapshot": { "revision": "revision-0", "sources": [
+            { "sourceId": "document", "text": "The report was published on friday and it\ncovers the whole quarter.", "sourceSyntax": "markdownDocumentHardLineBreaks" }
+          ] }
+        }
+      }
     }
   ]
 }

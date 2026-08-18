@@ -1,7 +1,7 @@
 NVIM ?= nvim
 STYLUA ?= stylua
 REFINE_PROTOCOL_ROOT ?= ../refine-protocol
-PROTOCOL_SCENARIOS := base-handshake golden-writing-session typed-rejections fatal-fault reconnect-resumed reconnect-lost-state sequence-exhaustion invalid-server-inputs
+PROTOCOL_SCENARIOS := base-handshake golden-writing-session typed-rejections fatal-fault reconnect-resumed reconnect-lost-state sequence-exhaustion invalid-server-inputs markdown-hard-line-breaks
 
 .PHONY: check format format-check helptags helptags-check test test-conformance test-core test-health test-nvim
 

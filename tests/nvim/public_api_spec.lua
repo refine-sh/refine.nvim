@@ -102,4 +102,33 @@ harness.test("setup preserves its prior filetype map after a legacy syntax is re
   harness.equal("no_ui", refine.status().reason)
 end)
 
+harness.test("offers immovable Markdown line endings as an opt-in and keeps the markdown default", function()
+  vim.cmd.enew({ bang = true })
+  vim.bo.buftype = ""
+  vim.bo.filetype = "markdown"
+  vim.bo.modifiable = true
+  vim.bo.readonly = false
+  vim.bo.binary = false
+
+  local refine = require("refine")
+  local eligibility = require("refine.nvim.eligibility")
+  local bufnr = vim.api.nvim_get_current_buf()
+
+  refine.setup({})
+  refine.configure_buffer(bufnr, {})
+  harness.equal("markdownDocument", require("refine.config").get().filetypes.markdown)
+  harness.equal("markdownDocument", eligibility.resolve(bufnr))
+
+  refine.configure_buffer(bufnr, { source_syntax = "markdownDocumentHardLineBreaks" })
+  harness.equal("markdownDocumentHardLineBreaks", eligibility.resolve(bufnr))
+
+  refine.configure_buffer(bufnr, {})
+  refine.setup({ filetypes = { markdown = "markdownDocumentHardLineBreaks" } })
+  harness.equal("markdownDocumentHardLineBreaks", eligibility.resolve(bufnr))
+
+  refine.setup({})
+  harness.equal("markdownDocument", require("refine.config").get().filetypes.markdown)
+  harness.equal("markdownDocument", eligibility.resolve(bufnr))
+end)
+
 harness.run()

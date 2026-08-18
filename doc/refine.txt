@@ -79,8 +79,8 @@ max_source_bytes ~
                                                         *refine-filetypes*
 filetypes ~
     Map from a nonempty Neovim 'filetype' to "plainText",
-    "markdownDocument", "latexDocument", or false. Entries merge with the
-    default map; false removes an entry.
+    "markdownDocument", "markdownDocumentHardLineBreaks", "latexDocument", or
+    false. Entries merge with the default map; false removes an entry.
 
                                                          *refine-frontend*
 frontend ~
@@ -109,8 +109,9 @@ require("refine").configure_buffer({bufnr}, {opts})
         but never bypasses hard safety checks or invents a source syntax.
 
     source_syntax ~
-        "plainText", "markdownDocument", or "latexDocument". Overrides the
-        filetype map and can opt an otherwise unmapped filetype in.
+        "plainText", "markdownDocument", "markdownDocumentHardLineBreaks", or
+        "latexDocument". Overrides the filetype map and can opt an otherwise
+        unmapped filetype in.
 
     Example: >lua
         require("refine").configure_buffer(0, {
@@ -143,6 +144,15 @@ inside one logical paragraph. "plainText" keeps physical line breaks as
 paragraph boundaries. "latexDocument" uses TeX and LaTeX document semantics.
 Apply preserves existing layout where possible and may reflow only the affected
 logical paragraph when a correction cannot retain its original soft breaks.
+
+"markdownDocumentHardLineBreaks" protects the same Markdown syntax as
+"markdownDocument" and still checks prose wrapped across source lines as one
+logical paragraph, but every line ending is immovable: Apply reproduces each
+one at the same position and never removes, introduces, or reflows across one.
+Choose it for a vault or renderer that displays every source line ending as a
+visible line break, such as a default Obsidian vault. The trade-off is that a
+correction which cannot keep the paragraph's existing line endings is dropped
+instead of applied.
 
 ==============================================================================
 5. Commands                                              *refine-commands*

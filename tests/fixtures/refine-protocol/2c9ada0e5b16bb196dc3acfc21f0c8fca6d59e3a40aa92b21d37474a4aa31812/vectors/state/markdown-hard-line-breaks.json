@@ -1,0 +1,132 @@
+{
+  "formatVersion": 1,
+  "id": "markdown-hard-line-breaks",
+  "description": "A hard-wrapped Markdown source whose line endings are immovable: one cross-line logical paragraph is checked, and the Apply receipt reproduces every LF and CRLF at its original position.",
+  "socketRunnable": true,
+  "messages": {
+    "hello": {
+      "type": "hello",
+      "protocol": { "major": 1, "minor": 0 },
+      "client": { "id": "com.runjuu.refine.reference", "version": "1.0.0-rc", "host": "reference-cli" },
+      "hostCapabilities": { "interceptableSuggestionActionKeys": [] },
+      "runId": "reference-run",
+      "launchToken": "${launchToken}",
+      "capabilities": []
+    },
+    "welcome": {
+      "type": "welcome",
+      "protocol": { "major": 1, "minor": 0 },
+      "serverEpoch": "${serverEpoch}",
+      "runResumed": false,
+      "limits": { "maxFrameBytes": 8388608, "maxSources": 2, "maxSourceBytes": 1048576 },
+      "capabilities": []
+    },
+    "openDocument": {
+      "type": "command", "sequence": 1, "id": "reference-open",
+      "command": {
+        "type": "openDocument",
+        "snapshot": { "revision": "vault:0", "sources": [
+          { "sourceId": "document", "text": "The report was published on friday and it\ncovers the whole quarter.\r\nSales were strong.", "sourceSyntax": "markdownDocumentHardLineBreaks" }
+        ] }
+      }
+    },
+    "documentAccepted": {
+      "type": "event", "sequence": 1, "epoch": "${serverEpoch}", "causeCommandId": "reference-open",
+      "event": { "type": "documentAccepted", "revision": "vault:0" }
+    },
+    "updateAttention": {
+      "type": "command", "sequence": 2, "id": "reference-attention",
+      "command": {
+        "type": "updateAttention", "revision": "vault:0",
+        "attention": { "sourceId": "document", "caretOffset": 34, "visibleRanges": [{ "location": 0, "length": 87 }] }
+      }
+    },
+    "fullCheck": {
+      "type": "command", "sequence": 3, "id": "reference-check",
+      "command": { "type": "requestCheck", "revision": "vault:0" }
+    },
+    "presentation": {
+      "type": "event", "sequence": 2, "epoch": "${serverEpoch}", "causeCommandId": "reference-check",
+      "event": {
+        "type": "presentationContentReplaced", "checkId": "check-hard-line-breaks",
+        "content": {
+          "documentRevision": "vault:0", "status": "complete", "coverage": "full",
+          "appearance": {
+            "highlight": { "style": "underline", "grammarColor": "#FF2D55", "fluencyColor": "#007AFF" },
+            "diff": { "additionColor": "#34C759", "deletionColor": "#FF3B30", "showHiddenWhitespace": true }
+          },
+          "interaction": {
+            "automaticChecksEnabled": true,
+            "quickApply": { "enabled": true, "applyKey": "tab", "dismissKey": "escape", "activationStyle": "showTipAndHighlight" }
+          },
+          "suggestions": [
+            {
+              "id": "suggestion-weekday", "sourceId": "document", "kind": "grammar",
+              "attribution": { "languageDisplayName": "English (American)", "textDirection": "ltr", "checkModelDisplayName": "On-Device (Gemma)" },
+              "activationRange": { "location": 28, "length": 6 },
+              "highlightRanges": [{ "location": 28, "length": 6 }],
+              "diff": [{ "kind": "delete", "text": "friday" }, { "kind": "insert", "text": "Friday" }],
+              "availableActions": ["apply", "dismiss", "explain", "report"]
+            }
+          ]
+        }
+      }
+    },
+    "performApply": {
+      "type": "command", "sequence": 4, "id": "reference-apply",
+      "command": {
+        "type": "performAction", "actionId": "action-apply", "kind": "apply",
+        "suggestion": { "id": "suggestion-weekday", "documentRevision": "vault:0" }
+      }
+    },
+    "applyRequested": {
+      "type": "event", "sequence": 3, "epoch": "${serverEpoch}", "causeCommandId": "reference-apply",
+      "event": {
+        "type": "applyRequested", "actionId": "action-apply", "transactionId": "transaction-hard-line-breaks",
+        "request": {
+          "expectedRevision": "vault:0", "sourceId": "document",
+          "edits": [{ "range": { "location": 28, "length": 6 }, "expectedText": "friday", "replacement": "Friday" }]
+        }
+      }
+    },
+    "completeApply": {
+      "type": "command", "sequence": 5, "id": "reference-receipt",
+      "command": {
+        "type": "completeApply", "transactionId": "transaction-hard-line-breaks",
+        "outcome": {
+          "status": "applied",
+          "snapshot": { "revision": "vault:1", "sources": [
+            { "sourceId": "document", "text": "The report was published on Friday and it\ncovers the whole quarter.\r\nSales were strong.", "sourceSyntax": "markdownDocumentHardLineBreaks" }
+          ] }
+        }
+      }
+    },
+    "applyCompleted": {
+      "type": "event", "sequence": 4, "epoch": "${serverEpoch}", "causeCommandId": "reference-receipt",
+      "event": { "type": "actionCompleted", "actionId": "action-apply" }
+    },
+    "closeDocument": {
+      "type": "command", "sequence": 6, "id": "reference-close",
+      "command": { "type": "closeDocument" }
+    }
+  },
+  "connections": [
+    {
+      "steps": [
+        { "direction": "client", "messageRef": "hello" },
+        { "direction": "server", "messageRef": "welcome" },
+        { "direction": "client", "messageRef": "openDocument" },
+        { "direction": "server", "messageRef": "documentAccepted" },
+        { "direction": "client", "messageRef": "updateAttention" },
+        { "direction": "client", "messageRef": "fullCheck" },
+        { "direction": "server", "messageRef": "presentation" },
+        { "direction": "client", "messageRef": "performApply" },
+        { "direction": "server", "messageRef": "applyRequested" },
+        { "direction": "client", "messageRef": "completeApply" },
+        { "direction": "server", "messageRef": "applyCompleted" },
+        { "direction": "client", "messageRef": "closeDocument" },
+        { "direction": "client", "close": true }
+      ]
+    }
+  ]
+}

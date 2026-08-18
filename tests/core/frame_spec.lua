@@ -217,7 +217,12 @@ describe("length-prefixed JSON frames", function()
       }
     end
 
-    for _, source_syntax in ipairs({ "plainText", "markdownDocument", "latexDocument" }) do
+    for _, source_syntax in ipairs({
+      "plainText",
+      "markdownDocument",
+      "latexDocument",
+      "markdownDocumentHardLineBreaks",
+    }) do
       wire.validate_command(command(source_syntax))
     end
     assert_raises("sourceSyntax is unsupported", function()

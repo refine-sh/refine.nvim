@@ -41,11 +41,20 @@ Unknown options and invalid values are rejected.
 
 ## Filetypes
 
-Refine supports three source syntaxes:
+Refine supports four source syntaxes:
 
 - `"plainText"` for prose whose physical line breaks are paragraph boundaries
 - `"markdownDocument"` for Markdown, including soft line breaks within logical paragraphs
+- `"markdownDocumentHardLineBreaks"` for Markdown whose every line ending is a
+  visible line break, so Refine never moves one
 - `"latexDocument"` for TeX and LaTeX documents
+
+`"markdownDocumentHardLineBreaks"` protects exactly the same Markdown syntax as
+`"markdownDocument"`, and prose wrapped across source lines is still checked as
+one logical paragraph. The difference is Apply: every line ending is immovable,
+reproduced at the same position, and Refine never removes, introduces, or
+reflows across one. The trade-off is that a correction which cannot keep the
+paragraph's existing line endings is dropped instead of applied.
 
 The default map is:
 
@@ -68,6 +77,40 @@ require("refine").setup({
     quarto = "markdownDocument",
     context = "latexDocument",
   },
+})
+```
+
+### Obsidian vaults and other hard-line-break Markdown
+
+`markdown` stays mapped to `"markdownDocument"`. Neovim Markdown buffers are
+commonly hard-wrapped at `'textwidth'`, where reflow inside one logical
+paragraph is invisible in the rendered output.
+
+Opt in to `"markdownDocumentHardLineBreaks"` when the same files are rendered
+somewhere that shows every line ending as a line break, such as a default
+Obsidian vault. Map the filetype globally:
+
+```lua
+require("refine").setup({
+  filetypes = {
+    markdown = "markdownDocumentHardLineBreaks",
+  },
+})
+```
+
+To keep the global default and opt in for one vault only, scope a buffer
+override by path:
+
+```lua
+local vault = vim.fn.expand("~/Documents/Vault")
+
+vim.api.nvim_create_autocmd("BufReadPost", {
+  pattern = vault .. "/*.md",
+  callback = function(args)
+    require("refine").configure_buffer(args.buf, {
+      source_syntax = "markdownDocumentHardLineBreaks",
+    })
+  end,
 })
 ```
 
@@ -112,7 +155,7 @@ Supported fields:
 | Field | Description |
 | --- | --- |
 | `enabled` | `false` opts out. `true` permits normal eligibility evaluation. |
-| `source_syntax` | `"plainText"`, `"markdownDocument"`, or `"latexDocument"`. This can opt an otherwise unmapped filetype in. |
+| `source_syntax` | `"plainText"`, `"markdownDocument"`, `"markdownDocumentHardLineBreaks"`, or `"latexDocument"`. This can opt an otherwise unmapped filetype in. |
 
 ## Automatic and manual checks
 

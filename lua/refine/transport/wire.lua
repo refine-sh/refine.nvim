@@ -62,6 +62,7 @@ local source_syntaxes = {
   plainText = true,
   markdownDocument = true,
   latexDocument = true,
+  markdownDocumentHardLineBreaks = true,
 }
 local action_unavailable_reasons = {
   disconnected = true,

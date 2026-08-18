@@ -1356,6 +1356,12 @@ function Run:_accept_engine_event(envelope)
       end
       self:_complete_pending(pending, outcome)
     end
+  elseif event.type == "fault" and event.fatal and event.code == "malformedMessage" then
+    self:_fatal(
+      engine_error(
+        "Refine could not decode a message from Refine for Neovim (malformedMessage). Update the Refine app to a compatible version, then reconnect."
+      )
+    )
   elseif event.type == "fault" and event.fatal then
     self:_fatal(engine_error("Refine engine fault: " .. event.code))
   elseif event.type == "fault" and event.code == "engineUnavailable" then

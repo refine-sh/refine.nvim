@@ -4,6 +4,7 @@ local source_syntaxes = {
   plainText = true,
   markdownDocument = true,
   latexDocument = true,
+  markdownDocumentHardLineBreaks = true,
 }
 
 local frontend_ids = {

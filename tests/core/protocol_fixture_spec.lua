@@ -153,10 +153,10 @@ local function load_fixture_bundle()
       assert_truthy(type(schema) == "table" and not vim.islist(schema))
     end
   end
-  assert_equal(139, #manifest.jsonPositiveCaseIds)
-  assert_equal(60, #manifest.jsonNegativeCaseIds)
+  assert_equal(141, #manifest.jsonPositiveCaseIds)
+  assert_equal(62, #manifest.jsonNegativeCaseIds)
   assert_equal(13, #manifest.frameCaseIds)
-  assert_equal(9, #manifest.stateScenarioIds)
+  assert_equal(10, #manifest.stateScenarioIds)
   assert_equal(manifest.jsonPositiveCaseIds, json_positive_ids)
   assert_equal(manifest.jsonNegativeCaseIds, json_negative_ids)
   assert_equal(manifest.frameCaseIds, frame_ids)

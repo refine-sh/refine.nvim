@@ -23,6 +23,9 @@ capability-parity release.
   both exact versions without inferring which component should update.
 - The legacy `mixed` source syntax is no longer accepted in configuration or
   buffer overrides.
+- A fatal `malformedMessage` engine fault now names a Refine app update instead
+  of reporting only the raw fault code. That is what a plugin declaring a source
+  syntax an older Refine app cannot decode looks like from Neovim.
 
 ### Added
 
@@ -45,3 +48,13 @@ capability-parity release.
 - Optional validated setup and buffer-local overrides.
 - Structured status, statusline component, and `:checkhealth refine`.
 - Opt-in redacted diagnostics bounded to a 256 KiB file and one rotation.
+- `"markdownDocumentHardLineBreaks"` is available wherever a source syntax is
+  configured, in `setup({ filetypes = ... })` and in `configure_buffer()`. It
+  protects exactly the same Markdown syntax as `"markdownDocument"` and still
+  checks prose wrapped across source lines as one logical paragraph, but every
+  line ending is immovable: Apply reproduces each one at the same position and
+  never removes, introduces, or reflows across one. Choose it when the same
+  files are rendered somewhere that shows every line ending as a line break,
+  such as a default Obsidian vault; a correction that cannot keep the
+  paragraph's existing line endings is dropped instead of applied. The
+  `markdown` filetype default stays `"markdownDocument"`.

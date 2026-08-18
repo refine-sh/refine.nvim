@@ -92,6 +92,32 @@
       "error": "schema"
     },
     {
+      "id": "near-miss-source-syntax-is-still-unknown",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 1, "id": "command-open",
+        "command": { "type": "openDocument", "snapshot": {
+          "revision": "revision", "sources": [
+            { "sourceId": "document", "text": "text", "sourceSyntax": "markdownDocumentHardLineBreak" }
+          ]
+        } }
+      },
+      "error": "schema"
+    },
+    {
+      "id": "source-syntax-is-case-sensitive",
+      "schema": "schema/envelope.schema.json",
+      "value": {
+        "type": "command", "sequence": 1, "id": "command-open",
+        "command": { "type": "openDocument", "snapshot": {
+          "revision": "revision", "sources": [
+            { "sourceId": "document", "text": "text", "sourceSyntax": "markdowndocumenthardlinebreaks" }
+          ]
+        } }
+      },
+      "error": "schema"
+    },
+    {
       "id": "identifier-must-be-visible-ascii",
       "schema": "schema/envelope.schema.json",
       "value": {

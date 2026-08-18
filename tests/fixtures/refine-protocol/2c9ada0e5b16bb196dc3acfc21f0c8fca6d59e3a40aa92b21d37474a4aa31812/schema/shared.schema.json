@@ -82,7 +82,10 @@
         "sourceId": { "$ref": "#/$defs/identifier" },
         "text": { "type": "string" },
         "sourceSyntax": {
-          "enum": ["plainText", "markdownDocument", "latexDocument"]
+          "enum": [
+            "plainText", "markdownDocument", "markdownDocumentHardLineBreaks",
+            "latexDocument"
+          ]
         }
       }
     },
