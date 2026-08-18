@@ -62,7 +62,7 @@ plugin spec:
 
 ```lua
 {
-  "runjuu/refine.nvim",
+  "refine-sh/refine.nvim",
 }
 ```
 
@@ -72,7 +72,7 @@ Alternatively, clone the plugin into Neovim's native package directory:
 
 ```sh
 mkdir -p ~/.local/share/nvim/site/pack/refine/start
-git clone --filter=blob:none https://github.com/runjuu/refine.nvim \
+git clone --filter=blob:none https://github.com/refine-sh/refine.nvim \
   ~/.local/share/nvim/site/pack/refine/start/refine.nvim
 ```
 
