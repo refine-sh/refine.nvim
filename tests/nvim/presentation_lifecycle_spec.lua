@@ -270,7 +270,9 @@ harness.test("sizes wrapped card text by occupied screen rows", function()
 
   harness.equal(true, host:show())
   local card_win = host.presentation:card_window()
-  harness.equal(6, vim.api.nvim_win_get_config(card_win).height)
+  local config = vim.api.nvim_win_get_config(card_win)
+  harness.equal(4, config.height)
+  harness.equal(math.floor(vim.api.nvim_win_get_height(owner_win) * 0.5), config.height + 2)
   host:close()
 end)
 

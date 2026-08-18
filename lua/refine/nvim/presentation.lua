@@ -101,6 +101,81 @@ local function highlight_attributes(style, color)
   return { sp = color_number(color), underline = true }
 end
 
+local card_border = "rounded"
+local card_border_rows = 2
+local card_border_columns = 2
+local card_titles = {
+  grammar = " Refine · Grammar ",
+  fluency = " Refine · Fluency ",
+  mixed = " Refine · Grammar & Fluency ",
+}
+local card_winhighlight = table.concat({
+  "NormalFloat:RefineCardNormal",
+  "FloatBorder:RefineCardBorder",
+  "FloatTitle:RefineCardTitle",
+  "EndOfBuffer:RefineCardNormal",
+}, ",")
+
+local function color_channels(value)
+  return math.floor(value / 65536) % 256, math.floor(value / 256) % 256, value % 256
+end
+
+local function mixed_color(base, target, amount)
+  local base_red, base_green, base_blue = color_channels(base)
+  local target_red, target_green, target_blue = color_channels(target)
+  local function channel(from, to)
+    return math.floor(from + (to - from) * amount + 0.5)
+  end
+  return channel(base_red, target_red) * 65536
+    + channel(base_green, target_green) * 256
+    + channel(base_blue, target_blue)
+end
+
+local function group_color(name, attribute)
+  local ok, attributes = pcall(vim.api.nvim_get_hl, 0, { name = name, link = false })
+  if not ok then
+    return nil
+  end
+  return attributes[attribute]
+end
+
+local function group_background(name)
+  return group_color(name, "bg")
+end
+
+local function group_foreground(name)
+  return group_color(name, "fg")
+end
+
+local function card_background()
+  local base = group_background("Normal")
+  if not base then
+    return group_background("Pmenu") or group_background("NormalFloat")
+  end
+  local red, green, blue = color_channels(base)
+  if (0.299 * red + 0.587 * green + 0.114 * blue) / 255 < 0.5 then
+    return mixed_color(base, 0xFFFFFF, 0.14)
+  end
+  return mixed_color(base, 0x000000, 0.07)
+end
+
+local function card_border_color(background)
+  local foreground = group_foreground("Normal")
+  if not foreground or not background then
+    return group_foreground("FloatBorder") or group_foreground("Comment")
+  end
+  return mixed_color(foreground, background, 0.5)
+end
+
+local function define_card_highlights()
+  local background = card_background()
+  vim.api.nvim_set_hl(0, "RefineCardNormal", { bg = background })
+  vim.api.nvim_set_hl(0, "RefineCardBorder", { fg = card_border_color(background), bg = background })
+  vim.api.nvim_set_hl(0, "RefineCardTitle", { bg = background, bold = true })
+  vim.api.nvim_set_hl(0, "RefineCardKey", { bold = true })
+  vim.api.nvim_set_hl(0, "RefineCardHint", { link = "Comment" })
+end
+
 local function define_highlights(appearance)
   local style = appearance.highlight.style
   vim.api.nvim_set_hl(0, "RefineGrammar", highlight_attributes(style, appearance.highlight.grammarColor))
@@ -195,11 +270,12 @@ local function add_deletion_midlines(midlines, row, start_col, text, remaining)
 end
 
 local function card_content(suggestion, feedback, interaction, appearance, focused)
-  local lines = {
-    ("%s · %s"):format(suggestion.attribution.languageDisplayName, suggestion.attribution.checkModelDisplayName),
-    "",
-  }
-  local highlights = {}
+  local attribution = ("%s · %s"):format(
+    suggestion.attribution.languageDisplayName,
+    suggestion.attribution.checkModelDisplayName
+  )
+  local lines = { attribution, "" }
+  local highlights = { { row = 0, start_col = 0, end_col = #attribution, group = "RefineCardHint" } }
   local midlines = {}
   local remaining_midlines = maximum_midline_graphemes
   local body_started = false
@@ -258,9 +334,14 @@ local function card_content(suggestion, feedback, interaction, appearance, focus
       lines[#lines + 1] = "Configured Dismiss key is unavailable in Neovim; use [d]."
     end
   end
-  lines[#lines + 1] = focused and "" or "Preview · :RefineShow to focus for card keys"
+  local hint = focused and "" or "Preview · :RefineShow to focus for card keys"
+  lines[#lines + 1] = hint
+  if hint ~= "" then
+    highlights[#highlights + 1] = { row = #lines - 1, start_col = 0, end_col = #hint, group = "RefineCardHint" }
+  end
   local footer = ""
   local targets = {}
+  local key_columns = {}
   for _, action in ipairs(card_actions) do
     if has_action(suggestion, action.kind) then
       if footer ~= "" then
@@ -275,6 +356,7 @@ local function card_content(suggestion, feedback, interaction, appearance, focus
         start_col = start_col,
         end_col = start_col + #text,
       }
+      key_columns[#key_columns + 1] = { start_col = start_col, end_col = start_col + #action.key + 2 }
     end
   end
   if footer ~= "" then
@@ -289,7 +371,16 @@ local function card_content(suggestion, feedback, interaction, appearance, focus
     start_col = close_start,
     end_col = close_start + #close_text,
   }
+  key_columns[#key_columns + 1] = { start_col = close_start, end_col = close_start + 3 }
   lines[#lines + 1] = footer
+  for _, columns in ipairs(key_columns) do
+    highlights[#highlights + 1] = {
+      row = #lines - 1,
+      start_col = columns.start_col,
+      end_col = columns.end_col,
+      group = "RefineCardKey",
+    }
+  end
   return { lines = lines, highlights = highlights, midlines = midlines, targets = targets }
 end
 
@@ -331,6 +422,7 @@ function Presentation:_render_card()
       return vim.fn.line("w$") >= vim.api.nvim_buf_line_count(self.card_buf)
     end)
   vim.bo[self.card_buf].modifiable = true
+  define_card_highlights()
   local content =
     card_content(suggestion, self.card_feedback, self.snapshot.interaction, self.snapshot.appearance, focused)
   vim.api.nvim_buf_set_lines(self.card_buf, 0, -1, true, content.lines)
@@ -574,16 +666,17 @@ function Presentation:_card_config(winid, suggestion, lines, content_height)
   end
   local owner_position = vim.api.nvim_win_get_position(winid)
   local owner_width = vim.api.nvim_win_get_width(winid)
-  local maximum_width = math.max(1, math.floor(owner_width * 0.8))
+  local maximum_width = math.max(1, math.floor(owner_width * 0.8) - card_border_columns)
   local minimum_width = math.min(20, maximum_width)
   width = math.min(math.max(width, minimum_width), maximum_width)
   local owner_height = vim.api.nvim_win_get_height(winid)
-  local height = math.min(content_height or #lines, math.max(1, math.floor(owner_height * 0.5)))
+  local maximum_height = math.max(1, math.floor(owner_height * 0.5) - card_border_rows)
+  local height = math.min(content_height or #lines, maximum_height)
   local owner_top = owner_position[1]
   local owner_bottom = owner_top + owner_height
   local anchor_row = anchor.row - 1
-  local available_below = owner_bottom - anchor.row
-  local available_above = anchor_row - owner_top
+  local available_below = owner_bottom - anchor.row - card_border_rows
+  local available_above = anchor_row - owner_top - card_border_rows
   local place_below = available_below >= height or (available_above < height and available_below >= available_above)
   local available = place_below and available_below or available_above
   if available < 1 then
@@ -592,7 +685,7 @@ function Presentation:_card_config(winid, suggestion, lines, content_height)
   height = math.min(height, available)
   local owner_left = owner_position[2]
   local owner_right = owner_left + owner_width
-  local column = math.max(owner_left, math.min(anchor.col - 1, owner_right - width))
+  local column = math.max(owner_left, math.min(anchor.col - 1, owner_right - width - card_border_columns))
 
   return {
     relative = "editor",
@@ -602,12 +695,16 @@ function Presentation:_card_config(winid, suggestion, lines, content_height)
     width = width,
     height = height,
     style = "minimal",
+    border = card_border,
+    title = { { card_titles[suggestion.kind] or card_titles.grammar, "RefineCardTitle" } },
+    title_pos = "left",
     focusable = true,
     zindex = 60,
   }
 end
 
 function Presentation:_open_card(winid, suggestion)
+  define_card_highlights()
   local content = card_content(suggestion, nil, self.snapshot.interaction, self.snapshot.appearance, false)
   local config = self:_card_config(winid, suggestion, content.lines)
   if not config then
@@ -625,6 +722,8 @@ function Presentation:_open_card(winid, suggestion)
   vim.wo[self.card_win].wrap = true
   vim.wo[self.card_win].linebreak = true
   vim.wo[self.card_win].rightleft = suggestion.attribution.textDirection == "rtl"
+  vim.wo[self.card_win].winhighlight = card_winhighlight
+  vim.wo[self.card_win].winblend = 0
   self.card_suggestion_id = suggestion.id
   self.card_mouse_targets = content.targets
   self.owner_win = winid
@@ -809,6 +908,9 @@ end
 function Presentation:refresh_highlights()
   if self.snapshot and self.snapshot.appearance then
     define_highlights(self.snapshot.appearance)
+    if self.card_suggestion_id then
+      define_card_highlights()
+    end
   end
   if self.active_suggestion_id then
     define_active_highlight()

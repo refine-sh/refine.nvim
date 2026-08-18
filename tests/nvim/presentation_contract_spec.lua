@@ -132,10 +132,13 @@ harness.test("renders diff runs inline with Refine colors and visible whitespace
     end
   end
   harness.equal({
+    { row = 0, start_col = 0, end_col = 31, group = "RefineCardHint" },
     { row = 2, start_col = 4, end_col = 9, group = "RefineDeletion" },
     { row = 2, start_col = 9, end_col = 14, group = "RefineAddition" },
     { row = 3, start_col = 6, end_col = 15, group = "RefineDeletion" },
     { row = 3, start_col = 15, end_col = 21, group = "RefineAddition" },
+    { row = 5, start_col = 0, end_col = 3, group = "RefineCardKey" },
+    { row = 5, start_col = 11, end_col = 14, group = "RefineCardKey" },
   }, highlights)
   harness.equal(2, groups.RefineAddition)
   harness.equal(2, groups.RefineDeletion)
@@ -238,8 +241,11 @@ harness.test("marks changed newlines while keeping their line break", function()
     end
   end
   harness.equal({
+    { row = 0, start_col = 0, end_col = 31, group = "RefineCardHint" },
     { row = 2, start_col = 5, end_col = 8, group = "RefineDeletion" },
     { row = 3, start_col = 0, end_col = 2, group = "RefineAddition" },
+    { row = 5, start_col = 0, end_col = 3, group = "RefineCardKey" },
+    { row = 5, start_col = 11, end_col = 14, group = "RefineCardKey" },
   }, highlights)
   host:deactivate()
 end)
@@ -1123,6 +1129,133 @@ harness.test("focuses cards from Insert mode for card actions", function()
   host:deactivate()
 
   harness.equal({ applied = 1, card_open = false, errmsg = "", shown = true }, outcome)
+end)
+
+harness.test("frames the card as chrome that separates it from the buffer", function()
+  local host = present({ available_actions = { "apply" } })
+  local card_win = host.presentation:card_window()
+  local config = vim.api.nvim_win_get_config(card_win)
+
+  harness.equal("╭", config.border[1])
+  harness.equal({ { " Refine · Grammar ", "RefineCardTitle" } }, config.title)
+  harness.equal("left", config.title_pos)
+  harness.equal(
+    "NormalFloat:RefineCardNormal,FloatBorder:RefineCardBorder,FloatTitle:RefineCardTitle,EndOfBuffer:RefineCardNormal",
+    vim.wo[card_win].winhighlight
+  )
+
+  local normal = vim.api.nvim_get_hl(0, { name = "Normal", link = false })
+  local card = vim.api.nvim_get_hl(0, { name = "RefineCardNormal", link = false })
+  local border = vim.api.nvim_get_hl(0, { name = "RefineCardBorder", link = false })
+  harness.equal(true, card.bg ~= nil)
+  harness.equal(true, card.bg ~= normal.bg)
+  harness.equal(card.bg, border.bg)
+  harness.equal(true, border.fg ~= nil and border.fg ~= card.bg and border.fg ~= normal.fg)
+  local title = vim.api.nvim_get_hl(0, { name = "RefineCardTitle", link = false })
+  harness.equal(card.bg, title.bg)
+  harness.equal(true, title.bold)
+  harness.equal(nil, title.fg)
+  local key = vim.api.nvim_get_hl(0, { name = "RefineCardKey", link = false })
+  harness.equal(true, key.bold)
+  harness.equal(nil, key.fg)
+  harness.equal(nil, key.bg)
+  host:deactivate()
+end)
+
+harness.test("names the suggestion kind in the card title without restyling the card", function()
+  local host = present({ available_actions = { "apply" } })
+  local grammar = {
+    title = vim.api.nvim_win_get_config(host.presentation:card_window()).title,
+    border = vim.api.nvim_get_hl(0, { name = "RefineCardBorder", link = false }),
+    key = vim.api.nvim_get_hl(0, { name = "RefineCardKey", link = false }),
+  }
+  host:deactivate()
+
+  for kind, label in pairs({ fluency = " Refine · Fluency ", mixed = " Refine · Grammar & Fluency " }) do
+    local next_host = present({
+      available_actions = { "apply" },
+      before_present = function(_, _, _, suggestion)
+        suggestion.kind = kind
+      end,
+    })
+
+    harness.equal(
+      { { label, "RefineCardTitle" } },
+      vim.api.nvim_win_get_config(next_host.presentation:card_window()).title
+    )
+    harness.equal(grammar.border, vim.api.nvim_get_hl(0, { name = "RefineCardBorder", link = false }))
+    harness.equal(grammar.key, vim.api.nvim_get_hl(0, { name = "RefineCardKey", link = false }))
+    next_host:deactivate()
+  end
+
+  harness.equal({ { " Refine · Grammar ", "RefineCardTitle" } }, grammar.title)
+end)
+
+harness.test("keeps buffer highlights in the color of each suggestion kind", function()
+  local host = present({ available_actions = { "apply" } })
+  local marks = vim.api.nvim_buf_get_extmarks(host.bufnr, -1, 0, -1, { details = true })
+  harness.equal("RefineGrammar", marks[1][4].hl_group)
+  host:deactivate()
+
+  local fluency = present({
+    available_actions = { "apply" },
+    before_present = function(_, _, _, suggestion)
+      suggestion.kind = "fluency"
+    end,
+  })
+  marks = vim.api.nvim_buf_get_extmarks(fluency.bufnr, -1, 0, -1, { details = true })
+  harness.equal("RefineFluency", marks[1][4].hl_group)
+  harness.equal(0xFF2D55, vim.api.nvim_get_hl(0, { name = "RefineGrammar", link = false }).sp)
+  harness.equal(0x007AFF, vim.api.nvim_get_hl(0, { name = "RefineFluency", link = false }).sp)
+  fluency:deactivate()
+end)
+
+harness.test("dims card metadata and emphasizes its action keys", function()
+  local host, _, _, owner_win = present({ available_actions = { "apply", "dismiss" } })
+  local card_buf = card_buffer(host)
+
+  local function chrome()
+    local marks = {}
+    for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(card_buf, -1, 0, -1, { details = true })) do
+      local group = mark[4].hl_group
+      if group == "RefineCardHint" or group == "RefineCardKey" then
+        marks[#marks + 1] = { row = mark[2], start_col = mark[3], end_col = mark[4].end_col, group = group }
+      end
+    end
+    return marks
+  end
+
+  local lines = vim.api.nvim_buf_get_lines(card_buf, 0, -1, true)
+  harness.equal("[a] Apply  [d] Dismiss  [q] Close", lines[#lines])
+  harness.equal({
+    { row = 0, start_col = 0, end_col = #lines[1], group = "RefineCardHint" },
+    { row = #lines - 1, start_col = 0, end_col = 3, group = "RefineCardKey" },
+    { row = #lines - 1, start_col = 11, end_col = 14, group = "RefineCardKey" },
+    { row = #lines - 1, start_col = 24, end_col = 27, group = "RefineCardKey" },
+  }, chrome())
+
+  vim.api.nvim_set_current_win(owner_win)
+  local hint = "Preview · :RefineShow to focus for card keys"
+  harness.equal(
+    true,
+    vim.wait(1000, function()
+      return vim.tbl_contains(vim.api.nvim_buf_get_lines(card_buf, 0, -1, true), hint)
+    end)
+  )
+  local hint_row
+  for index, line in ipairs(vim.api.nvim_buf_get_lines(card_buf, 0, -1, true)) do
+    if line == hint then
+      hint_row = index - 1
+    end
+  end
+  local hint_marks = {}
+  for _, mark in ipairs(chrome()) do
+    if mark.row == hint_row then
+      hint_marks[#hint_marks + 1] = mark
+    end
+  end
+  harness.equal({ { row = hint_row, start_col = 0, end_col = #hint, group = "RefineCardHint" } }, hint_marks)
+  host:deactivate()
 end)
 
 harness.run()
