@@ -1,11 +1,11 @@
 {
   "formatVersion": 1,
-  "releaseCandidate": "1.0.0-rc.2",
+  "releaseCandidate": "1.0.0-rc.3",
   "protocol": {
     "major": 1,
     "minor": 0
   },
-  "artifactDigest": "2c9ada0e5b16bb196dc3acfc21f0c8fca6d59e3a40aa92b21d37474a4aa31812",
+  "artifactDigest": "0ef58e1926dcf25bb5ac81389d3a8cde579483b81acc49894df7f2cbcbc4198c",
   "baseArtifactDigest": "4c5fff1efacaa68728f6602449b25b482432f312afe7c556e793d4535fb9310d",
   "capabilityRegistryDigest": "c36bc7945b37764c7594d526be7a038e6b4dd3bf4238be661e5f8aad00d6dc24",
   "jsonPositiveCaseIds": [
@@ -270,7 +270,7 @@
     },
     {
       "path": "SUPPORT.md",
-      "sha256": "b0b0cf7de56217bb95223a7f8159228fdd296a6f8d6d19681945133ad8d2336f",
+      "sha256": "2495d051cf293a5a1f0e2ed3610cada8d14fe3af9e60948c37f1b5adb87dedc2",
       "kind": "documentation"
     },
     {
@@ -285,7 +285,7 @@
     },
     {
       "path": "reference/typescript/package.json",
-      "sha256": "4c5d37a798617c964dfb8245c8d37309421a0a9fdda2c78240bc67ded29cd813",
+      "sha256": "1f77fb1e1b7c52e7f4ec03b9620a0d9a832d171f6dd31ad5fcdc5d22b579af27",
       "kind": "reference"
     },
     {
@@ -320,7 +320,7 @@
     },
     {
       "path": "runner/update_manifest.py",
-      "sha256": "3803058f28e947301b6dd36c84a12201f53a98949b96ef10a534862738c76ed4",
+      "sha256": "5722245a6d162f1206b1546ef27692b6dd2a20d8be29628847118c5bca2a595f",
       "kind": "runner"
     },
     {

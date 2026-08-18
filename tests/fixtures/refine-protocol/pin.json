@@ -1,10 +1,10 @@
 {
   "formatVersion": 1,
-  "releaseCandidate": "1.0.0-rc.2",
+  "releaseCandidate": "1.0.0-rc.3",
   "protocol": { "major": 1, "minor": 0 },
-  "protocolCommit": "7e599df9028d0f6af7a5f1e8bb8377d214c96201",
-  "artifactDirectory": "2c9ada0e5b16bb196dc3acfc21f0c8fca6d59e3a40aa92b21d37474a4aa31812",
-  "upstreamArtifactDigest": "2c9ada0e5b16bb196dc3acfc21f0c8fca6d59e3a40aa92b21d37474a4aa31812",
+  "protocolCommit": "e2f9c47e324b166f41a49dd9d7b4ea2bcea388f0",
+  "artifactDirectory": "0ef58e1926dcf25bb5ac81389d3a8cde579483b81acc49894df7f2cbcbc4198c",
+  "upstreamArtifactDigest": "0ef58e1926dcf25bb5ac81389d3a8cde579483b81acc49894df7f2cbcbc4198c",
   "vendoredSubset": {
     "artifactCount": 28,
     "digest": "750a42cb1cbf1e853e200f283fde1329ef5292d55fc1a5fdc73f9bcaca590219",
@@ -12,7 +12,7 @@
     "includedKinds": ["schema", "vectors"],
     "includedPaths": ["registry/capabilities.json"]
   },
-  "manifestDigest": "e03e2e44a2a8e56c78181fe9e226b84ddc4d39c0f8526bc6f274be58aa1cead8",
+  "manifestDigest": "863cfa35e7b7be8e59cbbf09c81d45aaa873e58dfdc06b7bcc961cfd5837dba9",
   "baseArtifactDigest": "4c5fff1efacaa68728f6602449b25b482432f312afe7c556e793d4535fb9310d",
   "capabilityRegistryDigest": "c36bc7945b37764c7594d526be7a038e6b4dd3bf4238be661e5f8aad00d6dc24",
   "goldenVectorDigest": "a4f62e6c8060d7e748451a01126d161668bb88c1a6a9b2ea1f05854ebda11e73"
