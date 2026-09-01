@@ -39,7 +39,7 @@ session; focusing the current Refine card is the sole exception.
 - macOS 14 or newer
 - Neovim 0.11 or newer
 - Refine 1.35 or newer (exact Integration Protocol 1.0)
-- An active Refine trial or valid license
+- Refine is free to use; no account or credit card is required
 
 The plugin is inactive in a headless Neovim. It activates when a UI attaches.
 SSH is not rejected when Neovim itself runs on macOS and can reach the

@@ -35,7 +35,8 @@ Features:
 - Neovim 0.11+
 - Refine 1.35+
 
-Refine includes a full-featured seven-day trial with no credit card required.
+Refine is free to use for grammar and fluency checks, with no account or credit
+card required.
 
 ## Quick Start
 
@@ -196,8 +197,8 @@ working offline.
 
 Refine can also use a provider you connect. Those requests go directly from
 your Mac to that provider and may include the source, so that provider's terms
-and privacy practices apply. Downloads, updates, standard license services,
-and hosted providers still require an internet connection.
+and privacy practices apply. Downloads, updates, optional license services, and
+hosted providers still require an internet connection.
 
 The Neovim plugin connects only to the local Refine app through a same-UID
 Unix-domain socket using Refine's current per-launch token. This boundary
