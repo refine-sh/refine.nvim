@@ -6,6 +6,9 @@ The project follows [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+- Understand suggestion-shortcuts.v2 and show modifier-only chords and
+  double-taps as unavailable without substituting a key mapping.
+
 - Support custom Apply and Dismiss key combinations configured in Refine,
   including Option+Right Arrow, with exact modifiers and restored native mappings.
 - Negotiate suggestion-shortcuts.v1 while preserving older Refine compatibility.

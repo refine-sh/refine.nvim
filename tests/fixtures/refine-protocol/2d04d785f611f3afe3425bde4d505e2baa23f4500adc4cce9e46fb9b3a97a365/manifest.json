@@ -1,13 +1,13 @@
 {
   "formatVersion": 1,
-  "releaseCandidate": "1.0.0-rc.4",
+  "releaseCandidate": "1.0.0-rc.5",
   "protocol": {
     "major": 1,
     "minor": 0
   },
-  "artifactDigest": "dd18bebe8c3ff9de0de7f8fc9dd07b501a31336c468c4f942713bfe6405bc804",
-  "baseArtifactDigest": "5e629c1fed278c6677b3b35f71aa10d80a473c5cb05c436e1a7f2c2dfd83e4aa",
-  "capabilityRegistryDigest": "427da0948e28afd81eecc825e88e365534c6c14517283dad0fcce6f760022a38",
+  "artifactDigest": "2d04d785f611f3afe3425bde4d505e2baa23f4500adc4cce9e46fb9b3a97a365",
+  "baseArtifactDigest": "c20ac8e2ec90abf6886ae27158bfe822b616cf236b90ca47a1797932cfc9497e",
+  "capabilityRegistryDigest": "272b913f65b18cd9558ecef91e28a73ebce88f5016a6df41d1b1cef6079bd192",
   "jsonPositiveCaseIds": [
     "command-open-document",
     "command-replace-document-two-sources",
@@ -236,6 +236,7 @@
     "golden-writing-session",
     "invalid-server-inputs",
     "markdown-hard-line-breaks",
+    "modifier-gestures",
     "reconnect-lost-state",
     "reconnect-resumed",
     "sequence-exhaustion",
@@ -290,13 +291,18 @@
       "kind": "reference"
     },
     {
+      "path": "reference/typescript/suggestion-binding.ts",
+      "sha256": "f2e101669c54311c10de9cae83746d3398b06611ef5457ce7a588ba7836e4a71",
+      "kind": "reference"
+    },
+    {
       "path": "reference/typescript/suggestion-shortcut.ts",
       "sha256": "b58deaebab0c3b2d950bdf13ed15146a8468e896ceed2297b05e5c6beccfe73e",
       "kind": "reference"
     },
     {
       "path": "reference/typescript/transport-session.ts",
-      "sha256": "2d7f1d80f977f8714da2cea3b42502b430278e64245d21b173c46a88539ffb64",
+      "sha256": "404209dad44bbff2ba28babbf19f556819030991b2f168b888f6ec7d72d330a2",
       "kind": "reference"
     },
     {
@@ -311,7 +317,7 @@
     },
     {
       "path": "registry/capabilities.json",
-      "sha256": "427da0948e28afd81eecc825e88e365534c6c14517283dad0fcce6f760022a38",
+      "sha256": "272b913f65b18cd9558ecef91e28a73ebce88f5016a6df41d1b1cef6079bd192",
       "kind": "registry"
     },
     {
@@ -321,12 +327,12 @@
     },
     {
       "path": "runner/conformance.py",
-      "sha256": "73d40406226f168c9f18d6b1952f92ca914b89230b1edc1f2b478ec235edc57b",
+      "sha256": "c779602f778453610f4772b2097098ce5571b2841be672f19ac6adeb422e935c",
       "kind": "runner"
     },
     {
       "path": "runner/update_manifest.py",
-      "sha256": "bf9273c72bfe235354b5777c3295ec6b8b3407eba5a630be77949f4ef068a8e6",
+      "sha256": "8487ae46e945438e2fdbdf50f1822f9bc978a5ff0f44957cd30354a97a2a9370",
       "kind": "runner"
     },
     {
@@ -365,6 +371,11 @@
       "kind": "schema"
     },
     {
+      "path": "schema/suggestion-shortcuts-v2.schema.json",
+      "sha256": "10b58d0d814e824338d75c3bffa32b789207867e90bb14447c56ee4c2b702156",
+      "kind": "schema"
+    },
+    {
       "path": "schema/suggestion-shortcuts.schema.json",
       "sha256": "09904751470a69cdc6f633720a047a9bbb78ce3edf410a83e07e213d0d8d05cb",
       "kind": "schema"
@@ -380,6 +391,11 @@
       "kind": "spec"
     },
     {
+      "path": "spec/suggestion-shortcuts-v2.md",
+      "sha256": "de63940ca66ab7f2f2d0add45928396aeab084b2df9be47c8e7703fb2799ea08",
+      "kind": "spec"
+    },
+    {
       "path": "tests/fake_server_adapter.py",
       "sha256": "a5a27d63355acbfa0d08ea07eb0f54756c9ffc377ef9cfd01ec24d31d5e558bd",
       "kind": "documentation"
@@ -391,7 +407,7 @@
     },
     {
       "path": "tests/test_suggestion_shortcuts.py",
-      "sha256": "ab274e7143030418ab4b6ca8590a241f08e5272e156b2b6c8b2f24df0965cca0",
+      "sha256": "dd6faab0e631d26f44a60d57a12179fa4283dad7e31a08aec9d5114321443523",
       "kind": "documentation"
     },
     {
@@ -445,6 +461,11 @@
       "kind": "vectors"
     },
     {
+      "path": "vectors/shortcuts/bindings-v2.json",
+      "sha256": "b88a7cbc2a0d3de005c71f6288b509d5a880b90bbd7fbdd46aec9df8b62d3ae1",
+      "kind": "vectors"
+    },
+    {
       "path": "vectors/shortcuts/bindings.json",
       "sha256": "68a5bbbbed2fe9e8ae05d1c611197b33f4c9fcea281a57fe738fe723ecc6ed9e",
       "kind": "vectors"
@@ -472,6 +493,11 @@
     {
       "path": "vectors/state/markdown-hard-line-breaks.json",
       "sha256": "15782d7a8344dc337ee23adae4e9481ee10a69a9dee0d738882cd52d26951aaa",
+      "kind": "vectors"
+    },
+    {
+      "path": "vectors/state/modifier-gestures.json",
+      "sha256": "ce0dccbaf7708682afdd6c317d62b4d4504da9f54ef96c48ad07737d7f2cf221",
       "kind": "vectors"
     },
     {

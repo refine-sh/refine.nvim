@@ -253,6 +253,10 @@ frontends and ambiguous control-key aliases may be unavailable. A combination
 owns a temporary mapping only while its suggestion is active or its card owns
 the action; previous mappings are restored when ownership ends.
 
+Held modifier combinations and modifier double-taps configured in Refine are
+unavailable through Neovim's input path. They install no fallback mapping.
+Use the existing Refine commands or explicit action mappings instead.
+
 When the configured Apply key cannot be intercepted by Neovim, the activation
 tip says `Apply shortcut unavailable`. The card explains how to configure
 another Apply key in Refine or add the Neovim mapping above. Refine does not

@@ -7,7 +7,7 @@ local M = {
   MAX_SOURCES = 2,
   MAX_SOURCE_BYTES = 1024 * 1024,
   MAX_CAPABILITIES = 64,
-  KNOWN_CAPABILITIES = { "com.runjuu.refine.suggestion-shortcuts.v1" },
+  KNOWN_CAPABILITIES = { "com.runjuu.refine.suggestion-shortcuts.v1", "com.runjuu.refine.suggestion-shortcuts.v2" },
 }
 
 local MAX_SAFE_INTEGER = 9007199254740991
@@ -424,6 +424,12 @@ function M.decode_handshake(value, offered_capabilities, known_capabilities)
     fail("malformed or incompatible welcome frame")
   end
   local activated = capability_list(value.capabilities, "welcome.capabilities")
+  if
+    vim.tbl_contains(activated, "com.runjuu.refine.suggestion-shortcuts.v1")
+    and vim.tbl_contains(activated, "com.runjuu.refine.suggestion-shortcuts.v2")
+  then
+    fail("conflicting shortcut versions activated")
+  end
   local offered = value_set(capability_list(offered_capabilities or {}, "offered capabilities"))
   local known = value_set(capability_list(known_capabilities or M.KNOWN_CAPABILITIES, "known capabilities", false))
   for _, capability in ipairs(activated) do
@@ -594,8 +600,40 @@ local shortcut_codes = {
 }
 local shortcut_modifier_names = { control = true, option = true, shift = true, command = true }
 
-local function suggestion_shortcut(value)
+local physical_modifiers =
+  { "ControlLeft", "ControlRight", "AltLeft", "AltRight", "ShiftLeft", "ShiftRight", "MetaLeft", "MetaRight" }
+
+local function suggestion_shortcut(value, version)
   value = record(value, "suggestion shortcut")
+  if version == 2 and value.kind ~= "keyCombination" then
+    if type(value.label) ~= "string" or #value.label == 0 or vim.fn.strchars(value.label) > 128 then
+      fail("invalid gesture label")
+    end
+    if value.kind == "modifierDoubleTap" and vim.tbl_contains(physical_modifiers, value.key) then
+      return { kind = value.kind, key = value.key, label = value.label }
+    end
+    if value.kind ~= "modifierChord" then
+      fail("invalid gesture kind or key")
+    end
+    local keys = list(value.keys, "gesture.keys")
+    if #keys < 2 or #keys > 8 then
+      fail("invalid chord size")
+    end
+    local seen = {}
+    for _, key in ipairs(keys) do
+      if not vim.tbl_contains(physical_modifiers, key) or seen[key] then
+        fail("invalid chord keys")
+      end
+      seen[key] = true
+    end
+    local normalized = {}
+    for _, key in ipairs(physical_modifiers) do
+      if seen[key] then
+        normalized[#normalized + 1] = key
+      end
+    end
+    return { kind = value.kind, keys = normalized, label = value.label }
+  end
   if
     not shortcut_codes[value.code]
     or type(value.key) ~= "string"
@@ -675,8 +713,8 @@ local function interaction(value, shortcuts_enabled)
   return {
     automaticChecksEnabled = value.automaticChecksEnabled,
     quickApply = {
-      applyShortcut = shortcuts_enabled and suggestion_shortcut(quick.applyShortcut) or nil,
-      dismissShortcut = shortcuts_enabled and suggestion_shortcut(quick.dismissShortcut) or nil,
+      applyShortcut = shortcuts_enabled and suggestion_shortcut(quick.applyShortcut, shortcuts_enabled) or nil,
+      dismissShortcut = shortcuts_enabled and suggestion_shortcut(quick.dismissShortcut, shortcuts_enabled) or nil,
       enabled = quick.enabled,
       applyKey = quick.applyKey,
       dismissKey = quick.dismissKey,
@@ -960,7 +998,8 @@ function M.decode_event(value, capabilities)
     epoch = value.epoch,
     event = server_event(
       value.event,
-      vim.tbl_contains(capabilities or {}, "com.runjuu.refine.suggestion-shortcuts.v1")
+      vim.tbl_contains(capabilities or {}, "com.runjuu.refine.suggestion-shortcuts.v2") and 2
+        or vim.tbl_contains(capabilities or {}, "com.runjuu.refine.suggestion-shortcuts.v1")
     ),
   }
   if value.causeCommandId ~= nil then
@@ -971,6 +1010,9 @@ end
 
 M.validate_snapshot = snapshot
 M.validate_suggestion_shortcut = suggestion_shortcut
+M.validate_suggestion_binding = function(value)
+  return suggestion_shortcut(value, 2)
+end
 M.validate_check_intent = check_intent
 
 return M

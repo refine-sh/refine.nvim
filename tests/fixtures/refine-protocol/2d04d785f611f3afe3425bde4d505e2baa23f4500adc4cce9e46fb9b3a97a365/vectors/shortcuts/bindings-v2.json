@@ -1,0 +1,125 @@
+{
+  "cases": [
+    {
+      "id": "v2-valid-0",
+      "valid": true,
+      "value": {
+        "kind": "modifierChord",
+        "keys": [
+          "AltLeft",
+          "AltRight"
+        ],
+        "label": "Left Option + Right Option"
+      }
+    },
+    {
+      "id": "v2-valid-1",
+      "valid": true,
+      "value": {
+        "kind": "modifierChord",
+        "keys": [
+          "MetaRight",
+          "ControlLeft",
+          "ShiftRight"
+        ],
+        "label": "Modifiers"
+      }
+    },
+    {
+      "id": "v2-valid-2",
+      "valid": true,
+      "value": {
+        "kind": "modifierDoubleTap",
+        "key": "AltRight",
+        "label": "Double-tap Right Option"
+      }
+    },
+    {
+      "id": "v2-valid-3",
+      "valid": true,
+      "value": {
+        "kind": "keyCombination",
+        "code": "ArrowRight",
+        "key": "ArrowRight",
+        "modifiers": [
+          "option"
+        ],
+        "label": "⌥→"
+      }
+    },
+    {
+      "id": "v2-invalid-0",
+      "valid": false,
+      "value": {
+        "kind": "modifierChord",
+        "keys": [
+          "AltLeft"
+        ],
+        "label": "Left Option + Right Option"
+      }
+    },
+    {
+      "id": "v2-invalid-1",
+      "valid": false,
+      "value": {
+        "kind": "modifierChord",
+        "keys": [
+          "AltLeft",
+          "AltLeft"
+        ],
+        "label": "Left Option + Right Option"
+      }
+    },
+    {
+      "id": "v2-invalid-2",
+      "valid": false,
+      "value": {
+        "kind": "modifierChord",
+        "keys": [
+          "AltLeft",
+          "Fn"
+        ],
+        "label": "Left Option + Right Option"
+      }
+    },
+    {
+      "id": "v2-invalid-3",
+      "valid": false,
+      "value": {
+        "kind": "modifierDoubleTap",
+        "key": "CapsLock",
+        "label": "Double-tap Right Option"
+      }
+    },
+    {
+      "id": "v2-invalid-4",
+      "valid": false,
+      "value": {
+        "kind": "modifierDoubleTap",
+        "key": "AltRight",
+        "label": ""
+      }
+    },
+    {
+      "id": "v2-invalid-5",
+      "valid": false,
+      "value": {
+        "kind": "keyCombination",
+        "code": "KeyA",
+        "key": "ArrowRight",
+        "modifiers": [],
+        "label": "⌥→"
+      }
+    },
+    {
+      "id": "v2-invalid-6",
+      "valid": false,
+      "value": {
+        "code": "ArrowRight",
+        "key": "ArrowRight",
+        "modifiers": [],
+        "label": "Right"
+      }
+    }
+  ]
+}

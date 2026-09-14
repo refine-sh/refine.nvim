@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "suggestion-shortcuts-v2.schema.json",
+  "oneOf": [
+    {
+      "allOf": [
+        {
+          "$ref": "suggestion-shortcuts.schema.json"
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "keyCombination"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "keys",
+        "label"
+      ],
+      "properties": {
+        "kind": {
+          "const": "modifierChord"
+        },
+        "keys": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "ControlLeft",
+              "ControlRight",
+              "AltLeft",
+              "AltRight",
+              "ShiftLeft",
+              "ShiftRight",
+              "MetaLeft",
+              "MetaRight"
+            ]
+          }
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "key",
+        "label"
+      ],
+      "properties": {
+        "kind": {
+          "const": "modifierDoubleTap"
+        },
+        "key": {
+          "enum": [
+            "ControlLeft",
+            "ControlRight",
+            "AltLeft",
+            "AltRight",
+            "ShiftLeft",
+            "ShiftRight",
+            "MetaLeft",
+            "MetaRight"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      }
+    }
+  ]
+}

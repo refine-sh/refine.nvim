@@ -10,6 +10,11 @@
       "id": "com.runjuu.refine.suggestion-shortcuts.v1",
       "specification": "spec/suggestion-shortcuts-v1.md",
       "digest": "99bdf4b7831f48026ff15726485c077094870f097b0e5457bb68f8f80feea4d5"
+    },
+    {
+      "id": "com.runjuu.refine.suggestion-shortcuts.v2",
+      "specification": "spec/suggestion-shortcuts-v2.md",
+      "digest": "de63940ca66ab7f2f2d0add45928396aeab084b2df9be47c8e7703fb2799ea08"
     }
   ]
 }

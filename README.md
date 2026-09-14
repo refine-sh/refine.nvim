@@ -106,6 +106,11 @@ when both Refine and this plugin support them; older versions keep the previous
 single-key bindings shown in Refine. Command combinations require Neovide;
 terminal frontends and ambiguous control-key aliases may be unavailable.
 
+Refine also records held modifier combinations and modifier double-taps. These
+gestures cannot be observed through Neovim's input path, so the plugin displays
+an unavailable message and installs no fallback mapping. Use the existing
+Refine commands or explicit action mappings instead.
+
 When the configured Apply key cannot be intercepted by Neovim, the activation
 tip says `Apply shortcut unavailable`. The card explains how to configure
 another Apply key in Refine or add the Neovim mapping above. Refine does not

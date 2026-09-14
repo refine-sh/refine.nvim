@@ -58,6 +58,21 @@ function M.conflicts(quick)
     return quick[action .. "Shortcut"] or { code = legacy_codes[quick[action .. "Key"]], modifiers = {} }
   end
   local apply, dismiss = identity("apply"), identity("dismiss")
+  local function gesture_keys(binding)
+    if binding.kind == "modifierChord" then
+      return binding.keys
+    end
+    if binding.kind == "modifierDoubleTap" then
+      return { binding.key }
+    end
+  end
+  local apply_keys, dismiss_keys = gesture_keys(apply), gesture_keys(dismiss)
+  if apply_keys and dismiss_keys then
+    return apply.kind == dismiss.kind and vim.deep_equal(apply_keys, dismiss_keys)
+  elseif apply_keys or dismiss_keys then
+    local keys, key = apply_keys or dismiss_keys, apply_keys and dismiss or apply
+    return key.code ~= nil and #key.modifiers == 0 and vim.tbl_contains(keys, key.code)
+  end
   if not apply.code or not dismiss.code then
     return false
   end
@@ -81,6 +96,9 @@ function M.lhs(quick, action)
   local shortcut = quick[action .. "Shortcut"]
   if not shortcut then
     return legacy[quick[action .. "Key"]]
+  end
+  if shortcut.kind == "modifierChord" or shortcut.kind == "modifierDoubleTap" then
+    return nil
   end
   if shortcut.code:match("^(Shift)") or shortcut.code:match("^(Alt)") or shortcut.code:match("^(Control)") then
     return nil

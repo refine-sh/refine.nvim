@@ -309,7 +309,7 @@ function Controller:_start(bufnr, winid, source_syntax)
     end,
   })
   local transport = self.transport_factory({
-    capabilities = { "com.runjuu.refine.suggestion-shortcuts.v1" },
+    capabilities = { "com.runjuu.refine.suggestion-shortcuts.v1", "com.runjuu.refine.suggestion-shortcuts.v2" },
     client = {
       id = "refine-neovim",
       version = require("refine.version").semver,

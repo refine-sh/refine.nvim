@@ -74,4 +74,17 @@ harness.test("Modifier prefix conflicts disable both custom actions", function()
   harness.equal(nil, shortcuts.lhs(quick, "dismiss"))
 end)
 
+harness.test("V2 modifier gestures stay unavailable without falling back to Tab", function()
+  local quick = {
+    applyKey = "tab",
+    dismissKey = "escape",
+    applyShortcut = { kind = "modifierChord", keys = { "AltLeft", "AltRight" }, label = "Both Options" },
+    dismissShortcut = { kind = "modifierDoubleTap", key = "AltRight", label = "Double-tap Right Option" },
+  }
+  harness.equal(nil, shortcuts.lhs(quick, "apply"))
+  harness.equal(nil, shortcuts.lhs(quick, "dismiss"))
+  harness.equal("Apply shortcut unavailable", shortcuts.tip(quick, "apply", "Apply"))
+  harness.equal("Both Options", shortcuts.label(quick, "apply"))
+end)
+
 harness.run()
