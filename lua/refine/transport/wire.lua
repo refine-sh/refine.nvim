@@ -7,7 +7,7 @@ local M = {
   MAX_SOURCES = 2,
   MAX_SOURCE_BYTES = 1024 * 1024,
   MAX_CAPABILITIES = 64,
-  KNOWN_CAPABILITIES = {},
+  KNOWN_CAPABILITIES = { "com.runjuu.refine.suggestion-shortcuts.v1" },
 }
 
 local MAX_SAFE_INTEGER = 9007199254740991
@@ -480,7 +480,181 @@ local function appearance(value)
   }
 end
 
-local function interaction(value)
+local shortcut_codes = {
+  ["KeyA"] = true,
+  ["KeyS"] = true,
+  ["KeyD"] = true,
+  ["KeyF"] = true,
+  ["KeyH"] = true,
+  ["KeyG"] = true,
+  ["KeyZ"] = true,
+  ["KeyX"] = true,
+  ["KeyC"] = true,
+  ["KeyV"] = true,
+  ["IntlBackslash"] = true,
+  ["KeyB"] = true,
+  ["KeyQ"] = true,
+  ["KeyW"] = true,
+  ["KeyE"] = true,
+  ["KeyR"] = true,
+  ["KeyY"] = true,
+  ["KeyT"] = true,
+  ["Digit1"] = true,
+  ["Digit2"] = true,
+  ["Digit3"] = true,
+  ["Digit4"] = true,
+  ["Digit6"] = true,
+  ["Digit5"] = true,
+  ["Equal"] = true,
+  ["Digit9"] = true,
+  ["Digit7"] = true,
+  ["Minus"] = true,
+  ["Digit8"] = true,
+  ["Digit0"] = true,
+  ["BracketRight"] = true,
+  ["KeyO"] = true,
+  ["KeyU"] = true,
+  ["BracketLeft"] = true,
+  ["KeyI"] = true,
+  ["KeyP"] = true,
+  ["Enter"] = true,
+  ["KeyL"] = true,
+  ["KeyJ"] = true,
+  ["Quote"] = true,
+  ["KeyK"] = true,
+  ["Semicolon"] = true,
+  ["Backslash"] = true,
+  ["Comma"] = true,
+  ["Slash"] = true,
+  ["KeyN"] = true,
+  ["KeyM"] = true,
+  ["Period"] = true,
+  ["Tab"] = true,
+  ["Space"] = true,
+  ["Backquote"] = true,
+  ["Backspace"] = true,
+  ["Escape"] = true,
+  ["ShiftLeft"] = true,
+  ["AltLeft"] = true,
+  ["ControlLeft"] = true,
+  ["ShiftRight"] = true,
+  ["AltRight"] = true,
+  ["ControlRight"] = true,
+  ["F17"] = true,
+  ["NumpadDecimal"] = true,
+  ["NumpadMultiply"] = true,
+  ["NumpadAdd"] = true,
+  ["NumLock"] = true,
+  ["NumpadDivide"] = true,
+  ["NumpadEnter"] = true,
+  ["NumpadSubtract"] = true,
+  ["F18"] = true,
+  ["F19"] = true,
+  ["NumpadEqual"] = true,
+  ["Numpad0"] = true,
+  ["Numpad1"] = true,
+  ["Numpad2"] = true,
+  ["Numpad3"] = true,
+  ["Numpad4"] = true,
+  ["Numpad5"] = true,
+  ["Numpad6"] = true,
+  ["Numpad7"] = true,
+  ["F20"] = true,
+  ["Numpad8"] = true,
+  ["Numpad9"] = true,
+  ["IntlYen"] = true,
+  ["IntlRo"] = true,
+  ["NumpadComma"] = true,
+  ["F5"] = true,
+  ["F6"] = true,
+  ["F7"] = true,
+  ["F3"] = true,
+  ["F8"] = true,
+  ["F9"] = true,
+  ["F11"] = true,
+  ["F13"] = true,
+  ["F16"] = true,
+  ["F14"] = true,
+  ["F10"] = true,
+  ["F12"] = true,
+  ["F15"] = true,
+  ["Insert"] = true,
+  ["Home"] = true,
+  ["PageUp"] = true,
+  ["Delete"] = true,
+  ["F4"] = true,
+  ["End"] = true,
+  ["F2"] = true,
+  ["PageDown"] = true,
+  ["F1"] = true,
+  ["ArrowLeft"] = true,
+  ["ArrowRight"] = true,
+  ["ArrowDown"] = true,
+  ["ArrowUp"] = true,
+}
+local shortcut_modifier_names = { control = true, option = true, shift = true, command = true }
+
+local function suggestion_shortcut(value)
+  value = record(value, "suggestion shortcut")
+  if
+    not shortcut_codes[value.code]
+    or type(value.key) ~= "string"
+    or vim.fn.strchars(value.key) > 32
+    or type(value.label) ~= "string"
+    or #value.label == 0
+    or vim.fn.strchars(value.label) > 128
+  then
+    fail("malformed suggestion shortcut")
+  end
+  local modifiers = list(value.modifiers, "shortcut.modifiers")
+  local seen = {}
+  local has_typing_modifier = false
+  for _, modifier in ipairs(modifiers) do
+    if not shortcut_modifier_names[modifier] or seen[modifier] then
+      fail("invalid shortcut modifiers")
+    end
+    seen[modifier] = true
+    if modifier ~= "shift" then
+      has_typing_modifier = true
+    end
+  end
+  if value.code:match("^Shift") or value.code:match("^Alt") or value.code:match("^Control") then
+    if #modifiers ~= 0 then
+      fail("standalone modifier cannot have modifiers")
+    end
+  else
+    local punctuation = {
+      Equal = true,
+      Minus = true,
+      BracketRight = true,
+      BracketLeft = true,
+      Quote = true,
+      Semicolon = true,
+      Backslash = true,
+      Comma = true,
+      Slash = true,
+      Period = true,
+      Backquote = true,
+    }
+    local printable = value.code:match("^Key")
+      or value.code:match("^Digit")
+      or value.code:match("^Intl")
+      or value.code:match("^Numpad")
+      or punctuation[value.code]
+    if printable and not has_typing_modifier then
+      fail("typing shortcut requires a modifier")
+    end
+  end
+  local normalized = {}
+  for _, name in ipairs({ "control", "option", "shift", "command" }) do
+    if seen[name] then
+      normalized[#normalized + 1] = name
+    end
+  end
+  return { code = value.code, key = value.key, modifiers = normalized, label = value.label }
+end
+
+local function interaction(value, shortcuts_enabled)
   value = record(value, "presentation.interaction")
   local quick = record(value.quickApply, "presentation.interaction.quickApply")
   required_keys(value, { "automaticChecksEnabled", "quickApply" }, "presentation.interaction")
@@ -501,6 +675,8 @@ local function interaction(value)
   return {
     automaticChecksEnabled = value.automaticChecksEnabled,
     quickApply = {
+      applyShortcut = shortcuts_enabled and suggestion_shortcut(quick.applyShortcut) or nil,
+      dismissShortcut = shortcuts_enabled and suggestion_shortcut(quick.dismissShortcut) or nil,
       enabled = quick.enabled,
       applyKey = quick.applyKey,
       dismissKey = quick.dismissKey,
@@ -572,11 +748,11 @@ local function suggestion(value)
   }
 end
 
-local function presentation_content(value)
+local function presentation_content(value, shortcuts_enabled)
   value = record(value, "presentation content")
   identifier(value.documentRevision, "presentation.documentRevision")
   local decoded_appearance = appearance(value.appearance)
-  local decoded_interaction = interaction(value.interaction)
+  local decoded_interaction = interaction(value.interaction, shortcuts_enabled)
   local suggestions = list(value.suggestions, "presentation.suggestions")
   local decoded_suggestions = {}
   for _, item in ipairs(suggestions) do
@@ -708,7 +884,7 @@ local function explanation_update(value)
   return { status = "stale" }
 end
 
-local function server_event(value)
+local function server_event(value, shortcuts_enabled)
   value = record(value, "server event")
   if value.type == "documentAccepted" then
     identifier(value.revision, "documentAccepted.revision")
@@ -728,7 +904,7 @@ local function server_event(value)
     return {
       type = "presentationContentReplaced",
       checkId = value.checkId,
-      content = presentation_content(value.content),
+      content = presentation_content(value.content, shortcuts_enabled),
     }
   elseif value.type == "applyRequested" then
     identifier(value.actionId, "applyRequested.actionId")
@@ -769,7 +945,7 @@ local function server_event(value)
   end
 end
 
-function M.decode_event(value)
+function M.decode_event(value, capabilities)
   value = record(value, "event envelope")
   if value.type ~= "event" or not is_uint32(value.sequence) or value.sequence == 0 then
     fail("malformed server event envelope")
@@ -782,7 +958,10 @@ function M.decode_event(value)
     type = "event",
     sequence = value.sequence,
     epoch = value.epoch,
-    event = server_event(value.event),
+    event = server_event(
+      value.event,
+      vim.tbl_contains(capabilities or {}, "com.runjuu.refine.suggestion-shortcuts.v1")
+    ),
   }
   if value.causeCommandId ~= nil then
     decoded.causeCommandId = value.causeCommandId
@@ -791,6 +970,7 @@ function M.decode_event(value)
 end
 
 M.validate_snapshot = snapshot
+M.validate_suggestion_shortcut = suggestion_shortcut
 M.validate_check_intent = check_intent
 
 return M

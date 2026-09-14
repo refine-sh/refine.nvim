@@ -1,0 +1,110 @@
+{
+  "cases": [
+    {
+      "id": "option-arrow",
+      "valid": true,
+      "value": {
+        "code": "ArrowRight",
+        "key": "ArrowRight",
+        "modifiers": [
+          "option"
+        ],
+        "label": "⌥→"
+      }
+    },
+    {
+      "id": "shift-arrow",
+      "valid": true,
+      "value": {
+        "code": "ArrowRight",
+        "key": "ArrowRight",
+        "modifiers": [
+          "shift"
+        ],
+        "label": "⌥→"
+      }
+    },
+    {
+      "id": "letter",
+      "valid": true,
+      "value": {
+        "code": "KeyK",
+        "key": "k",
+        "modifiers": [
+          "control",
+          "option"
+        ],
+        "label": "⌃⌥K"
+      }
+    },
+    {
+      "id": "modifier-only",
+      "valid": true,
+      "value": {
+        "code": "ShiftRight",
+        "key": "ShiftRight",
+        "modifiers": [],
+        "label": "Right Shift"
+      }
+    },
+    {
+      "id": "duplicate-modifier",
+      "valid": false,
+      "value": {
+        "code": "ArrowRight",
+        "key": "ArrowRight",
+        "modifiers": [
+          "option",
+          "option"
+        ],
+        "label": "⌥→"
+      }
+    },
+    {
+      "id": "unknown-code",
+      "valid": false,
+      "value": {
+        "code": "Unknown",
+        "key": "ArrowRight",
+        "modifiers": [
+          "option"
+        ],
+        "label": "⌥→"
+      }
+    },
+    {
+      "id": "unmodified-letter",
+      "valid": false,
+      "value": {
+        "code": "KeyK",
+        "key": "k",
+        "modifiers": [],
+        "label": "K"
+      }
+    },
+    {
+      "id": "shift-letter",
+      "valid": false,
+      "value": {
+        "code": "KeyK",
+        "key": "k",
+        "modifiers": [
+          "shift"
+        ],
+        "label": "⇧K"
+      }
+    },
+    {
+      "id": "modifier-combination",
+      "valid": false,
+      "value": {
+        "code": "AltLeft",
+        "key": "AltLeft",
+        "modifiers": [
+          "shift"
+        ],
+        "label": "Shift Option"
+      }
+    }
+  ]
+}

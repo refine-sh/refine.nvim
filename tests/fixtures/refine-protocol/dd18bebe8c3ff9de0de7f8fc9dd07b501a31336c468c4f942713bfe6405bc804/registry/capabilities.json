@@ -1,0 +1,15 @@
+{
+  "registrySchema": "../schema/capability-registry.schema.json",
+  "schemaVersion": 1,
+  "protocol": {
+    "major": 1,
+    "minor": 0
+  },
+  "capabilities": [
+    {
+      "id": "com.runjuu.refine.suggestion-shortcuts.v1",
+      "specification": "spec/suggestion-shortcuts-v1.md",
+      "digest": "99bdf4b7831f48026ff15726485c077094870f097b0e5457bb68f8f80feea4d5"
+    }
+  ]
+}

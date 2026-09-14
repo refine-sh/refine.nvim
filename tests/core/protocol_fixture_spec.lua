@@ -110,7 +110,12 @@ local function load_fixture_bundle()
   local registry = vim.json.decode(registry_data, { luanil = { object = true, array = true } })
   assert_equal(1, registry.schemaVersion)
   assert_equal(pin.protocol, registry.protocol)
-  assert_equal({}, registry.capabilities)
+  assert_equal(1, #registry.capabilities)
+  assert_equal("com.runjuu.refine.suggestion-shortcuts.v1", registry.capabilities[1].id)
+  assert_equal(
+    registry.capabilities[1].digest,
+    sha256.hex(read_bytes(artifact_root .. "/" .. registry.capabilities[1].specification))
+  )
 
   local state_ids = {}
   local states = {}
@@ -131,6 +136,12 @@ local function load_fixture_bundle()
       end
       state_ids[#state_ids + 1] = vector.id
       states[vector.id] = vector
+    elseif artifact.path:match("^vectors/shortcuts/") then
+      local collection = decode_json(artifact_root .. "/" .. artifact.path)
+      for _, case in ipairs(collection.cases) do
+        local ok = pcall(require("refine.transport.wire").validate_suggestion_shortcut, case.value)
+        assert_equal(case.valid, ok)
+      end
     elseif artifact.path:match("^vectors/") then
       local collection = decode_json(artifact_root .. "/" .. artifact.path)
       assert_equal(1, collection.formatVersion)
@@ -156,7 +167,7 @@ local function load_fixture_bundle()
   assert_equal(141, #manifest.jsonPositiveCaseIds)
   assert_equal(62, #manifest.jsonNegativeCaseIds)
   assert_equal(13, #manifest.frameCaseIds)
-  assert_equal(10, #manifest.stateScenarioIds)
+  assert_equal(11, #manifest.stateScenarioIds)
   assert_equal(manifest.jsonPositiveCaseIds, json_positive_ids)
   assert_equal(manifest.jsonNegativeCaseIds, json_negative_ids)
   assert_equal(manifest.frameCaseIds, frame_ids)

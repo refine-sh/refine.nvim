@@ -136,7 +136,7 @@ function Session:_accept_frame(value)
   if self.closed or self.ended then
     return
   end
-  local ok, envelope = pcall(wire.decode_event, value)
+  local ok, envelope = pcall(wire.decode_event, value, self.capabilities)
   if not ok then
     self:_end(envelope)
     return

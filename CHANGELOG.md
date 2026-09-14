@@ -4,6 +4,13 @@ All notable changes to Refine for Neovim will be documented here.
 
 The project follows [Semantic Versioning](https://semver.org/).
 
+## Unreleased
+
+- Support custom Apply and Dismiss key combinations configured in Refine,
+  including Option+Right Arrow, with exact modifiers and restored native mappings.
+- Negotiate suggestion-shortcuts.v1 while preserving older Refine compatibility.
+- Show availability warnings for unsupported or ambiguous frontend shortcuts.
+
 ## [1.0.0] - 2026-08-17
 
 First public release. Refine for Neovim presents the Refine grammar checker's

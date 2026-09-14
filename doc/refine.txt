@@ -243,6 +243,16 @@ Example: >lua
     vim.keymap.set("n", "[r", "<Plug>(RefinePrevious)")
     vim.keymap.set("n", "<leader>ra", "<Plug>(RefineApply)")
 <
+CUSTOM SUGGESTION SHORTCUTS                             *refine-shortcuts*
+
+Record custom Apply and Dismiss combinations in Refine's Shortcuts settings,
+such as Option+Right Arrow or Control+Option+K. Both the app and plugin must
+support custom combinations. Older versions keep the previous single-key
+bindings shown in Refine. Command combinations require Neovide; terminal
+frontends and ambiguous control-key aliases may be unavailable. A combination
+owns a temporary mapping only while its suggestion is active or its card owns
+the action; previous mappings are restored when ownership ends.
+
 When the configured Apply key cannot be intercepted by Neovim, the activation
 tip says `Apply shortcut unavailable`. The card explains how to configure
 another Apply key in Refine or add the Neovim mapping above. Refine does not

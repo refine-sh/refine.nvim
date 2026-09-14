@@ -1,3 +1,4 @@
+local shortcuts = require("refine.nvim.shortcuts")
 local coordinates = require("refine.nvim.coordinates")
 local mappings = require("refine.nvim.mappings")
 
@@ -9,17 +10,6 @@ local Presentation = {}
 Presentation.__index = Presentation
 
 local kind_priority = { grammar = 1, mixed = 2, fluency = 3 }
-local action_keys = {
-  delete = "<BS>",
-  downArrow = "<Down>",
-  escape = "<Esc>",
-  leftArrow = "<Left>",
-  ["return"] = "<CR>",
-  rightArrow = "<Right>",
-  space = "<Space>",
-  tab = "<Tab>",
-  upArrow = "<Up>",
-}
 local card_control_aliases = {
   ["<Tab>"] = "<C-I>",
   ["<Esc>"] = "<C-[>",
@@ -43,15 +33,6 @@ local function quick_action_tip(key, action)
     return ("[%s] %s"):format(label, action)
   end
   return action .. " shortcut unavailable"
-end
-
-local function action_key_label(key)
-  local label = key_labels[key]
-  if label then
-    return label
-  end
-  local words = key:gsub("(%l)(%u)", "%1 %2")
-  return (words:gsub("^%l", string.upper))
 end
 
 local left_mouse = vim.keycode("<LeftMouse>")
@@ -320,17 +301,17 @@ local function card_content(suggestion, feedback, interaction, appearance, focus
   if quick then
     local can_apply = has_action(suggestion, "apply")
     local can_dismiss = has_action(suggestion, "dismiss")
-    if can_apply and can_dismiss and quick.applyKey == quick.dismissKey then
+    if can_apply and can_dismiss and shortcuts.conflicts(quick) then
       lines[#lines + 1] = ""
       lines[#lines + 1] = "Configured Apply and Dismiss keys conflict; use [a] or [d]."
     end
-    if can_apply and not action_keys[quick.applyKey] then
+    if can_apply and not shortcuts.lhs(quick, "apply") then
       lines[#lines + 1] = ""
-      lines[#lines + 1] = ("%s cannot be intercepted by Neovim."):format(action_key_label(quick.applyKey))
+      lines[#lines + 1] = ("%s cannot be intercepted by Neovim."):format(shortcuts.label(quick, "apply"))
       lines[#lines + 1] = "Configure another Apply key in Refine, or add a Neovim mapping:"
       lines[#lines + 1] = 'vim.keymap.set("n", "<leader>ra", "<Plug>(RefineApply)")'
     end
-    if can_dismiss and not action_keys[quick.dismissKey] then
+    if can_dismiss and not shortcuts.lhs(quick, "dismiss") then
       lines[#lines + 1] = "Configured Dismiss key is unavailable in Neovim; use [d]."
     end
   end
@@ -557,8 +538,8 @@ function Presentation:_install_card_mappings()
   end
 
   local quick_apply = self.snapshot.interaction.quickApply
-  local apply_lhs = action_keys[quick_apply.applyKey]
-  local dismiss_lhs = action_keys[quick_apply.dismissKey]
+  local apply_lhs = shortcuts.lhs(quick_apply, "apply")
+  local dismiss_lhs = shortcuts.lhs(quick_apply, "dismiss")
   if apply_lhs == dismiss_lhs then
     return
   end
@@ -583,8 +564,8 @@ end
 function Presentation:_install_owner_card_mappings(suggestion)
   self.card_owner_mappings:restore()
   local quick_apply = self.snapshot.interaction.quickApply
-  local apply_lhs = action_keys[quick_apply.applyKey]
-  local dismiss_lhs = action_keys[quick_apply.dismissKey]
+  local apply_lhs = shortcuts.lhs(quick_apply, "apply")
+  local dismiss_lhs = shortcuts.lhs(quick_apply, "dismiss")
   if apply_lhs == dismiss_lhs then
     return
   end
@@ -612,8 +593,8 @@ function Presentation:_refresh_card_controls()
   end
   local quick_apply = self.snapshot.interaction.quickApply
   local next_configured_lhs = {
-    apply = action_keys[quick_apply.applyKey],
-    dismiss = action_keys[quick_apply.dismissKey],
+    apply = shortcuts.lhs(quick_apply, "apply"),
+    dismiss = shortcuts.lhs(quick_apply, "dismiss"),
   }
   self.card_configured_key_changed = {
     apply = self.card_last_configured_lhs.apply ~= next_configured_lhs.apply,
@@ -1106,7 +1087,11 @@ function Presentation:_render_activation(suggestion)
     vim.api.nvim_buf_set_extmark(self.bufnr, activation_namespace, position.row, position.byte_col, {
       virt_text = {
         {
-          (" %s · %s"):format(quick_action_tip(quick.applyKey, "Apply"), quick_action_tip(quick.dismissKey, "Cancel")),
+          (" %s · %s"):format(
+            quick.applyShortcut and shortcuts.tip(quick, "apply", "Apply") or quick_action_tip(quick.applyKey, "Apply"),
+            quick.dismissShortcut and shortcuts.tip(quick, "dismiss", "Cancel")
+              or quick_action_tip(quick.dismissKey, "Cancel")
+          ),
           "Comment",
         },
       },
@@ -1120,8 +1105,8 @@ function Presentation:_install_quick_mappings(suggestion)
   self:_clear_activation()
   self.active_suggestion_id = suggestion.id
   local quick_apply = self.snapshot.interaction.quickApply
-  local apply_lhs = action_keys[quick_apply.applyKey]
-  local dismiss_lhs = action_keys[quick_apply.dismissKey]
+  local apply_lhs = shortcuts.lhs(quick_apply, "apply")
+  local dismiss_lhs = shortcuts.lhs(quick_apply, "dismiss")
   self:_render_activation(suggestion)
 
   if apply_lhs == dismiss_lhs then

@@ -1,19 +1,28 @@
 {
   "formatVersion": 1,
-  "releaseCandidate": "1.0.0-rc.3",
-  "protocol": { "major": 1, "minor": 0 },
-  "protocolCommit": "e2f9c47e324b166f41a49dd9d7b4ea2bcea388f0",
-  "artifactDirectory": "0ef58e1926dcf25bb5ac81389d3a8cde579483b81acc49894df7f2cbcbc4198c",
-  "upstreamArtifactDigest": "0ef58e1926dcf25bb5ac81389d3a8cde579483b81acc49894df7f2cbcbc4198c",
-  "vendoredSubset": {
-    "artifactCount": 28,
-    "digest": "750a42cb1cbf1e853e200f283fde1329ef5292d55fc1a5fdc73f9bcaca590219",
-    "canonicalization": "manifest order: UTF-8 path, NUL, lowercase SHA-256, LF",
-    "includedKinds": ["schema", "vectors"],
-    "includedPaths": ["registry/capabilities.json"]
+  "releaseCandidate": "1.0.0-rc.4",
+  "protocol": {
+    "major": 1,
+    "minor": 0
   },
-  "manifestDigest": "863cfa35e7b7be8e59cbbf09c81d45aaa873e58dfdc06b7bcc961cfd5837dba9",
-  "baseArtifactDigest": "4c5fff1efacaa68728f6602449b25b482432f312afe7c556e793d4535fb9310d",
-  "capabilityRegistryDigest": "c36bc7945b37764c7594d526be7a038e6b4dd3bf4238be661e5f8aad00d6dc24",
+  "protocolCommit": "900e29603ecf3e190529a92eb1843e018183414c",
+  "artifactDirectory": "dd18bebe8c3ff9de0de7f8fc9dd07b501a31336c468c4f942713bfe6405bc804",
+  "upstreamArtifactDigest": "dd18bebe8c3ff9de0de7f8fc9dd07b501a31336c468c4f942713bfe6405bc804",
+  "vendoredSubset": {
+    "artifactCount": 32,
+    "digest": "214009c0b62581626303a28965b8ed5eb486790ddc15bfc3d0004397e130013d",
+    "canonicalization": "manifest order: UTF-8 path, NUL, lowercase SHA-256, LF",
+    "includedKinds": [
+      "schema",
+      "vectors"
+    ],
+    "includedPaths": [
+      "registry/capabilities.json",
+      "spec/suggestion-shortcuts-v1.md"
+    ]
+  },
+  "manifestDigest": "9807d7a01b230f318c3259bd9c5c0547e47bb7310b98b15c91013a9229f9c120",
+  "baseArtifactDigest": "5e629c1fed278c6677b3b35f71aa10d80a473c5cb05c436e1a7f2c2dfd83e4aa",
+  "capabilityRegistryDigest": "427da0948e28afd81eecc825e88e365534c6c14517283dad0fcce6f760022a38",
   "goldenVectorDigest": "a4f62e6c8060d7e748451a01126d161668bb88c1a6a9b2ea1f05854ebda11e73"
 }
