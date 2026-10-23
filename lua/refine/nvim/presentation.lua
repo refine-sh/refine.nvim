@@ -172,6 +172,11 @@ local function define_active_highlight()
   vim.api.nvim_set_hl(0, "RefineActive", { bold = true, underline = true })
 end
 
+function Presentation:invalidate()
+  self.snapshot = nil
+  self.actions = nil
+end
+
 function Presentation:clear()
   self:close(false)
   self:_clear_activation()
@@ -179,8 +184,7 @@ function Presentation:clear()
   if vim.api.nvim_buf_is_valid(self.bufnr) then
     vim.api.nvim_buf_clear_namespace(self.bufnr, namespace, 0, -1)
   end
-  self.snapshot = nil
-  self.actions = nil
+  self:invalidate()
 end
 
 local function candidate_before(left, right)

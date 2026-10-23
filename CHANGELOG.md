@@ -6,6 +6,9 @@ The project follows [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+- Prevent Unicode-scalar boundary errors when editing text with active Quick
+  Apply tips or an open suggestion card.
+
 - Understand suggestion-shortcuts.v2 and show modifier-only chords and
   double-taps as unavailable without substituting a key mapping.
 

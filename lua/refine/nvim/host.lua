@@ -173,6 +173,7 @@ function Host:_schedule_refresh(source_may_have_changed)
 end
 
 function Host:_schedule_presentation_clear()
+  self.presentation:invalidate()
   self.presentation_clear_epoch = self.presentation_epoch
   if self.presentation_clear_scheduled then
     return

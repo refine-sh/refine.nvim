@@ -71,7 +71,7 @@ local function suggestion(lines, options)
   }
 end
 
-local function present(lines, suggestions, actions)
+local function present(lines, suggestions, actions, interaction_settings)
   vim.cmd.only()
   vim.cmd.enew({ bang = true })
   local bufnr = vim.api.nvim_get_current_buf()
@@ -88,10 +88,100 @@ local function present(lines, suggestions, actions)
     checkGeneration = 1,
     state = { type = "complete", coverage = "full" },
     appearance = appearance,
-    interaction = interaction,
+    interaction = interaction_settings or interaction,
     suggestions = suggestions,
   }, actions or {})
   return host, bufnr, owner_win
+end
+
+harness.test("closes a suggestion card without callback errors after deleting from its source", function()
+  local lines = { "Is that you dog?" }
+  local item = suggestion(lines, {
+    activation_start_row = 0,
+    activation_finish_row = 0,
+    highlight_rows = { 0 },
+  })
+  item.highlightRanges = { vim.deepcopy(item.activationRange) }
+  local host, bufnr, owner_win = present(lines, { item })
+  local detach = host:observe(function() end, function() end)
+  vim.api.nvim_win_set_cursor(owner_win, { 1, 0 })
+  harness.equal(true, host:show())
+  vim.api.nvim_set_current_win(owner_win)
+  harness.equal(true, vim.api.nvim_win_is_valid(host.presentation:card_window()))
+  vim.cmd("messages clear")
+  vim.v.errmsg = ""
+
+  vim.api.nvim_feedkeys("x", "xt", false)
+  local closed = vim.wait(1000, function()
+    return host.presentation:card_window() == nil
+  end)
+  local messages = vim.api.nvim_exec2("messages", { output = true }).output
+  local outcome = {
+    buffer = vim.api.nvim_buf_get_lines(bufnr, 0, -1, true),
+    closed = closed,
+    callback_error = messages:lower():find("lua callback", 1, true) ~= nil,
+    errmsg = vim.v.errmsg,
+  }
+  detach()
+  host:deactivate()
+
+  harness.equal({
+    buffer = { "s that you dog?" },
+    closed = true,
+    callback_error = false,
+    errmsg = "",
+  }, outcome)
+end)
+
+for _, case in ipairs({
+  { name = "end of buffer", text = "Is that you dog?" },
+  { name = "Unicode boundary", text = "Is that you dog?😀" },
+  { name = "following sentence", text = "Is that you dog? Another sentence." },
+}) do
+  harness.test("discards Quick Apply tips after source deletion at " .. case.name, function()
+    local lines = { case.text }
+    local item = suggestion(lines, {
+      activation_start_row = 0,
+      activation_finish_row = 0,
+      highlight_rows = { 0 },
+    })
+    item.activationRange = { location = 0, length = 16 }
+    item.highlightRanges = { { location = 8, length = 3 } }
+    local settings = vim.deepcopy(interaction)
+    settings.quickApply.enabled = true
+    settings.quickApply.activationStyle = "showTipAndHighlight"
+    local host, bufnr, owner_win = present(lines, { item }, {}, settings)
+    local detach = host:observe(function() end, function() end)
+    vim.api.nvim_win_set_cursor(owner_win, { 1, 0 })
+    vim.api.nvim_exec_autocmds("CursorMoved", { buffer = bufnr })
+    harness.equal("Refine Apply suggestion", vim.fn.maparg("<Tab>", "n", false, true).desc)
+    vim.cmd("messages clear")
+    vim.v.errmsg = ""
+
+    vim.api.nvim_feedkeys("x", "xt", false)
+    vim.api.nvim_exec_autocmds("CursorMoved", { buffer = bufnr })
+    local cleared = vim.wait(1000, function()
+      return #vim.api.nvim_buf_get_extmarks(bufnr, -1, 0, -1, {}) == 0
+    end)
+    local messages = vim.api.nvim_exec2("messages", { output = true }).output
+    local outcome = {
+      buffer = vim.api.nvim_buf_get_lines(bufnr, 0, -1, true),
+      cleared = cleared,
+      callback_error = messages:lower():find("lua callback", 1, true) ~= nil,
+      errmsg = vim.v.errmsg,
+      mapping = vim.fn.maparg("<Tab>", "n", false, true),
+    }
+    detach()
+    host:deactivate()
+
+    harness.equal({
+      buffer = { case.text:sub(2) },
+      cleared = true,
+      callback_error = false,
+      errmsg = "",
+      mapping = {},
+    }, outcome)
+  end)
 end
 
 harness.test("anchors below the first visible suggestion highlight", function()
