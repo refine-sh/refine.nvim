@@ -225,4 +225,81 @@ harness.test("refuses Apply after the buffer becomes structurally ineligible", f
   harness.equal({ "cat" }, vim.api.nvim_buf_get_lines(bufnr, 0, -1, true))
 end)
 
+local function apply_host_quote_result(expected, observed, fail_after_write)
+  vim.cmd.enew({ bang = true })
+  local bufnr = vim.api.nvim_get_current_buf()
+  vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, { "Before" })
+  local source = require("refine.nvim.source").new({
+    bufnr = bufnr,
+    source_syntax = "plainText",
+    run_id = "quotes",
+  })
+  local before = source:snapshot()
+  local original_set_text = vim.api.nvim_buf_set_text
+  local dispatches = 0
+  vim.api.nvim_buf_set_text = function(buffer, start_row, start_col, end_row, end_col, replacement)
+    dispatches = dispatches + 1
+    harness.equal(bufnr, buffer)
+    harness.equal({ expected }, replacement)
+    original_set_text(buffer, start_row, start_col, end_row, end_col, { observed })
+    if fail_after_write then
+      error("write outcome unknown")
+    end
+  end
+
+  local ok, outcome = xpcall(function()
+    return require("refine.nvim.apply").apply(source, {
+      expectedRevision = before.revision,
+      sourceId = "document",
+      edits = {
+        { range = { location = 0, length = 6 }, expectedText = "Before", replacement = expected },
+      },
+    })
+  end, debug.traceback)
+  vim.api.nvim_buf_set_text = original_set_text
+  assert(ok, outcome)
+  harness.equal(1, dispatches)
+  harness.equal(observed, outcome.snapshot.sources[1].text)
+  harness.equal({ observed }, vim.api.nvim_buf_get_lines(bufnr, 0, -1, true))
+  assert(before.revision ~= outcome.snapshot.revision)
+  return outcome
+end
+
+for _, pair in ipairs({
+  { "It's ready.", "It’s ready." },
+  { "It’s ready.", "It's ready." },
+  { "'Ready'", "‘Ready’" },
+  { '"Ready"', "“Ready”" },
+  { "“Ready”", '"Ready"' },
+  { '😀 é says "it\'s ready".', "😀 é says “it’s ready”." },
+}) do
+  harness.test("reports actual host quote styles after successful dispatch: " .. pair[1], function()
+    local outcome = apply_host_quote_result(pair[1], pair[2])
+    harness.equal("applied", outcome.status)
+  end)
+end
+
+for _, pair in ipairs({
+  { "It's ready.", "It′s ready." },
+  { "It's ready.", "Itʼs ready." },
+  { "It's ready.", "It‚s ready." },
+  { "'Ready'", "`Ready`" },
+  { "'Ready'", "“Ready”" },
+  { "It's ready.", "Its ready." },
+  { "It's ready.", "It’s  ready." },
+  { "It's ready.", "It’s late." },
+  { "A'B", "AB’" },
+  { '😀 "Ready"', "😃 “Ready”" },
+}) do
+  harness.test("keeps other host changes indeterminate: " .. pair[2], function()
+    local outcome = apply_host_quote_result(pair[1], pair[2])
+    harness.equal("indeterminate", outcome.status)
+  end)
+end
+
+harness.test("a thrown write remains indeterminate even when only quote styles changed", function()
+  local outcome = apply_host_quote_result("It's ready.", "It’s ready.", true)
+  harness.equal("indeterminate", outcome.status)
+end)
+
 harness.run()

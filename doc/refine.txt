@@ -191,6 +191,9 @@ instead of applied.
     Multiple edits are composed inside their smallest enclosing buffer range
     and dispatched as one mutation. Third-party extmarks inside that envelope
     therefore follow Neovim's gravity rules for one enclosing replacement.
+    After a successful write, equivalent straight or curly quotes supplied by
+    buffer tooling are passed to Refine for final validation. The actual buffer
+    text is reported unchanged; other text changes remain indeterminate.
 
                                                      *:RefineDismiss*
 :RefineDismiss

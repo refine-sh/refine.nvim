@@ -199,6 +199,10 @@ default. You can add another Neovim filetype or disable a default through
 Only ordinary, editable, valid UTF-8 buffers within the configured size limit
 are eligible. Refine never changes file format or end-of-line settings.
 
+After a successful Apply write, equivalent straight or curly quotes supplied by
+buffer tooling are passed to Refine for final validation. The plugin reports the
+actual buffer text; other text changes still leave the outcome uncertain.
+
 ## Local AI and privacy
 
 The plugin sends a complete canonical snapshot of each eligible buffer to the

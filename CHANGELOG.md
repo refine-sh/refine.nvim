@@ -6,6 +6,9 @@ The project follows [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+- Pass equivalent straight or curly quotes from successful Apply writes to
+  Refine for final validation, preserving the actual buffer text.
+
 - Prevent Unicode-scalar boundary errors when editing text with active Quick
   Apply tips or an open suggestion card.
 

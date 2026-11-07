@@ -2,6 +2,15 @@ local coordinates = require("refine.nvim.coordinates")
 
 local M = {}
 
+local function fold_host_quotes(text)
+  return (text:gsub("‘", "'"):gsub("’", "'"):gsub("“", '"'):gsub("”", '"'))
+end
+
+local function matches_host_quote_result(expected, actual)
+  -- Each substitution preserves one UTF-16 unit; every other byte stays exact.
+  return actual == expected or fold_host_quotes(actual) == fold_host_quotes(expected)
+end
+
 local function resume_insert_before_typeahead(command)
   vim.api.nvim_feedkeys(vim.keycode(command .. "<C-G>u"), "ni", false)
 end
@@ -194,7 +203,8 @@ function M.apply(source, request)
   end
 
   local after = source:snapshot()
-  if after.sources[1].text ~= expected_text then
+  -- Refine validates protected source and prose against this unchanged snapshot.
+  if not matches_host_quote_result(expected_text, after.sources[1].text) then
     return { status = "indeterminate", snapshot = after }
   end
 
