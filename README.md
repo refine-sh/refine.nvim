@@ -1,27 +1,26 @@
 <div align="center">
-  <a href="https://refine.sh?utm_source=refine.nvim&utm_medium=readme">
+  <a href="https://refine.sh?utm_source=refine-nvim&utm_medium=referral&utm_campaign=dev_plugin_readme">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="https://refine.sh/icon-dark.png">
       <img src="https://refine.sh/icon.png" width="128" alt="Refine icon">
     </picture>
   </a>
   <h1>Refine.nvim</h1>
-  <p><strong>A local-first AI grammar checker and writing assistant for Neovim, powered by <a href="https://refine.sh?utm_source=refine.nvim&utm_medium=readme">Refine</a>.</strong></p>
+  <p><strong>A local-first AI grammar checker and writing assistant for Neovim, powered by <a href="https://refine.sh?utm_source=refine-nvim&utm_medium=referral&utm_campaign=dev_plugin_readme">Refine</a>.</strong></p>
   <p>
-    <a href="https://refine.sh?utm_source=refine.nvim&utm_medium=readme"><img src="https://img.shields.io/badge/macOS-14%2B-111111?logo=apple" alt="macOS 14 or newer"></a>
+    <a href="https://refine.sh?utm_source=refine-nvim&utm_medium=referral&utm_campaign=dev_plugin_readme"><img src="https://img.shields.io/badge/macOS-14%2B-111111?logo=apple" alt="macOS 14 or newer"></a>
     <a href="https://neovim.io"><img src="https://img.shields.io/badge/Neovim-0.11%2B-57A143?logo=neovim&logoColor=white" alt="Neovim 0.11 or newer"></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT license"></a>
   </p>
 </div>
 
-Refine is an AI grammar checker powered by a local language model, so it can run
-entirely offline. This plugin brings its contextual grammar and fluency
-suggestions to Neovim, helping you improve your writing without leaving your
-editor.
+Refine is an AI grammar checker for Mac. It checks your writing with a local
+model, so checks keep working offline once the model is downloaded. This
+plugin brings its grammar and fluency suggestions into Neovim.
 
 Features:
 
-- Private, offline checks powered by a local LLM on your device
+- Grammar and fluency checks with a local model on your Mac
 - Native highlights and floating cards for reviewing changes in context
 - Clear explanations of why each change is suggested
 
@@ -35,8 +34,9 @@ Features:
 - Neovim 0.11+
 - Refine 1.35+
 
-Refine is free to use for grammar and fluency checks, with no account or credit
-card required.
+Basic grammar checks are free. Every feature has a 7-day free trial, with no
+account needed. A one-time license is $38 for 1 Mac or $68 for 3 Macs. See
+[pricing](https://refine.sh/?utm_source=refine-nvim&utm_medium=referral&utm_campaign=dev_plugin_readme#pricing).
 
 ## Quick Start
 
@@ -48,7 +48,7 @@ Install Refine with Homebrew:
 brew install --cask refine
 ```
 
-You can also [download Refine for Mac](https://refine.sh?utm_source=refine.nvim&utm_medium=readme)
+You can also [download Refine for Mac](https://refine.sh?utm_source=refine-nvim&utm_medium=referral&utm_campaign=dev_plugin_readme)
 directly.
 
 ### 2. Install `refine.nvim`
@@ -208,8 +208,9 @@ working offline.
 
 Refine can also use a provider you connect. Those requests go directly from
 your Mac to that provider and may include the source, so that provider's terms
-and privacy practices apply. Downloads, updates, optional license services, and
-hosted providers still require an internet connection.
+and privacy practices apply. With a local model, Refine still uses the network
+for the model download, app updates, license activation, crash reports, and a
+launch ping. Hosted providers also need a connection.
 
 The Neovim plugin connects only to the local Refine app through a same-UID
 Unix-domain socket using Refine's current per-launch token. This boundary
@@ -225,9 +226,9 @@ it, the Refine app may send original and revised excerpts plus suggestion,
 model, language, custom-instruction, Refine-version, and macOS-version context
 to Refine's feedback service.
 
-Read [How Refine works](https://refine.sh/guides/how-refine-works?utm_source=refine.nvim&utm_medium=readme),
-the [offline grammar checker guide](https://refine.sh/guides/offline-grammar-checker-mac?utm_source=refine.nvim&utm_medium=readme),
-and the [privacy policy](https://refine.sh/privacy-policy?utm_source=refine.nvim&utm_medium=readme)
+Read [How Refine works](https://refine.sh/guides/how-refine-works?utm_source=refine-nvim&utm_medium=referral&utm_campaign=dev_plugin_readme),
+the [offline grammar checker guide](https://refine.sh/guides/offline-grammar-checker-mac?utm_source=refine-nvim&utm_medium=referral&utm_campaign=dev_plugin_readme),
+and the [privacy policy](https://refine.sh/privacy-policy?utm_source=refine-nvim&utm_medium=referral&utm_campaign=dev_plugin_readme)
 for full details.
 
 ## Protocol compatibility and support
