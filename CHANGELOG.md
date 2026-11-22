@@ -6,6 +6,9 @@ The project follows [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+- Negotiate wavy-underline-highlight.v1 and draw Refine's Wavy Underline
+  suggestion style as an undercurl in the suggestion color.
+
 - Pass equivalent straight or curly quotes from successful Apply writes to
   Refine for final validation, preserving the actual buffer text.
 

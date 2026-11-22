@@ -78,6 +78,8 @@ local function highlight_attributes(style, color)
     return { bg = color_number(color) }
   elseif style == "dashedUnderline" then
     return { sp = color_number(color), underdashed = true }
+  elseif style == "wavyUnderline" then
+    return { sp = color_number(color), undercurl = true }
   end
   return { sp = color_number(color), underline = true }
 end

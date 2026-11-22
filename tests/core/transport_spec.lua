@@ -257,6 +257,36 @@ describe("Refine Protocol 1.0 transport", function()
     assert_equal({ capability }, session.capabilities)
   end)
 
+  it("offers and activates the wavy underline capability by default", function()
+    local capability = "com.runjuu.refine.wavy-underline-highlight.v1"
+    local fixture = fake_transport_fixture({
+      handshake = {
+        type = "welcome",
+        protocol = { major = 1, minor = 0 },
+        serverEpoch = "epoch-1",
+        runResumed = false,
+        limits = { maxFrameBytes = 8388608, maxSources = 2, maxSourceBytes = 1048576 },
+        capabilities = { capability },
+      },
+    })
+    local client = require("refine.transport").new({
+      client = { id = "refine-neovim", version = "0.1.0", host = "neovim" },
+      host_capabilities = { interceptableSuggestionActionKeys = {} },
+      capabilities = { capability },
+      endpoint_locator = fixture.locator,
+      connector = fixture.connector,
+    })
+    local session
+
+    client:connect({ run_id = "run-1" }, function(err, value)
+      assert_equal(nil, err)
+      session = value
+    end)
+
+    assert_equal({ capability }, fixture.sent[1].capabilities)
+    assert_equal({ capability }, session.capabilities)
+  end)
+
   it("rejects invalid capability offers before endpoint discovery", function()
     local capability = "com.example.refine.optional-metadata.v1"
     local too_many = {}

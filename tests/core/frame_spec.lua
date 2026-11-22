@@ -460,6 +460,59 @@ describe("length-prefixed JSON frames", function()
     end
   end)
 
+  it("accepts a wavy underline style only after its capability is activated", function()
+    local wire = require("refine.transport.wire")
+    local capability = "com.runjuu.refine.wavy-underline-highlight.v1"
+    local function envelope(style)
+      return {
+        type = "event",
+        sequence = 1,
+        epoch = "epoch-1",
+        event = {
+          type = "presentationContentReplaced",
+          checkId = "check-1",
+          content = {
+            documentRevision = "revision-1",
+            status = "complete",
+            coverage = "full",
+            appearance = {
+              highlight = { style = style, grammarColor = "#FF2D55", fluencyColor = "#007AFF" },
+              diff = { additionColor = "#34C759", deletionColor = "#FF3B30", showHiddenWhitespace = true },
+            },
+            interaction = {
+              automaticChecksEnabled = true,
+              quickApply = {
+                enabled = true,
+                applyKey = "tab",
+                dismissKey = "escape",
+                activationStyle = "highlightChanges",
+              },
+            },
+            suggestions = {},
+          },
+        },
+      }
+    end
+
+    local decoded = wire.decode_event(envelope("wavyUnderline"), { capability })
+    assert_equal("wavyUnderline", decoded.event.content.appearance.highlight.style)
+    for _, style in ipairs({ "underline", "dashedUnderline", "highlight" }) do
+      assert_equal(style, wire.decode_event(envelope(style), { capability }).event.content.appearance.highlight.style)
+    end
+    assert_raises("malformed presentation highlight style", function()
+      wire.decode_event(envelope("dottedUnderline"), { capability })
+    end)
+
+    for _, capabilities in ipairs({ {}, { "com.runjuu.refine.suggestion-shortcuts.v2" } }) do
+      assert_raises("malformed presentation highlight style", function()
+        wire.decode_event(envelope("wavyUnderline"), capabilities)
+      end)
+    end
+    assert_raises("malformed presentation highlight style", function()
+      wire.decode_event(envelope("wavyUnderline"))
+    end)
+  end)
+
   it("ignores unknown welcome members while preserving the base handshake", function()
     local wire = require("refine.transport.wire")
     local decoded = wire.decode_handshake({

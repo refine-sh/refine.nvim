@@ -1210,6 +1210,29 @@ harness.test("keeps buffer highlights in the color of each suggestion kind", fun
   fluency:deactivate()
 end)
 
+harness.test("draws each highlight style with its native underline attribute", function()
+  for _, case in ipairs({
+    { style = "underline", attribute = "underline" },
+    { style = "dashedUnderline", attribute = "underdashed" },
+    { style = "wavyUnderline", attribute = "undercurl" },
+  }) do
+    local styled = vim.deepcopy(appearance)
+    styled.highlight.style = case.style
+    local host = present({ appearance = styled })
+    for group, color in pairs({ RefineGrammar = 0xFF2D55, RefineFluency = 0x007AFF }) do
+      local attributes = vim.api.nvim_get_hl(0, { name = group, link = false })
+      harness.equal(true, attributes[case.attribute])
+      harness.equal(color, attributes.sp)
+      for _, other in ipairs({ "underline", "underdashed", "undercurl" }) do
+        if other ~= case.attribute then
+          harness.equal(nil, attributes[other])
+        end
+      end
+    end
+    host:deactivate()
+  end
+end)
+
 harness.test("dims card metadata and emphasizes its action keys", function()
   local host, _, _, owner_win = present({ available_actions = { "apply", "dismiss" } })
   local card_buf = card_buffer(host)

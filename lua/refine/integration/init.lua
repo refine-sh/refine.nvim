@@ -1302,7 +1302,11 @@ function Run:_accept_engine_event(envelope)
   if not self.running or not self.session then
     return
   end
-  local valid, invalid = pcall(wire.decode_event, envelope)
+  local presentation_capabilities = {}
+  if vim.tbl_contains(self.session.capabilities or {}, wire.WAVY_UNDERLINE_HIGHLIGHT_CAPABILITY) then
+    presentation_capabilities[1] = wire.WAVY_UNDERLINE_HIGHLIGHT_CAPABILITY
+  end
+  local valid, invalid = pcall(wire.decode_event, envelope, presentation_capabilities)
   if not valid then
     self:_fatal(engine_error("Refine published a malformed event", invalid))
     return

@@ -134,6 +134,11 @@ harness.test("owns one eligible buffer and publishes copied semantic status", fu
   controller:reconcile(first, vim.api.nvim_get_current_win())
   harness.equal(1, #runs)
   harness.equal("refine-neovim", runs[1].transport_options.client.id)
+  harness.equal({
+    "com.runjuu.refine.suggestion-shortcuts.v1",
+    "com.runjuu.refine.suggestion-shortcuts.v2",
+    "com.runjuu.refine.wavy-underline-highlight.v1",
+  }, runs[1].transport_options.capabilities)
   harness.equal("pending", controller:status(first).state)
   harness.equal(0, controller:status(first).suggestion_count)
 

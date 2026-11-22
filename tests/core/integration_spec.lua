@@ -228,6 +228,23 @@ describe("host-neutral Refine integration runtime", function()
     assert_equal({}, fixture.errors)
   end)
 
+  it("presents a wavy underline style only when its capability is activated", function()
+    local wavy_content = suggestion_content({})
+    wavy_content.appearance = vim.deepcopy(APPEARANCE)
+    wavy_content.appearance.highlight.style = "wavyUnderline"
+
+    local activated = runtime_fixture()
+    activated.session.capabilities = { "com.runjuu.refine.wavy-underline-highlight.v1" }
+    activated.event(1, { type = "presentationContentReplaced", checkId = "check-1", content = wavy_content })
+    assert_equal({}, activated.errors)
+    assert_equal("wavyUnderline", activated.presentations[#activated.presentations].snapshot.appearance.highlight.style)
+
+    local unactivated = runtime_fixture()
+    unactivated.event(1, { type = "presentationContentReplaced", checkId = "check-1", content = wavy_content })
+    assert_equal(1, #unactivated.errors)
+    assert_equal("fatal", unactivated.errors[1].recoverability)
+  end)
+
   it("ignores engine work for a superseded same-revision manual check", function()
     local fixture = runtime_fixture()
     fixture.observe({ type = "checkRequested", revision = "doc:0" })

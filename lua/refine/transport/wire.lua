@@ -7,7 +7,12 @@ local M = {
   MAX_SOURCES = 2,
   MAX_SOURCE_BYTES = 1024 * 1024,
   MAX_CAPABILITIES = 64,
-  KNOWN_CAPABILITIES = { "com.runjuu.refine.suggestion-shortcuts.v1", "com.runjuu.refine.suggestion-shortcuts.v2" },
+  WAVY_UNDERLINE_HIGHLIGHT_CAPABILITY = "com.runjuu.refine.wavy-underline-highlight.v1",
+  KNOWN_CAPABILITIES = {
+    "com.runjuu.refine.suggestion-shortcuts.v1",
+    "com.runjuu.refine.suggestion-shortcuts.v2",
+    "com.runjuu.refine.wavy-underline-highlight.v1",
+  },
 }
 
 local MAX_SAFE_INTEGER = 9007199254740991
@@ -454,14 +459,19 @@ function M.decode_handshake(value, offered_capabilities, known_capabilities)
   }
 end
 
-local function appearance(value)
+local function appearance(value, wavy_underline_enabled)
   value = record(value, "presentation.appearance")
   local highlight = record(value.highlight, "presentation.appearance.highlight")
   local diff = record(value.diff, "presentation.appearance.diff")
   required_keys(value, { "highlight", "diff" }, "presentation.appearance")
   required_keys(highlight, { "style", "grammarColor", "fluencyColor" }, "presentation.appearance.highlight")
   required_keys(diff, { "additionColor", "deletionColor", "showHiddenWhitespace" }, "presentation.appearance.diff")
-  if highlight.style ~= "underline" and highlight.style ~= "dashedUnderline" and highlight.style ~= "highlight" then
+  if
+    highlight.style ~= "underline"
+    and highlight.style ~= "dashedUnderline"
+    and highlight.style ~= "highlight"
+    and not (wavy_underline_enabled and highlight.style == "wavyUnderline")
+  then
     fail("malformed presentation highlight style")
   end
   for _, color in ipairs({ highlight.grammarColor, highlight.fluencyColor, diff.additionColor, diff.deletionColor }) do
@@ -786,10 +796,10 @@ local function suggestion(value)
   }
 end
 
-local function presentation_content(value, shortcuts_enabled)
+local function presentation_content(value, shortcuts_enabled, wavy_underline_enabled)
   value = record(value, "presentation content")
   identifier(value.documentRevision, "presentation.documentRevision")
-  local decoded_appearance = appearance(value.appearance)
+  local decoded_appearance = appearance(value.appearance, wavy_underline_enabled)
   local decoded_interaction = interaction(value.interaction, shortcuts_enabled)
   local suggestions = list(value.suggestions, "presentation.suggestions")
   local decoded_suggestions = {}
@@ -922,7 +932,7 @@ local function explanation_update(value)
   return { status = "stale" }
 end
 
-local function server_event(value, shortcuts_enabled)
+local function server_event(value, shortcuts_enabled, wavy_underline_enabled)
   value = record(value, "server event")
   if value.type == "documentAccepted" then
     identifier(value.revision, "documentAccepted.revision")
@@ -942,7 +952,7 @@ local function server_event(value, shortcuts_enabled)
     return {
       type = "presentationContentReplaced",
       checkId = value.checkId,
-      content = presentation_content(value.content, shortcuts_enabled),
+      content = presentation_content(value.content, shortcuts_enabled, wavy_underline_enabled),
     }
   elseif value.type == "applyRequested" then
     identifier(value.actionId, "applyRequested.actionId")
@@ -999,7 +1009,8 @@ function M.decode_event(value, capabilities)
     event = server_event(
       value.event,
       vim.tbl_contains(capabilities or {}, "com.runjuu.refine.suggestion-shortcuts.v2") and 2
-        or vim.tbl_contains(capabilities or {}, "com.runjuu.refine.suggestion-shortcuts.v1")
+        or vim.tbl_contains(capabilities or {}, "com.runjuu.refine.suggestion-shortcuts.v1"),
+      vim.tbl_contains(capabilities or {}, M.WAVY_UNDERLINE_HIGHLIGHT_CAPABILITY)
     ),
   }
   if value.causeCommandId ~= nil then
