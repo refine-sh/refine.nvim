@@ -4,7 +4,7 @@ All notable changes to Refine for Neovim will be documented here.
 
 The project follows [Semantic Versioning](https://semver.org/).
 
-## Unreleased
+## [1.1.0] - 2026-11-22
 
 - Negotiate wavy-underline-highlight.v1 and draw Refine's Wavy Underline
   suggestion style as an undercurl in the suggestion color.

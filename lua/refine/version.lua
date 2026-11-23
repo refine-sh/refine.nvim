@@ -1,3 +1,3 @@
 return {
-  semver = "1.0.0",
+  semver = "1.1.0",
 }
