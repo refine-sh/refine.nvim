@@ -5,9 +5,9 @@
     "major": 1,
     "minor": 0
   },
-  "artifactDigest": "2d04d785f611f3afe3425bde4d505e2baa23f4500adc4cce9e46fb9b3a97a365",
-  "baseArtifactDigest": "c20ac8e2ec90abf6886ae27158bfe822b616cf236b90ca47a1797932cfc9497e",
-  "capabilityRegistryDigest": "272b913f65b18cd9558ecef91e28a73ebce88f5016a6df41d1b1cef6079bd192",
+  "artifactDigest": "a84303cb0ba9ed8bbb144eea2499e65cb100a10e05e53e5209c0a616706bd35c",
+  "baseArtifactDigest": "2c4b8615b2f87d7729da40af4deed68eebf8d8504bc7231bdc19bccecbcbe759",
+  "capabilityRegistryDigest": "bdb5de898ca909dbec8d1b43a8d42aececb080c0c7b95c9116833dfb67817406",
   "jsonPositiveCaseIds": [
     "command-open-document",
     "command-replace-document-two-sources",
@@ -149,7 +149,11 @@
     "action-rejected-indeterminate",
     "action-rejected-apply-proof",
     "action-rejected-reporting",
-    "action-rejected-unsupported"
+    "action-rejected-unsupported",
+    "modifier-owner",
+    "modifier-revoke",
+    "modifier-availability",
+    "modifier-press"
   ],
   "jsonNegativeCaseIds": [
     "duplicate-root-member",
@@ -213,7 +217,11 @@
     "handshake-recovery-pair-is-closed",
     "received-protocol-is-only-for-version-rejection",
     "typed-rejection-reports-server-protocol-1-0",
-    "optional-apply-snapshot-does-not-accept-null"
+    "optional-apply-snapshot-does-not-accept-null",
+    "modifier-invalid-process",
+    "modifier-duplicate-keys",
+    "modifier-nonmodifier",
+    "modifier-too-many"
   ],
   "frameCaseIds": [
     "exact-hello-frame",
@@ -230,8 +238,54 @@
     "unknown-exponent-number",
     "unknown-unsafe-integer"
   ],
+  "checkDiagnosticCaseIds": [
+    "single-passage",
+    "omitted-only",
+    "canonical-kind-order",
+    "invalid-reason",
+    "invalid-kind",
+    "invalid-sourceId",
+    "empty",
+    "surrogate-split",
+    "out-of-bounds",
+    "unsafe-end",
+    "empty-diagnostics",
+    "duplicate-issue",
+    "too-many",
+    "negative-omitted",
+    "fractional-omitted",
+    "range-order",
+    "source-order",
+    "wrong-status-checking",
+    "wrong-status-pending",
+    "wrong-status-unavailable",
+    "wrong-status-closed",
+    "full-coverage",
+    "unactivated-ignored",
+    "old-server-no-field",
+    "distinct-128-issues",
+    "distinct-129-issues"
+  ],
+  "wavyUnderlineHighlightCaseIds": [
+    "activated-wavy-underline",
+    "activated-underline",
+    "activated-dashed-underline",
+    "activated-highlight",
+    "unactivated-underline-fallback",
+    "unactivated-dashed-underline",
+    "unactivated-highlight",
+    "unactivated-wavy-underline",
+    "activated-unknown-style",
+    "activated-case-mismatch",
+    "activated-wavy-lowercase-color",
+    "activated-wavy-missing-color",
+    "activated-wavy-missing-diff",
+    "activated-wavy-nonboolean-whitespace",
+    "unactivated-unknown-style"
+  ],
   "stateScenarioIds": [
     "base-handshake",
+    "check-diagnostics",
     "fatal-fault",
     "golden-writing-session",
     "invalid-server-inputs",
@@ -242,7 +296,8 @@
     "sequence-exhaustion",
     "suggestion-shortcuts",
     "typed-rejections",
-    "unicode-scalar-coordinates"
+    "unicode-scalar-coordinates",
+    "wavy-underline-highlight"
   ],
   "artifacts": [
     {
@@ -262,7 +317,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "0493ef93e8927b4c3818efa3b07baa028d05c863bca92494051c0b515ed03b8f",
+      "sha256": "a8cdb95b8e4c16503c7b67d8eef78b95b076f663a494880698a86639500286ba",
       "kind": "documentation"
     },
     {
@@ -277,7 +332,12 @@
     },
     {
       "path": "reference/typescript/README.md",
-      "sha256": "ab5e350c3e3c668d12ee447b595d8c9c1bf935901f1d9a6000e198bbb507e222",
+      "sha256": "138c0cb13fe679807116e1a14d008fc87a3813176eb5cd95db7fbbb12c4d8c09",
+      "kind": "reference"
+    },
+    {
+      "path": "reference/typescript/check-diagnostics.ts",
+      "sha256": "d45f464536e57eb41d78716b7909ed41dcf8b064a3fa6f0debcb0b6c0f30ee11",
       "kind": "reference"
     },
     {
@@ -287,7 +347,7 @@
     },
     {
       "path": "reference/typescript/package.json",
-      "sha256": "5651ebfdccc5ea522a265a0803c4a8253b1d441c0b04418c855d84b78bc57293",
+      "sha256": "bcdf845770c9dd6d9a207e9a1c5416b5eed5c6e221c78130be9ef9148c7c96c2",
       "kind": "reference"
     },
     {
@@ -302,7 +362,7 @@
     },
     {
       "path": "reference/typescript/transport-session.ts",
-      "sha256": "404209dad44bbff2ba28babbf19f556819030991b2f168b888f6ec7d72d330a2",
+      "sha256": "aa1c87306e72d0d92565cdc82373208ec8cd3bc7551c3f8a11756f2ca9daa0f2",
       "kind": "reference"
     },
     {
@@ -311,28 +371,33 @@
       "kind": "reference"
     },
     {
+      "path": "reference/typescript/wavy-underline-highlight.ts",
+      "sha256": "5bbb548775a88cdd0031a5ecac12aed68f68ac7ed05e4bf5f5e9c13114eb5a6f",
+      "kind": "reference"
+    },
+    {
       "path": "registry/README.md",
-      "sha256": "8139328c9c1b48d06a8e25b624004f3b773f83ffbb5e809c70f6a483e4dea9b6",
+      "sha256": "4686a0a2542d1f5b574da74fd2ddf6679e00a8379d94316f1c1d877f11fc84b7",
       "kind": "registry"
     },
     {
       "path": "registry/capabilities.json",
-      "sha256": "272b913f65b18cd9558ecef91e28a73ebce88f5016a6df41d1b1cef6079bd192",
+      "sha256": "bdb5de898ca909dbec8d1b43a8d42aececb080c0c7b95c9116833dfb67817406",
       "kind": "registry"
     },
     {
       "path": "runner/README.md",
-      "sha256": "b5c94f749909ee39bc2c0a579b687f49194585f3019ea9ce435098cfdc52aae1",
+      "sha256": "542fe93fa3d65677f5d81f9887e63aa37a136e98e152de16b471977b97d55f3a",
       "kind": "runner"
     },
     {
       "path": "runner/conformance.py",
-      "sha256": "c779602f778453610f4772b2097098ce5571b2841be672f19ac6adeb422e935c",
+      "sha256": "bca74b8a168795d10257106fda09acc80a944ff88d40e6ea2c436f9e4242602d",
       "kind": "runner"
     },
     {
       "path": "runner/update_manifest.py",
-      "sha256": "8487ae46e945438e2fdbdf50f1822f9bc978a5ff0f44957cd30354a97a2a9370",
+      "sha256": "9da857c91b667ef6ae39bfe044691c9b4ecdbe42bc243c436668ddadd24d6b99",
       "kind": "runner"
     },
     {
@@ -341,8 +406,13 @@
       "kind": "schema"
     },
     {
+      "path": "schema/check-diagnostics.schema.json",
+      "sha256": "0c5ea222a82603d322031febbb98a8de7a99583206b53406e36a8f6c7286165b",
+      "kind": "schema"
+    },
+    {
       "path": "schema/command.schema.json",
-      "sha256": "7c81e6229dd16b6ba1ca2b3d73208db5c4f85f7f8ce707a2f33eefd75e561cd0",
+      "sha256": "b27ce22b1cfbebefec11ba25a33ad3bc1cccfdef8e3a4833b4c59cab0d173ce7",
       "kind": "schema"
     },
     {
@@ -357,7 +427,7 @@
     },
     {
       "path": "schema/event.schema.json",
-      "sha256": "19ac7202abfac3ae847524d439a48cc32e0989966e9747d0cd4f36f6b5317eb7",
+      "sha256": "89a4360f05b49f544ead693ccc0b5e18bfaa62638176f658c5443b1c11833484",
       "kind": "schema"
     },
     {
@@ -381,8 +451,23 @@
       "kind": "schema"
     },
     {
+      "path": "schema/wavy-underline-highlight.schema.json",
+      "sha256": "df060bc4453877891edda327131be0a882bfc35f8863268a7cc47cd9d5c02d76",
+      "kind": "schema"
+    },
+    {
+      "path": "spec/check-diagnostics-v1.md",
+      "sha256": "eeb884fb1c9b9c668bef2fca876851d1d01320617f2503c8ee5e32e9abb9bc30",
+      "kind": "spec"
+    },
+    {
       "path": "spec/protocol.md",
-      "sha256": "3437a2fef09717d403512d374909dec9982d6f8fda6e124cc9712de7fd37d115",
+      "sha256": "797021e01ea1619b201a1e35599cc9bf329a879edf47df886d05dd2ead55ff2c",
+      "kind": "spec"
+    },
+    {
+      "path": "spec/standalone-modifier-shortcuts-v1.md",
+      "sha256": "c6c4f08d727732b6494df32d8a55d1632e535f2d68ec26f671f37d5a08be1b05",
       "kind": "spec"
     },
     {
@@ -396,8 +481,23 @@
       "kind": "spec"
     },
     {
+      "path": "spec/wavy-underline-highlight-v1.md",
+      "sha256": "6f0ff750e64081edfb9a2c1fe8d584b1c540912c553b4be11d797e6caf6ae724",
+      "kind": "spec"
+    },
+    {
       "path": "tests/fake_server_adapter.py",
       "sha256": "a5a27d63355acbfa0d08ea07eb0f54756c9ffc377ef9cfd01ec24d31d5e558bd",
+      "kind": "documentation"
+    },
+    {
+      "path": "tests/test_check_diagnostics.py",
+      "sha256": "db95607d9bd0829eeb1800f77e02c1152c9c68b1fb9738031242a79490e18a05",
+      "kind": "documentation"
+    },
+    {
+      "path": "tests/test_check_diagnostics_reference.py",
+      "sha256": "93d2a815ade711e80aaf6a109ab8083656a2de5ec81563817b4be43bcd3cbc1d",
       "kind": "documentation"
     },
     {
@@ -409,6 +509,16 @@
       "path": "tests/test_suggestion_shortcuts.py",
       "sha256": "dd6faab0e631d26f44a60d57a12179fa4283dad7e31a08aec9d5114321443523",
       "kind": "documentation"
+    },
+    {
+      "path": "tests/test_wavy_underline_highlight.py",
+      "sha256": "e377c4df8dc60be721b76020044c0f52456677d8ac8273a91c0698d4fb2160a1",
+      "kind": "documentation"
+    },
+    {
+      "path": "vectors/check-diagnostics/presentations.json",
+      "sha256": "9fc744630ac1989cade5249dfaf080c498c91157de59a7f7b4f4ef7da35a9fc1",
+      "kind": "vectors"
     },
     {
       "path": "vectors/frames/framing.json",
@@ -428,6 +538,11 @@
     {
       "path": "vectors/json/negative/shape-and-enums.json",
       "sha256": "591179fe8b870f5613882705dc7d6b9c4413c8f91b0cbb9d72152552cce5c911",
+      "kind": "vectors"
+    },
+    {
+      "path": "vectors/json/negative/standalone-modifiers.json",
+      "sha256": "5649a6964fe11e355d1cb03f59ebf5020fef26111991cf0d9724b1bdbf23198a",
       "kind": "vectors"
     },
     {
@@ -461,6 +576,11 @@
       "kind": "vectors"
     },
     {
+      "path": "vectors/json/positive/standalone-modifiers.json",
+      "sha256": "ff93d85ba71cc3d4ca267c56b3ca187d2f251545b4f6cfc2f8973ad2872a72c9",
+      "kind": "vectors"
+    },
+    {
       "path": "vectors/shortcuts/bindings-v2.json",
       "sha256": "b88a7cbc2a0d3de005c71f6288b509d5a880b90bbd7fbdd46aec9df8b62d3ae1",
       "kind": "vectors"
@@ -473,6 +593,11 @@
     {
       "path": "vectors/state/base-handshake.json",
       "sha256": "92795e8552bcf3d079095a1f052954480ae56407d32f161e5927f7b56bc6934d",
+      "kind": "vectors"
+    },
+    {
+      "path": "vectors/state/check-diagnostics.json",
+      "sha256": "c71c045eb2d5e552c5436c600f701a374a41e98718beb157b5dcce8520448687",
       "kind": "vectors"
     },
     {
@@ -528,6 +653,16 @@
     {
       "path": "vectors/state/unicode-scalar-coordinates.json",
       "sha256": "7ab4430f30e6b6d69bda033386cc3841216aa84c0d679b8087972dcca12d1a4e",
+      "kind": "vectors"
+    },
+    {
+      "path": "vectors/state/wavy-underline-highlight.json",
+      "sha256": "f0bce1584127ad46be581f21b53a7b5ac5c4a6069375545104177aa723ccfb15",
+      "kind": "vectors"
+    },
+    {
+      "path": "vectors/wavy-underline-highlight/appearances.json",
+      "sha256": "7932c61817ce5804e72894298b7bfe16672d50f7f7cf841cedc4f74a00136789",
       "kind": "vectors"
     }
   ]

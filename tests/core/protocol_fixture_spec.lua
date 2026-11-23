@@ -110,7 +110,7 @@ local function load_fixture_bundle()
   local registry = vim.json.decode(registry_data, { luanil = { object = true, array = true } })
   assert_equal(1, registry.schemaVersion)
   assert_equal(pin.protocol, registry.protocol)
-  assert_equal(2, #registry.capabilities)
+  assert_equal(5, #registry.capabilities)
   assert_equal("com.runjuu.refine.suggestion-shortcuts.v1", registry.capabilities[1].id)
   for _, capability in ipairs(registry.capabilities) do
     assert_equal(capability.digest, sha256.hex(read_bytes(artifact_root .. "/" .. capability.specification)))
@@ -121,6 +121,8 @@ local function load_fixture_bundle()
   local json_positive_ids = {}
   local json_negative_ids = {}
   local frame_ids = {}
+  local check_diagnostic_ids = {}
+  local wavy_underline_highlight_ids = {}
   for _, artifact in ipairs(artifacts) do
     if artifact.path:match("^vectors/state/[^/]+%.json$") then
       local vector = decode_json(artifact_root .. "/" .. artifact.path)
@@ -144,6 +146,13 @@ local function load_fixture_bundle()
         local ok = pcall(validator, case.value)
         assert_equal(case.valid, ok)
       end
+    elseif artifact.path:match("^vectors/check%-diagnostics/") then
+      -- The published check-diagnostics collection carries no formatVersion.
+      local collection = decode_json(artifact_root .. "/" .. artifact.path)
+      for _, case in ipairs(collection.cases) do
+        assert_truthy(type(case.id) == "string" and case.id ~= "")
+        check_diagnostic_ids[#check_diagnostic_ids + 1] = case.id
+      end
     elseif artifact.path:match("^vectors/") then
       local collection = decode_json(artifact_root .. "/" .. artifact.path)
       assert_equal(1, collection.formatVersion)
@@ -155,6 +164,8 @@ local function load_fixture_bundle()
         case_ids = json_negative_ids
       elseif artifact.path:match("^vectors/frames/") then
         case_ids = frame_ids
+      elseif artifact.path:match("^vectors/wavy%-underline%-highlight/") then
+        case_ids = wavy_underline_highlight_ids
       end
       assert_truthy(case_ids ~= nil, "unclassified vector collection " .. artifact.path)
       for _, case in ipairs(collection.cases) do
@@ -166,14 +177,18 @@ local function load_fixture_bundle()
       assert_truthy(type(schema) == "table" and not vim.islist(schema))
     end
   end
-  assert_equal(141, #manifest.jsonPositiveCaseIds)
-  assert_equal(62, #manifest.jsonNegativeCaseIds)
+  assert_equal(145, #manifest.jsonPositiveCaseIds)
+  assert_equal(66, #manifest.jsonNegativeCaseIds)
   assert_equal(13, #manifest.frameCaseIds)
-  assert_equal(12, #manifest.stateScenarioIds)
+  assert_equal(14, #manifest.stateScenarioIds)
+  assert_equal(26, #manifest.checkDiagnosticCaseIds)
+  assert_equal(15, #manifest.wavyUnderlineHighlightCaseIds)
   assert_equal(manifest.jsonPositiveCaseIds, json_positive_ids)
   assert_equal(manifest.jsonNegativeCaseIds, json_negative_ids)
   assert_equal(manifest.frameCaseIds, frame_ids)
   assert_equal(manifest.stateScenarioIds, state_ids)
+  assert_equal(manifest.checkDiagnosticCaseIds, check_diagnostic_ids)
+  assert_equal(manifest.wavyUnderlineHighlightCaseIds, wavy_underline_highlight_ids)
   assert_equal(#json_positive_ids, unique_count(json_positive_ids))
   assert_equal(#json_negative_ids, unique_count(json_negative_ids))
   assert_equal(#frame_ids, unique_count(frame_ids))
@@ -499,6 +514,18 @@ local function exercise_positive_fragment(case)
   return "runtime"
 end
 
+-- The standalone modifier bridge is an optional capability this client never
+-- offers, so its command and event fragments have no production seam here.
+local standalone_modifier_fragments = {
+  modifierShortcutAvailability = true,
+  modifierShortcutPressed = true,
+  setModifierShortcutOwner = true,
+}
+
+local function is_standalone_modifier_fragment(value)
+  return type(value) == "table" and standalone_modifier_fragments[value.type] == true
+end
+
 local function exercise_positive_case(case)
   local endpoint = require("refine.transport.endpoint")
   local wire = require("refine.transport.wire")
@@ -506,6 +533,8 @@ local function exercise_positive_case(case)
   if case.generate and case.generate.kind == "capabilityRegistry" then
     assert_equal(case.generate.count, #value.capabilities)
     return "schema-only capability registry generator"
+  elseif is_standalone_modifier_fragment(value) then
+    return "standalone modifier bridge not offered"
   elseif case.generate and case.generate.kind == "helloCapabilities" then
     capture_hello(value)
   elseif case.generate and case.generate.kind == "sourceBytes" then
@@ -544,6 +573,9 @@ local schema_only_negative = {
 local function exercise_negative_case(case)
   if schema_only_negative[case.id] then
     return "schema-only producer shape or capability registry"
+  end
+  if is_standalone_modifier_fragment(case.value) then
+    return "standalone modifier bridge not offered"
   end
   local endpoint = require("refine.transport.endpoint")
   local wire = require("refine.transport.wire")

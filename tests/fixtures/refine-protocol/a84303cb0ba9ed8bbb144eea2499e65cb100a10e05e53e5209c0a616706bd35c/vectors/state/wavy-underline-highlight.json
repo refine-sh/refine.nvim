@@ -1,0 +1,641 @@
+{
+  "formatVersion": 1,
+  "id": "wavy-underline-highlight",
+  "description": "An activated session accepts wavyUnderline and still rejects other unknown styles; an unactivated session receives the underline fallback and rejects wavyUnderline.",
+  "socketRunnable": true,
+  "messages": {
+    "hello": {
+      "type": "hello",
+      "protocol": {
+        "major": 1,
+        "minor": 0
+      },
+      "client": {
+        "id": "refine-obsidian",
+        "version": "0.1.0",
+        "host": "obsidian"
+      },
+      "hostCapabilities": {
+        "interceptableSuggestionActionKeys": [
+          "tab",
+          "escape",
+          "return",
+          "space",
+          "delete",
+          "leftArrow",
+          "rightArrow",
+          "upArrow",
+          "downArrow",
+          "leftShift",
+          "rightShift",
+          "leftOption",
+          "rightOption",
+          "leftControl",
+          "rightControl"
+        ]
+      },
+      "runId": "wavy-highlight-run",
+      "launchToken": "${launchToken}",
+      "capabilities": [
+        "com.runjuu.refine.wavy-underline-highlight.v1"
+      ]
+    },
+    "welcome": {
+      "type": "welcome",
+      "protocol": {
+        "major": 1,
+        "minor": 0
+      },
+      "serverEpoch": "${serverEpoch}",
+      "runResumed": false,
+      "limits": {
+        "maxFrameBytes": 8388608,
+        "maxSources": 2,
+        "maxSourceBytes": 1048576
+      },
+      "capabilities": [
+        "com.runjuu.refine.wavy-underline-highlight.v1"
+      ]
+    },
+    "helloUnactivated": {
+      "type": "hello",
+      "protocol": {
+        "major": 1,
+        "minor": 0
+      },
+      "client": {
+        "id": "refine-obsidian",
+        "version": "0.1.0",
+        "host": "obsidian"
+      },
+      "hostCapabilities": {
+        "interceptableSuggestionActionKeys": [
+          "tab",
+          "escape",
+          "return",
+          "space",
+          "delete",
+          "leftArrow",
+          "rightArrow",
+          "upArrow",
+          "downArrow",
+          "leftShift",
+          "rightShift",
+          "leftOption",
+          "rightOption",
+          "leftControl",
+          "rightControl"
+        ]
+      },
+      "runId": "wavy-highlight-run",
+      "launchToken": "${launchToken}",
+      "capabilities": []
+    },
+    "welcomeUnactivated": {
+      "type": "welcome",
+      "protocol": {
+        "major": 1,
+        "minor": 0
+      },
+      "serverEpoch": "${serverEpoch}",
+      "runResumed": false,
+      "limits": {
+        "maxFrameBytes": 8388608,
+        "maxSources": 2,
+        "maxSourceBytes": 1048576
+      },
+      "capabilities": []
+    },
+    "openDocument": {
+      "type": "command",
+      "sequence": 1,
+      "id": "wavy-command-1",
+      "command": {
+        "type": "openDocument",
+        "snapshot": {
+          "revision": "wavy:1",
+          "sources": [
+            {
+              "sourceId": "document",
+              "text": "This are fine.",
+              "sourceSyntax": "plainText"
+            }
+          ]
+        }
+      }
+    },
+    "documentAccepted": {
+      "type": "event",
+      "sequence": 1,
+      "epoch": "${serverEpoch}",
+      "causeCommandId": "wavy-command-1",
+      "event": {
+        "type": "documentAccepted",
+        "revision": "wavy:1"
+      }
+    },
+    "requestCheck": {
+      "type": "command",
+      "sequence": 2,
+      "id": "wavy-command-2",
+      "command": {
+        "type": "requestCheck",
+        "revision": "wavy:1"
+      }
+    },
+    "fallbackPresentation": {
+      "type": "event",
+      "sequence": 2,
+      "epoch": "${serverEpoch}",
+      "causeCommandId": "wavy-command-2",
+      "event": {
+        "type": "presentationContentReplaced",
+        "checkId": "check-wavy:1",
+        "content": {
+          "documentRevision": "wavy:1",
+          "status": "complete",
+          "coverage": "full",
+          "suggestions": [
+            {
+              "id": "suggestion-1",
+              "sourceId": "document",
+              "kind": "grammar",
+              "attribution": {
+                "languageDisplayName": "English",
+                "textDirection": "ltr",
+                "checkModelDisplayName": "Refine"
+              },
+              "activationRange": {
+                "location": 5,
+                "length": 3
+              },
+              "highlightRanges": [
+                {
+                  "location": 5,
+                  "length": 3
+                }
+              ],
+              "diff": [
+                {
+                  "kind": "unchanged",
+                  "text": "This "
+                },
+                {
+                  "kind": "delete",
+                  "text": "are"
+                },
+                {
+                  "kind": "insert",
+                  "text": "is"
+                },
+                {
+                  "kind": "unchanged",
+                  "text": " fine."
+                }
+              ],
+              "availableActions": [
+                "apply",
+                "dismiss"
+              ]
+            }
+          ],
+          "appearance": {
+            "highlight": {
+              "style": "underline",
+              "grammarColor": "#FF2D55",
+              "fluencyColor": "#007AFF"
+            },
+            "diff": {
+              "additionColor": "#34C759",
+              "deletionColor": "#FF3B30",
+              "showHiddenWhitespace": true
+            }
+          },
+          "interaction": {
+            "automaticChecksEnabled": false,
+            "quickApply": {
+              "enabled": true,
+              "applyKey": "tab",
+              "dismissKey": "escape",
+              "activationStyle": "showTipAndHighlight"
+            }
+          }
+        }
+      }
+    },
+    "closeDocument": {
+      "type": "command",
+      "sequence": 3,
+      "id": "wavy-command-3",
+      "command": {
+        "type": "closeDocument"
+      }
+    }
+  },
+  "connections": [
+    {
+      "id": "activated-wavy-underline",
+      "steps": [
+        {
+          "direction": "client",
+          "messageRef": "hello"
+        },
+        {
+          "direction": "server",
+          "messageRef": "welcome"
+        },
+        {
+          "direction": "client",
+          "messageRef": "openDocument"
+        },
+        {
+          "direction": "server",
+          "messageRef": "documentAccepted"
+        },
+        {
+          "direction": "client",
+          "messageRef": "requestCheck"
+        },
+        {
+          "direction": "server",
+          "message": {
+            "type": "event",
+            "sequence": 2,
+            "epoch": "${serverEpoch}",
+            "causeCommandId": "wavy-command-2",
+            "event": {
+              "type": "presentationContentReplaced",
+              "checkId": "check-wavy:1",
+              "content": {
+                "documentRevision": "wavy:1",
+                "status": "complete",
+                "coverage": "full",
+                "suggestions": [
+                  {
+                    "id": "suggestion-1",
+                    "sourceId": "document",
+                    "kind": "grammar",
+                    "attribution": {
+                      "languageDisplayName": "English",
+                      "textDirection": "ltr",
+                      "checkModelDisplayName": "Refine"
+                    },
+                    "activationRange": {
+                      "location": 5,
+                      "length": 3
+                    },
+                    "highlightRanges": [
+                      {
+                        "location": 5,
+                        "length": 3
+                      }
+                    ],
+                    "diff": [
+                      {
+                        "kind": "unchanged",
+                        "text": "This "
+                      },
+                      {
+                        "kind": "delete",
+                        "text": "are"
+                      },
+                      {
+                        "kind": "insert",
+                        "text": "is"
+                      },
+                      {
+                        "kind": "unchanged",
+                        "text": " fine."
+                      }
+                    ],
+                    "availableActions": [
+                      "apply",
+                      "dismiss"
+                    ]
+                  }
+                ],
+                "appearance": {
+                  "highlight": {
+                    "style": "wavyUnderline",
+                    "grammarColor": "#FF2D55",
+                    "fluencyColor": "#007AFF"
+                  },
+                  "diff": {
+                    "additionColor": "#34C759",
+                    "deletionColor": "#FF3B30",
+                    "showHiddenWhitespace": true
+                  }
+                },
+                "interaction": {
+                  "automaticChecksEnabled": false,
+                  "quickApply": {
+                    "enabled": true,
+                    "applyKey": "tab",
+                    "dismissKey": "escape",
+                    "activationStyle": "showTipAndHighlight"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "direction": "client",
+          "messageRef": "closeDocument"
+        }
+      ]
+    },
+    {
+      "id": "activated-base-style",
+      "steps": [
+        {
+          "direction": "client",
+          "messageRef": "hello"
+        },
+        {
+          "direction": "server",
+          "messageRef": "welcome"
+        },
+        {
+          "direction": "client",
+          "messageRef": "openDocument"
+        },
+        {
+          "direction": "server",
+          "messageRef": "documentAccepted"
+        },
+        {
+          "direction": "client",
+          "messageRef": "requestCheck"
+        },
+        {
+          "direction": "server",
+          "messageRef": "fallbackPresentation"
+        },
+        {
+          "direction": "client",
+          "messageRef": "closeDocument"
+        }
+      ]
+    },
+    {
+      "id": "activated-unknown-style",
+      "steps": [
+        {
+          "direction": "client",
+          "messageRef": "hello"
+        },
+        {
+          "direction": "server",
+          "messageRef": "welcome"
+        },
+        {
+          "direction": "client",
+          "messageRef": "openDocument"
+        },
+        {
+          "direction": "server",
+          "messageRef": "documentAccepted"
+        },
+        {
+          "direction": "client",
+          "messageRef": "requestCheck"
+        },
+        {
+          "direction": "server",
+          "invalid": "schema",
+          "message": {
+            "type": "event",
+            "sequence": 2,
+            "epoch": "${serverEpoch}",
+            "causeCommandId": "wavy-command-2",
+            "event": {
+              "type": "presentationContentReplaced",
+              "checkId": "check-wavy:1",
+              "content": {
+                "documentRevision": "wavy:1",
+                "status": "complete",
+                "coverage": "full",
+                "suggestions": [
+                  {
+                    "id": "suggestion-1",
+                    "sourceId": "document",
+                    "kind": "grammar",
+                    "attribution": {
+                      "languageDisplayName": "English",
+                      "textDirection": "ltr",
+                      "checkModelDisplayName": "Refine"
+                    },
+                    "activationRange": {
+                      "location": 5,
+                      "length": 3
+                    },
+                    "highlightRanges": [
+                      {
+                        "location": 5,
+                        "length": 3
+                      }
+                    ],
+                    "diff": [
+                      {
+                        "kind": "unchanged",
+                        "text": "This "
+                      },
+                      {
+                        "kind": "delete",
+                        "text": "are"
+                      },
+                      {
+                        "kind": "insert",
+                        "text": "is"
+                      },
+                      {
+                        "kind": "unchanged",
+                        "text": " fine."
+                      }
+                    ],
+                    "availableActions": [
+                      "apply",
+                      "dismiss"
+                    ]
+                  }
+                ],
+                "appearance": {
+                  "highlight": {
+                    "style": "zigzagUnderline",
+                    "grammarColor": "#FF2D55",
+                    "fluencyColor": "#007AFF"
+                  },
+                  "diff": {
+                    "additionColor": "#34C759",
+                    "deletionColor": "#FF3B30",
+                    "showHiddenWhitespace": true
+                  }
+                },
+                "interaction": {
+                  "automaticChecksEnabled": false,
+                  "quickApply": {
+                    "enabled": true,
+                    "applyKey": "tab",
+                    "dismissKey": "escape",
+                    "activationStyle": "showTipAndHighlight"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "direction": "client",
+          "close": true
+        }
+      ]
+    },
+    {
+      "id": "unactivated-underline-fallback",
+      "steps": [
+        {
+          "direction": "client",
+          "messageRef": "helloUnactivated"
+        },
+        {
+          "direction": "server",
+          "messageRef": "welcomeUnactivated"
+        },
+        {
+          "direction": "client",
+          "messageRef": "openDocument"
+        },
+        {
+          "direction": "server",
+          "messageRef": "documentAccepted"
+        },
+        {
+          "direction": "client",
+          "messageRef": "requestCheck"
+        },
+        {
+          "direction": "server",
+          "messageRef": "fallbackPresentation"
+        },
+        {
+          "direction": "client",
+          "messageRef": "closeDocument"
+        }
+      ]
+    },
+    {
+      "id": "unactivated-rejects-wavy-underline",
+      "steps": [
+        {
+          "direction": "client",
+          "messageRef": "helloUnactivated"
+        },
+        {
+          "direction": "server",
+          "messageRef": "welcomeUnactivated"
+        },
+        {
+          "direction": "client",
+          "messageRef": "openDocument"
+        },
+        {
+          "direction": "server",
+          "messageRef": "documentAccepted"
+        },
+        {
+          "direction": "client",
+          "messageRef": "requestCheck"
+        },
+        {
+          "direction": "server",
+          "invalid": "schema",
+          "message": {
+            "type": "event",
+            "sequence": 2,
+            "epoch": "${serverEpoch}",
+            "causeCommandId": "wavy-command-2",
+            "event": {
+              "type": "presentationContentReplaced",
+              "checkId": "check-wavy:1",
+              "content": {
+                "documentRevision": "wavy:1",
+                "status": "complete",
+                "coverage": "full",
+                "suggestions": [
+                  {
+                    "id": "suggestion-1",
+                    "sourceId": "document",
+                    "kind": "grammar",
+                    "attribution": {
+                      "languageDisplayName": "English",
+                      "textDirection": "ltr",
+                      "checkModelDisplayName": "Refine"
+                    },
+                    "activationRange": {
+                      "location": 5,
+                      "length": 3
+                    },
+                    "highlightRanges": [
+                      {
+                        "location": 5,
+                        "length": 3
+                      }
+                    ],
+                    "diff": [
+                      {
+                        "kind": "unchanged",
+                        "text": "This "
+                      },
+                      {
+                        "kind": "delete",
+                        "text": "are"
+                      },
+                      {
+                        "kind": "insert",
+                        "text": "is"
+                      },
+                      {
+                        "kind": "unchanged",
+                        "text": " fine."
+                      }
+                    ],
+                    "availableActions": [
+                      "apply",
+                      "dismiss"
+                    ]
+                  }
+                ],
+                "appearance": {
+                  "highlight": {
+                    "style": "wavyUnderline",
+                    "grammarColor": "#FF2D55",
+                    "fluencyColor": "#007AFF"
+                  },
+                  "diff": {
+                    "additionColor": "#34C759",
+                    "deletionColor": "#FF3B30",
+                    "showHiddenWhitespace": true
+                  }
+                },
+                "interaction": {
+                  "automaticChecksEnabled": false,
+                  "quickApply": {
+                    "enabled": true,
+                    "applyKey": "tab",
+                    "dismissKey": "escape",
+                    "activationStyle": "showTipAndHighlight"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "direction": "client",
+          "close": true
+        }
+      ]
+    }
+  ]
+}

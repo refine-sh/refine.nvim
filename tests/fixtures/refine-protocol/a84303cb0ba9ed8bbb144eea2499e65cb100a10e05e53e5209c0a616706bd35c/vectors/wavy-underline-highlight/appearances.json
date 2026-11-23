@@ -1,0 +1,254 @@
+{
+  "formatVersion": 1,
+  "cases": [
+    {
+      "id": "activated-wavy-underline",
+      "activated": true,
+      "appearance": {
+        "highlight": {
+          "style": "wavyUnderline",
+          "grammarColor": "#FF2D55",
+          "fluencyColor": "#007AFF"
+        },
+        "diff": {
+          "additionColor": "#34C759",
+          "deletionColor": "#FF3B30",
+          "showHiddenWhitespace": true
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": "activated-underline",
+      "activated": true,
+      "appearance": {
+        "highlight": {
+          "style": "underline",
+          "grammarColor": "#FF2D55",
+          "fluencyColor": "#007AFF"
+        },
+        "diff": {
+          "additionColor": "#34C759",
+          "deletionColor": "#FF3B30",
+          "showHiddenWhitespace": true
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": "activated-dashed-underline",
+      "activated": true,
+      "appearance": {
+        "highlight": {
+          "style": "dashedUnderline",
+          "grammarColor": "#FF2D55",
+          "fluencyColor": "#007AFF"
+        },
+        "diff": {
+          "additionColor": "#34C759",
+          "deletionColor": "#FF3B30",
+          "showHiddenWhitespace": true
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": "activated-highlight",
+      "activated": true,
+      "appearance": {
+        "highlight": {
+          "style": "highlight",
+          "grammarColor": "#FF2D55",
+          "fluencyColor": "#007AFF"
+        },
+        "diff": {
+          "additionColor": "#34C759",
+          "deletionColor": "#FF3B30",
+          "showHiddenWhitespace": true
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": "unactivated-underline-fallback",
+      "activated": false,
+      "appearance": {
+        "highlight": {
+          "style": "underline",
+          "grammarColor": "#FF2D55",
+          "fluencyColor": "#007AFF"
+        },
+        "diff": {
+          "additionColor": "#34C759",
+          "deletionColor": "#FF3B30",
+          "showHiddenWhitespace": true
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": "unactivated-dashed-underline",
+      "activated": false,
+      "appearance": {
+        "highlight": {
+          "style": "dashedUnderline",
+          "grammarColor": "#FF2D55",
+          "fluencyColor": "#007AFF"
+        },
+        "diff": {
+          "additionColor": "#34C759",
+          "deletionColor": "#FF3B30",
+          "showHiddenWhitespace": true
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": "unactivated-highlight",
+      "activated": false,
+      "appearance": {
+        "highlight": {
+          "style": "highlight",
+          "grammarColor": "#FF2D55",
+          "fluencyColor": "#007AFF"
+        },
+        "diff": {
+          "additionColor": "#34C759",
+          "deletionColor": "#FF3B30",
+          "showHiddenWhitespace": true
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": "unactivated-wavy-underline",
+      "activated": false,
+      "appearance": {
+        "highlight": {
+          "style": "wavyUnderline",
+          "grammarColor": "#FF2D55",
+          "fluencyColor": "#007AFF"
+        },
+        "diff": {
+          "additionColor": "#34C759",
+          "deletionColor": "#FF3B30",
+          "showHiddenWhitespace": true
+        }
+      },
+      "valid": false
+    },
+    {
+      "id": "activated-unknown-style",
+      "activated": true,
+      "appearance": {
+        "highlight": {
+          "style": "zigzagUnderline",
+          "grammarColor": "#FF2D55",
+          "fluencyColor": "#007AFF"
+        },
+        "diff": {
+          "additionColor": "#34C759",
+          "deletionColor": "#FF3B30",
+          "showHiddenWhitespace": true
+        }
+      },
+      "valid": false
+    },
+    {
+      "id": "activated-case-mismatch",
+      "activated": true,
+      "appearance": {
+        "highlight": {
+          "style": "WavyUnderline",
+          "grammarColor": "#FF2D55",
+          "fluencyColor": "#007AFF"
+        },
+        "diff": {
+          "additionColor": "#34C759",
+          "deletionColor": "#FF3B30",
+          "showHiddenWhitespace": true
+        }
+      },
+      "valid": false
+    },
+    {
+      "id": "activated-wavy-lowercase-color",
+      "activated": true,
+      "appearance": {
+        "highlight": {
+          "style": "wavyUnderline",
+          "grammarColor": "#ff2d55",
+          "fluencyColor": "#007AFF"
+        },
+        "diff": {
+          "additionColor": "#34C759",
+          "deletionColor": "#FF3B30",
+          "showHiddenWhitespace": true
+        }
+      },
+      "valid": false
+    },
+    {
+      "id": "activated-wavy-missing-color",
+      "activated": true,
+      "appearance": {
+        "highlight": {
+          "style": "wavyUnderline",
+          "grammarColor": "#FF2D55"
+        },
+        "diff": {
+          "additionColor": "#34C759",
+          "deletionColor": "#FF3B30",
+          "showHiddenWhitespace": true
+        }
+      },
+      "valid": false
+    },
+    {
+      "id": "activated-wavy-missing-diff",
+      "activated": true,
+      "appearance": {
+        "highlight": {
+          "style": "wavyUnderline",
+          "grammarColor": "#FF2D55",
+          "fluencyColor": "#007AFF"
+        }
+      },
+      "valid": false
+    },
+    {
+      "id": "activated-wavy-nonboolean-whitespace",
+      "activated": true,
+      "appearance": {
+        "highlight": {
+          "style": "wavyUnderline",
+          "grammarColor": "#FF2D55",
+          "fluencyColor": "#007AFF"
+        },
+        "diff": {
+          "additionColor": "#34C759",
+          "deletionColor": "#FF3B30",
+          "showHiddenWhitespace": "yes"
+        }
+      },
+      "valid": false
+    },
+    {
+      "id": "unactivated-unknown-style",
+      "activated": false,
+      "appearance": {
+        "highlight": {
+          "style": "zigzagUnderline",
+          "grammarColor": "#FF2D55",
+          "fluencyColor": "#007AFF"
+        },
+        "diff": {
+          "additionColor": "#34C759",
+          "deletionColor": "#FF3B30",
+          "showHiddenWhitespace": true
+        }
+      },
+      "valid": false
+    }
+  ]
+}

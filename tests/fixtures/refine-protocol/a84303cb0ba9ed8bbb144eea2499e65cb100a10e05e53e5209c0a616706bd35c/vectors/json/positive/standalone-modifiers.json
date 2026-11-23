@@ -1,0 +1,53 @@
+{
+  "formatVersion": 1,
+  "cases": [
+    {
+      "id": "modifier-owner",
+      "schema": "schema/command.schema.json",
+      "value": {
+        "type": "setModifierShortcutOwner",
+        "owner": {
+          "ownerId": "owner",
+          "processId": 123,
+          "keys": [
+            "ShiftLeft"
+          ]
+        }
+      }
+    },
+    {
+      "id": "modifier-revoke",
+      "schema": "schema/command.schema.json",
+      "value": {
+        "type": "setModifierShortcutOwner",
+        "owner": {
+          "ownerId": "revoked",
+          "processId": 123,
+          "keys": []
+        }
+      }
+    },
+    {
+      "id": "modifier-availability",
+      "schema": "schema/event.schema.json",
+      "value": {
+        "type": "modifierShortcutAvailability",
+        "state": {
+          "ownerId": "owner",
+          "available": true
+        }
+      }
+    },
+    {
+      "id": "modifier-press",
+      "schema": "schema/event.schema.json",
+      "value": {
+        "type": "modifierShortcutPressed",
+        "press": {
+          "ownerId": "owner",
+          "code": "ShiftLeft"
+        }
+      }
+    }
+  ]
+}

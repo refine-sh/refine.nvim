@@ -1,0 +1,4290 @@
+{
+  "cases": [
+    {
+      "id": "single-passage",
+      "activated": true,
+      "sources": [
+        {
+          "sourceId": "document",
+          "text": "A😀.\nNext line."
+        },
+        {
+          "sourceId": "second",
+          "text": "Second source."
+        }
+      ],
+      "content": {
+        "status": "complete",
+        "coverage": "partial",
+        "checkDiagnostics": {
+          "issues": [
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            }
+          ],
+          "omittedIssueCount": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": "omitted-only",
+      "activated": true,
+      "sources": [
+        {
+          "sourceId": "document",
+          "text": "A😀.\nNext line."
+        },
+        {
+          "sourceId": "second",
+          "text": "Second source."
+        }
+      ],
+      "content": {
+        "status": "complete",
+        "coverage": "partial",
+        "checkDiagnostics": {
+          "issues": [],
+          "omittedIssueCount": 2
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": "canonical-kind-order",
+      "activated": true,
+      "sources": [
+        {
+          "sourceId": "document",
+          "text": "A😀.\nNext line."
+        },
+        {
+          "sourceId": "second",
+          "text": "Second source."
+        }
+      ],
+      "content": {
+        "status": "complete",
+        "coverage": "partial",
+        "checkDiagnostics": {
+          "issues": [
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "fluency",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            }
+          ],
+          "omittedIssueCount": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": "invalid-reason",
+      "activated": true,
+      "sources": [
+        {
+          "sourceId": "document",
+          "text": "A😀.\nNext line."
+        },
+        {
+          "sourceId": "second",
+          "text": "Second source."
+        }
+      ],
+      "content": {
+        "status": "complete",
+        "coverage": "partial",
+        "checkDiagnostics": {
+          "issues": [
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "raw-error"
+            }
+          ],
+          "omittedIssueCount": 0
+        }
+      },
+      "valid": false
+    },
+    {
+      "id": "invalid-kind",
+      "activated": true,
+      "sources": [
+        {
+          "sourceId": "document",
+          "text": "A😀.\nNext line."
+        },
+        {
+          "sourceId": "second",
+          "text": "Second source."
+        }
+      ],
+      "content": {
+        "status": "complete",
+        "coverage": "partial",
+        "checkDiagnostics": {
+          "issues": [
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "mixed",
+              "reason": "unusableOutput"
+            }
+          ],
+          "omittedIssueCount": 0
+        }
+      },
+      "valid": false
+    },
+    {
+      "id": "invalid-sourceId",
+      "activated": true,
+      "sources": [
+        {
+          "sourceId": "document",
+          "text": "A😀.\nNext line."
+        },
+        {
+          "sourceId": "second",
+          "text": "Second source."
+        }
+      ],
+      "content": {
+        "status": "complete",
+        "coverage": "partial",
+        "checkDiagnostics": {
+          "issues": [
+            {
+              "sourceId": "missing",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            }
+          ],
+          "omittedIssueCount": 0
+        }
+      },
+      "valid": false
+    },
+    {
+      "id": "empty",
+      "activated": true,
+      "sources": [
+        {
+          "sourceId": "document",
+          "text": "A😀.\nNext line."
+        },
+        {
+          "sourceId": "second",
+          "text": "Second source."
+        }
+      ],
+      "content": {
+        "status": "complete",
+        "coverage": "partial",
+        "checkDiagnostics": {
+          "issues": [
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 0,
+                "length": 0
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            }
+          ],
+          "omittedIssueCount": 0
+        }
+      },
+      "valid": false
+    },
+    {
+      "id": "surrogate-split",
+      "activated": true,
+      "sources": [
+        {
+          "sourceId": "document",
+          "text": "A😀.\nNext line."
+        },
+        {
+          "sourceId": "second",
+          "text": "Second source."
+        }
+      ],
+      "content": {
+        "status": "complete",
+        "coverage": "partial",
+        "checkDiagnostics": {
+          "issues": [
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 2,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            }
+          ],
+          "omittedIssueCount": 0
+        }
+      },
+      "valid": false
+    },
+    {
+      "id": "out-of-bounds",
+      "activated": true,
+      "sources": [
+        {
+          "sourceId": "document",
+          "text": "A😀.\nNext line."
+        },
+        {
+          "sourceId": "second",
+          "text": "Second source."
+        }
+      ],
+      "content": {
+        "status": "complete",
+        "coverage": "partial",
+        "checkDiagnostics": {
+          "issues": [
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 0,
+                "length": 99
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            }
+          ],
+          "omittedIssueCount": 0
+        }
+      },
+      "valid": false
+    },
+    {
+      "id": "unsafe-end",
+      "activated": true,
+      "sources": [
+        {
+          "sourceId": "document",
+          "text": "A😀.\nNext line."
+        },
+        {
+          "sourceId": "second",
+          "text": "Second source."
+        }
+      ],
+      "content": {
+        "status": "complete",
+        "coverage": "partial",
+        "checkDiagnostics": {
+          "issues": [
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 9007199254740991,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            }
+          ],
+          "omittedIssueCount": 0
+        }
+      },
+      "valid": false
+    },
+    {
+      "id": "empty-diagnostics",
+      "activated": true,
+      "sources": [
+        {
+          "sourceId": "document",
+          "text": "A😀.\nNext line."
+        },
+        {
+          "sourceId": "second",
+          "text": "Second source."
+        }
+      ],
+      "content": {
+        "status": "complete",
+        "coverage": "partial",
+        "checkDiagnostics": {
+          "issues": [],
+          "omittedIssueCount": 0
+        }
+      },
+      "valid": false
+    },
+    {
+      "id": "duplicate-issue",
+      "activated": true,
+      "sources": [
+        {
+          "sourceId": "document",
+          "text": "A😀.\nNext line."
+        },
+        {
+          "sourceId": "second",
+          "text": "Second source."
+        }
+      ],
+      "content": {
+        "status": "complete",
+        "coverage": "partial",
+        "checkDiagnostics": {
+          "issues": [
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            }
+          ],
+          "omittedIssueCount": 0
+        }
+      },
+      "valid": false
+    },
+    {
+      "id": "too-many",
+      "activated": true,
+      "sources": [
+        {
+          "sourceId": "document",
+          "text": "A😀.\nNext line."
+        },
+        {
+          "sourceId": "second",
+          "text": "Second source."
+        }
+      ],
+      "content": {
+        "status": "complete",
+        "coverage": "partial",
+        "checkDiagnostics": {
+          "issues": [
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            }
+          ],
+          "omittedIssueCount": 0
+        }
+      },
+      "valid": false
+    },
+    {
+      "id": "negative-omitted",
+      "activated": true,
+      "sources": [
+        {
+          "sourceId": "document",
+          "text": "A😀.\nNext line."
+        },
+        {
+          "sourceId": "second",
+          "text": "Second source."
+        }
+      ],
+      "content": {
+        "status": "complete",
+        "coverage": "partial",
+        "checkDiagnostics": {
+          "issues": [
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            }
+          ],
+          "omittedIssueCount": -1
+        }
+      },
+      "valid": false
+    },
+    {
+      "id": "fractional-omitted",
+      "activated": true,
+      "sources": [
+        {
+          "sourceId": "document",
+          "text": "A😀.\nNext line."
+        },
+        {
+          "sourceId": "second",
+          "text": "Second source."
+        }
+      ],
+      "content": {
+        "status": "complete",
+        "coverage": "partial",
+        "checkDiagnostics": {
+          "issues": [
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            }
+          ],
+          "omittedIssueCount": 1.0
+        }
+      },
+      "valid": false
+    },
+    {
+      "id": "range-order",
+      "activated": true,
+      "sources": [
+        {
+          "sourceId": "document",
+          "text": "A😀.\nNext line."
+        },
+        {
+          "sourceId": "second",
+          "text": "Second source."
+        }
+      ],
+      "content": {
+        "status": "complete",
+        "coverage": "partial",
+        "checkDiagnostics": {
+          "issues": [
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 5,
+                "length": 4
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            }
+          ],
+          "omittedIssueCount": 0
+        }
+      },
+      "valid": false
+    },
+    {
+      "id": "source-order",
+      "activated": true,
+      "sources": [
+        {
+          "sourceId": "document",
+          "text": "A😀.\nNext line."
+        },
+        {
+          "sourceId": "second",
+          "text": "Second source."
+        }
+      ],
+      "content": {
+        "status": "complete",
+        "coverage": "partial",
+        "checkDiagnostics": {
+          "issues": [
+            {
+              "sourceId": "second",
+              "range": {
+                "location": 0,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            }
+          ],
+          "omittedIssueCount": 0
+        }
+      },
+      "valid": false
+    },
+    {
+      "id": "wrong-status-checking",
+      "activated": true,
+      "sources": [
+        {
+          "sourceId": "document",
+          "text": "A😀.\nNext line."
+        },
+        {
+          "sourceId": "second",
+          "text": "Second source."
+        }
+      ],
+      "content": {
+        "status": "checking",
+        "coverage": "partial",
+        "checkDiagnostics": {
+          "issues": [
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            }
+          ],
+          "omittedIssueCount": 0
+        }
+      },
+      "valid": false
+    },
+    {
+      "id": "wrong-status-pending",
+      "activated": true,
+      "sources": [
+        {
+          "sourceId": "document",
+          "text": "A😀.\nNext line."
+        },
+        {
+          "sourceId": "second",
+          "text": "Second source."
+        }
+      ],
+      "content": {
+        "status": "pending",
+        "coverage": "partial",
+        "checkDiagnostics": {
+          "issues": [
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            }
+          ],
+          "omittedIssueCount": 0
+        }
+      },
+      "valid": false
+    },
+    {
+      "id": "wrong-status-unavailable",
+      "activated": true,
+      "sources": [
+        {
+          "sourceId": "document",
+          "text": "A😀.\nNext line."
+        },
+        {
+          "sourceId": "second",
+          "text": "Second source."
+        }
+      ],
+      "content": {
+        "status": "unavailable",
+        "coverage": "partial",
+        "checkDiagnostics": {
+          "issues": [
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            }
+          ],
+          "omittedIssueCount": 0
+        }
+      },
+      "valid": false
+    },
+    {
+      "id": "wrong-status-closed",
+      "activated": true,
+      "sources": [
+        {
+          "sourceId": "document",
+          "text": "A😀.\nNext line."
+        },
+        {
+          "sourceId": "second",
+          "text": "Second source."
+        }
+      ],
+      "content": {
+        "status": "closed",
+        "coverage": "partial",
+        "checkDiagnostics": {
+          "issues": [
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            }
+          ],
+          "omittedIssueCount": 0
+        }
+      },
+      "valid": false
+    },
+    {
+      "id": "full-coverage",
+      "activated": true,
+      "sources": [
+        {
+          "sourceId": "document",
+          "text": "A😀.\nNext line."
+        },
+        {
+          "sourceId": "second",
+          "text": "Second source."
+        }
+      ],
+      "content": {
+        "status": "complete",
+        "coverage": "full",
+        "checkDiagnostics": {
+          "issues": [
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 2
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            }
+          ],
+          "omittedIssueCount": 0
+        }
+      },
+      "valid": false
+    },
+    {
+      "id": "unactivated-ignored",
+      "activated": false,
+      "sources": [
+        {
+          "sourceId": "document",
+          "text": "A😀.\nNext line."
+        },
+        {
+          "sourceId": "second",
+          "text": "Second source."
+        }
+      ],
+      "content": {
+        "status": "complete",
+        "coverage": "partial",
+        "checkDiagnostics": "ignored extension"
+      },
+      "valid": true
+    },
+    {
+      "id": "old-server-no-field",
+      "activated": true,
+      "sources": [
+        {
+          "sourceId": "document",
+          "text": "A😀.\nNext line."
+        },
+        {
+          "sourceId": "second",
+          "text": "Second source."
+        }
+      ],
+      "content": {
+        "status": "complete",
+        "coverage": "partial"
+      },
+      "valid": true
+    },
+    {
+      "id": "distinct-128-issues",
+      "activated": true,
+      "sources": [
+        {
+          "sourceId": "document",
+          "text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+      ],
+      "content": {
+        "status": "complete",
+        "coverage": "partial",
+        "checkDiagnostics": {
+          "issues": [
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 0,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 2,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 3,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 4,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 5,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 6,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 7,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 8,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 9,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 10,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 11,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 12,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 13,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 14,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 15,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 16,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 17,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 18,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 19,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 20,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 21,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 22,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 23,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 24,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 25,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 26,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 27,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 28,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 29,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 30,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 31,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 32,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 33,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 34,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 35,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 36,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 37,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 38,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 39,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 40,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 41,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 42,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 43,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 44,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 45,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 46,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 47,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 48,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 49,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 50,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 51,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 52,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 53,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 54,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 55,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 56,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 57,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 58,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 59,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 60,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 61,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 62,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 63,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 64,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 65,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 66,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 67,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 68,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 69,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 70,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 71,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 72,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 73,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 74,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 75,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 76,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 77,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 78,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 79,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 80,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 81,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 82,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 83,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 84,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 85,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 86,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 87,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 88,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 89,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 90,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 91,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 92,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 93,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 94,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 95,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 96,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 97,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 98,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 99,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 100,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 101,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 102,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 103,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 104,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 105,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 106,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 107,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 108,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 109,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 110,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 111,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 112,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 113,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 114,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 115,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 116,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 117,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 118,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 119,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 120,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 121,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 122,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 123,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 124,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 125,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 126,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 127,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            }
+          ],
+          "omittedIssueCount": 1
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": "distinct-129-issues",
+      "activated": true,
+      "sources": [
+        {
+          "sourceId": "document",
+          "text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+      ],
+      "content": {
+        "status": "complete",
+        "coverage": "partial",
+        "checkDiagnostics": {
+          "issues": [
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 0,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 1,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 2,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 3,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 4,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 5,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 6,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 7,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 8,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 9,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 10,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 11,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 12,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 13,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 14,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 15,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 16,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 17,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 18,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 19,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 20,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 21,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 22,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 23,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 24,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 25,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 26,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 27,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 28,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 29,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 30,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 31,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 32,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 33,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 34,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 35,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 36,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 37,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 38,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 39,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 40,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 41,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 42,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 43,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 44,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 45,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 46,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 47,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 48,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 49,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 50,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 51,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 52,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 53,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 54,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 55,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 56,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 57,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 58,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 59,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 60,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 61,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 62,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 63,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 64,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 65,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 66,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 67,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 68,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 69,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 70,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 71,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 72,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 73,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 74,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 75,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 76,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 77,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 78,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 79,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 80,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 81,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 82,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 83,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 84,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 85,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 86,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 87,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 88,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 89,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 90,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 91,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 92,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 93,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 94,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 95,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 96,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 97,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 98,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 99,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 100,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 101,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 102,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 103,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 104,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 105,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 106,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 107,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 108,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 109,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 110,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 111,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 112,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 113,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 114,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 115,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 116,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 117,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 118,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 119,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 120,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 121,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 122,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 123,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 124,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 125,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 126,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 127,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            },
+            {
+              "sourceId": "document",
+              "range": {
+                "location": 128,
+                "length": 1
+              },
+              "kind": "grammar",
+              "reason": "unusableOutput"
+            }
+          ],
+          "omittedIssueCount": 1
+        }
+      },
+      "valid": false
+    }
+  ]
+}

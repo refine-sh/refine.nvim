@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "wavy-underline-highlight.schema.json",
+  "title": "Negotiated wavy underline presentation appearance",
+  "type": "object",
+  "required": ["highlight", "diff"],
+  "properties": {
+    "highlight": {
+      "type": "object",
+      "required": ["style", "grammarColor", "fluencyColor"],
+      "properties": {
+        "style": { "enum": ["underline", "dashedUnderline", "highlight", "wavyUnderline"] },
+        "grammarColor": { "$ref": "shared.schema.json#/$defs/sRGBHex" },
+        "fluencyColor": { "$ref": "shared.schema.json#/$defs/sRGBHex" }
+      }
+    },
+    "diff": {
+      "type": "object",
+      "required": ["additionColor", "deletionColor", "showHiddenWhitespace"],
+      "properties": {
+        "additionColor": { "$ref": "shared.schema.json#/$defs/sRGBHex" },
+        "deletionColor": { "$ref": "shared.schema.json#/$defs/sRGBHex" },
+        "showHiddenWhitespace": { "type": "boolean" }
+      }
+    }
+  }
+}

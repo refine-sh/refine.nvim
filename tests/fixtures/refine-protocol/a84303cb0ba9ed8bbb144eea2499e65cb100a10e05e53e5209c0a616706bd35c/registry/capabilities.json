@@ -1,0 +1,35 @@
+{
+  "registrySchema": "../schema/capability-registry.schema.json",
+  "schemaVersion": 1,
+  "protocol": {
+    "major": 1,
+    "minor": 0
+  },
+  "capabilities": [
+    {
+      "id": "com.runjuu.refine.suggestion-shortcuts.v1",
+      "specification": "spec/suggestion-shortcuts-v1.md",
+      "digest": "99bdf4b7831f48026ff15726485c077094870f097b0e5457bb68f8f80feea4d5"
+    },
+    {
+      "id": "com.runjuu.refine.suggestion-shortcuts.v2",
+      "specification": "spec/suggestion-shortcuts-v2.md",
+      "digest": "de63940ca66ab7f2f2d0add45928396aeab084b2df9be47c8e7703fb2799ea08"
+    },
+    {
+      "id": "com.runjuu.refine.standalone-modifier-shortcuts.v1",
+      "specification": "spec/standalone-modifier-shortcuts-v1.md",
+      "digest": "c6c4f08d727732b6494df32d8a55d1632e535f2d68ec26f671f37d5a08be1b05"
+    },
+    {
+      "id": "com.runjuu.refine.check-diagnostics.v1",
+      "specification": "spec/check-diagnostics-v1.md",
+      "digest": "eeb884fb1c9b9c668bef2fca876851d1d01320617f2503c8ee5e32e9abb9bc30"
+    },
+    {
+      "id": "com.runjuu.refine.wavy-underline-highlight.v1",
+      "specification": "spec/wavy-underline-highlight-v1.md",
+      "digest": "6f0ff750e64081edfb9a2c1fe8d584b1c540912c553b4be11d797e6caf6ae724"
+    }
+  ]
+}

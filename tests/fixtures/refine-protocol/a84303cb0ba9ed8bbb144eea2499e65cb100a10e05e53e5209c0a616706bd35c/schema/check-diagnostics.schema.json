@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "check-diagnostics.schema.json",
+  "title": "Negotiated partial check diagnostics",
+  "type": "object",
+  "required": [
+    "issues",
+    "omittedIssueCount"
+  ],
+  "properties": {
+    "issues": {
+      "type": "array",
+      "maxItems": 128,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "required": [
+          "sourceId",
+          "range",
+          "kind",
+          "reason"
+        ],
+        "properties": {
+          "sourceId": {
+            "$ref": "shared.schema.json#/$defs/identifier"
+          },
+          "range": {
+            "$ref": "shared.schema.json#/$defs/nonEmptyUTF16Range"
+          },
+          "kind": {
+            "enum": [
+              "grammar",
+              "fluency"
+            ]
+          },
+          "reason": {
+            "enum": [
+              "unusableOutput",
+              "protectedTextRestoreFailed",
+              "excessiveChange",
+              "cancelled"
+            ]
+          }
+        }
+      }
+    },
+    "omittedIssueCount": {
+      "$ref": "shared.schema.json#/$defs/safeInteger"
+    }
+  },
+  "anyOf": [
+    {
+      "properties": {
+        "issues": {
+          "minItems": 1
+        }
+      }
+    },
+    {
+      "properties": {
+        "omittedIssueCount": {
+          "minimum": 1
+        }
+      }
+    }
+  ]
+}

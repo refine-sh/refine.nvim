@@ -1,0 +1,68 @@
+{
+  "formatVersion": 1,
+  "cases": [
+    {
+      "id": "modifier-invalid-process",
+      "schema": "schema/command.schema.json",
+      "value": {
+        "type": "setModifierShortcutOwner",
+        "owner": {
+          "ownerId": "owner",
+          "processId": 0,
+          "keys": [
+            "ShiftLeft"
+          ]
+        }
+      },
+      "error": "schema"
+    },
+    {
+      "id": "modifier-duplicate-keys",
+      "schema": "schema/command.schema.json",
+      "value": {
+        "type": "setModifierShortcutOwner",
+        "owner": {
+          "ownerId": "owner",
+          "processId": 1,
+          "keys": [
+            "ShiftLeft",
+            "ShiftLeft"
+          ]
+        }
+      },
+      "error": "schema"
+    },
+    {
+      "id": "modifier-nonmodifier",
+      "schema": "schema/command.schema.json",
+      "value": {
+        "type": "setModifierShortcutOwner",
+        "owner": {
+          "ownerId": "owner",
+          "processId": 1,
+          "keys": [
+            "KeyA"
+          ]
+        }
+      },
+      "error": "schema"
+    },
+    {
+      "id": "modifier-too-many",
+      "schema": "schema/command.schema.json",
+      "value": {
+        "type": "setModifierShortcutOwner",
+        "owner": {
+          "ownerId": "owner",
+          "processId": 1,
+          "keys": [
+            "ShiftLeft",
+            "ShiftRight",
+            "AltLeft"
+          ]
+        }
+      },
+      "error": "schema"
+    }
+  ]
+}

@@ -1,0 +1,1226 @@
+{
+  "formatVersion": 1,
+  "id": "check-diagnostics",
+  "description": "Negotiated diagnostics validate shape, source-local UTF-16 coordinates, source order, and original revision evidence; unactivated fields remain ignored.",
+  "socketRunnable": true,
+  "messages": {
+    "hello": {
+      "type": "hello",
+      "protocol": {
+        "major": 1,
+        "minor": 0
+      },
+      "client": {
+        "id": "refine-obsidian",
+        "version": "0.1.0",
+        "host": "obsidian"
+      },
+      "hostCapabilities": {
+        "interceptableSuggestionActionKeys": [
+          "tab",
+          "escape",
+          "return",
+          "space",
+          "delete",
+          "leftArrow",
+          "rightArrow",
+          "upArrow",
+          "downArrow",
+          "leftShift",
+          "rightShift",
+          "leftOption",
+          "rightOption",
+          "leftControl",
+          "rightControl"
+        ]
+      },
+      "runId": "diagnostic-run",
+      "launchToken": "${launchToken}",
+      "capabilities": [
+        "com.runjuu.refine.check-diagnostics.v1"
+      ]
+    },
+    "welcome": {
+      "type": "welcome",
+      "protocol": {
+        "major": 1,
+        "minor": 0
+      },
+      "serverEpoch": "${serverEpoch}",
+      "runResumed": false,
+      "limits": {
+        "maxFrameBytes": 8388608,
+        "maxSources": 2,
+        "maxSourceBytes": 1048576
+      },
+      "capabilities": [
+        "com.runjuu.refine.check-diagnostics.v1"
+      ]
+    },
+    "helloUnactivated": {
+      "type": "hello",
+      "protocol": {
+        "major": 1,
+        "minor": 0
+      },
+      "client": {
+        "id": "refine-obsidian",
+        "version": "0.1.0",
+        "host": "obsidian"
+      },
+      "hostCapabilities": {
+        "interceptableSuggestionActionKeys": [
+          "tab",
+          "escape",
+          "return",
+          "space",
+          "delete",
+          "leftArrow",
+          "rightArrow",
+          "upArrow",
+          "downArrow",
+          "leftShift",
+          "rightShift",
+          "leftOption",
+          "rightOption",
+          "leftControl",
+          "rightControl"
+        ]
+      },
+      "runId": "diagnostic-run",
+      "launchToken": "${launchToken}",
+      "capabilities": []
+    },
+    "welcomeUnactivated": {
+      "type": "welcome",
+      "protocol": {
+        "major": 1,
+        "minor": 0
+      },
+      "serverEpoch": "${serverEpoch}",
+      "runResumed": false,
+      "limits": {
+        "maxFrameBytes": 8388608,
+        "maxSources": 2,
+        "maxSourceBytes": 1048576
+      },
+      "capabilities": []
+    },
+    "openDocument": {
+      "type": "command",
+      "sequence": 1,
+      "id": "diagnostic-command-1",
+      "command": {
+        "type": "openDocument",
+        "snapshot": {
+          "revision": "diagnostic:1",
+          "sources": [
+            {
+              "sourceId": "z-first",
+              "text": "A😀.\nNext line.",
+              "sourceSyntax": "plainText"
+            },
+            {
+              "sourceId": "a-second",
+              "text": "Second source.",
+              "sourceSyntax": "plainText"
+            }
+          ]
+        }
+      }
+    },
+    "documentAccepted": {
+      "type": "event",
+      "sequence": 1,
+      "epoch": "${serverEpoch}",
+      "event": {
+        "type": "documentAccepted",
+        "revision": "diagnostic:1"
+      }
+    },
+    "requestCheck": {
+      "type": "command",
+      "sequence": 2,
+      "id": "diagnostic-command-2",
+      "command": {
+        "type": "requestCheck",
+        "revision": "diagnostic:1"
+      }
+    },
+    "presentation": {
+      "type": "event",
+      "sequence": 2,
+      "epoch": "${serverEpoch}",
+      "event": {
+        "type": "presentationContentReplaced",
+        "checkId": "check-diagnostic:1",
+        "content": {
+          "documentRevision": "diagnostic:1",
+          "status": "complete",
+          "coverage": "partial",
+          "appearance": {
+            "highlight": {
+              "style": "underline",
+              "grammarColor": "#FF2D55",
+              "fluencyColor": "#007AFF"
+            },
+            "diff": {
+              "additionColor": "#34C759",
+              "deletionColor": "#FF3B30",
+              "showHiddenWhitespace": true
+            }
+          },
+          "interaction": {
+            "automaticChecksEnabled": false,
+            "quickApply": {
+              "enabled": true,
+              "applyKey": "tab",
+              "dismissKey": "escape",
+              "activationStyle": "showTipAndHighlight"
+            }
+          },
+          "suggestions": [],
+          "checkDiagnostics": {
+            "issues": [
+              {
+                "sourceId": "z-first",
+                "range": {
+                  "location": 1,
+                  "length": 2
+                },
+                "kind": "grammar",
+                "reason": "unusableOutput"
+              },
+              {
+                "sourceId": "a-second",
+                "range": {
+                  "location": 0,
+                  "length": 6
+                },
+                "kind": "fluency",
+                "reason": "cancelled"
+              }
+            ],
+            "omittedIssueCount": 0
+          }
+        }
+      }
+    },
+    "replaceDocument": {
+      "type": "command",
+      "sequence": 3,
+      "id": "diagnostic-command-3",
+      "command": {
+        "type": "replaceDocument",
+        "snapshot": {
+          "revision": "diagnostic:2",
+          "sources": [
+            {
+              "sourceId": "a-second",
+              "text": "Second source changed.",
+              "sourceSyntax": "plainText"
+            },
+            {
+              "sourceId": "z-first",
+              "text": "ABCD.\nNext line changed.",
+              "sourceSyntax": "plainText"
+            }
+          ]
+        }
+      }
+    },
+    "replacementAccepted": {
+      "type": "event",
+      "sequence": 3,
+      "epoch": "${serverEpoch}",
+      "event": {
+        "type": "documentAccepted",
+        "revision": "diagnostic:2"
+      }
+    },
+    "requestReplacementCheck": {
+      "type": "command",
+      "sequence": 4,
+      "id": "diagnostic-command-4",
+      "command": {
+        "type": "requestCheck",
+        "revision": "diagnostic:2"
+      }
+    },
+    "historicalPresentation": {
+      "type": "event",
+      "sequence": 4,
+      "epoch": "${serverEpoch}",
+      "event": {
+        "type": "presentationContentReplaced",
+        "checkId": "check-diagnostic:1",
+        "content": {
+          "documentRevision": "diagnostic:1",
+          "status": "complete",
+          "coverage": "partial",
+          "appearance": {
+            "highlight": {
+              "style": "underline",
+              "grammarColor": "#FF2D55",
+              "fluencyColor": "#007AFF"
+            },
+            "diff": {
+              "additionColor": "#34C759",
+              "deletionColor": "#FF3B30",
+              "showHiddenWhitespace": true
+            }
+          },
+          "interaction": {
+            "automaticChecksEnabled": false,
+            "quickApply": {
+              "enabled": true,
+              "applyKey": "tab",
+              "dismissKey": "escape",
+              "activationStyle": "showTipAndHighlight"
+            }
+          },
+          "suggestions": [],
+          "checkDiagnostics": {
+            "issues": [
+              {
+                "sourceId": "z-first",
+                "range": {
+                  "location": 1,
+                  "length": 2
+                },
+                "kind": "grammar",
+                "reason": "unusableOutput"
+              },
+              {
+                "sourceId": "a-second",
+                "range": {
+                  "location": 0,
+                  "length": 6
+                },
+                "kind": "fluency",
+                "reason": "cancelled"
+              }
+            ],
+            "omittedIssueCount": 0
+          }
+        }
+      }
+    },
+    "replacementPresentation": {
+      "type": "event",
+      "sequence": 5,
+      "epoch": "${serverEpoch}",
+      "event": {
+        "type": "presentationContentReplaced",
+        "checkId": "check-diagnostic:2",
+        "content": {
+          "documentRevision": "diagnostic:2",
+          "status": "complete",
+          "coverage": "partial",
+          "appearance": {
+            "highlight": {
+              "style": "underline",
+              "grammarColor": "#FF2D55",
+              "fluencyColor": "#007AFF"
+            },
+            "diff": {
+              "additionColor": "#34C759",
+              "deletionColor": "#FF3B30",
+              "showHiddenWhitespace": true
+            }
+          },
+          "interaction": {
+            "automaticChecksEnabled": false,
+            "quickApply": {
+              "enabled": true,
+              "applyKey": "tab",
+              "dismissKey": "escape",
+              "activationStyle": "showTipAndHighlight"
+            }
+          },
+          "suggestions": [],
+          "checkDiagnostics": {
+            "issues": [
+              {
+                "sourceId": "a-second",
+                "range": {
+                  "location": 0,
+                  "length": 6
+                },
+                "kind": "fluency",
+                "reason": "cancelled"
+              },
+              {
+                "sourceId": "z-first",
+                "range": {
+                  "location": 1,
+                  "length": 2
+                },
+                "kind": "grammar",
+                "reason": "unusableOutput"
+              }
+            ],
+            "omittedIssueCount": 0
+          }
+        }
+      }
+    },
+    "closeDocument": {
+      "type": "command",
+      "sequence": 5,
+      "id": "diagnostic-command-5",
+      "command": {
+        "type": "closeDocument"
+      }
+    }
+  },
+  "connections": [
+    {
+      "id": "activated-original-and-current-revisions",
+      "steps": [
+        {
+          "direction": "client",
+          "messageRef": "hello"
+        },
+        {
+          "direction": "server",
+          "messageRef": "welcome"
+        },
+        {
+          "direction": "client",
+          "messageRef": "openDocument"
+        },
+        {
+          "direction": "server",
+          "messageRef": "documentAccepted"
+        },
+        {
+          "direction": "client",
+          "messageRef": "requestCheck"
+        },
+        {
+          "direction": "server",
+          "messageRef": "presentation"
+        },
+        {
+          "direction": "client",
+          "messageRef": "replaceDocument"
+        },
+        {
+          "direction": "server",
+          "messageRef": "replacementAccepted"
+        },
+        {
+          "direction": "client",
+          "messageRef": "requestReplacementCheck"
+        },
+        {
+          "direction": "server",
+          "messageRef": "historicalPresentation"
+        },
+        {
+          "direction": "server",
+          "messageRef": "replacementPresentation"
+        },
+        {
+          "direction": "client",
+          "messageRef": "closeDocument"
+        }
+      ]
+    },
+    {
+      "id": "malformed-shape",
+      "steps": [
+        {
+          "direction": "client",
+          "messageRef": "hello"
+        },
+        {
+          "direction": "server",
+          "messageRef": "welcome"
+        },
+        {
+          "direction": "client",
+          "messageRef": "openDocument"
+        },
+        {
+          "direction": "server",
+          "messageRef": "documentAccepted"
+        },
+        {
+          "direction": "client",
+          "messageRef": "requestCheck"
+        },
+        {
+          "direction": "server",
+          "message": {
+            "type": "event",
+            "sequence": 2,
+            "epoch": "${serverEpoch}",
+            "event": {
+              "type": "presentationContentReplaced",
+              "checkId": "check-diagnostic:1",
+              "content": {
+                "documentRevision": "diagnostic:1",
+                "status": "complete",
+                "coverage": "partial",
+                "appearance": {
+                  "highlight": {
+                    "style": "underline",
+                    "grammarColor": "#FF2D55",
+                    "fluencyColor": "#007AFF"
+                  },
+                  "diff": {
+                    "additionColor": "#34C759",
+                    "deletionColor": "#FF3B30",
+                    "showHiddenWhitespace": true
+                  }
+                },
+                "interaction": {
+                  "automaticChecksEnabled": false,
+                  "quickApply": {
+                    "enabled": true,
+                    "applyKey": "tab",
+                    "dismissKey": "escape",
+                    "activationStyle": "showTipAndHighlight"
+                  }
+                },
+                "suggestions": [],
+                "checkDiagnostics": "not-a-diagnostics-object"
+              }
+            }
+          },
+          "invalid": "checkDiagnostics"
+        },
+        {
+          "direction": "client",
+          "close": true
+        }
+      ]
+    },
+    {
+      "id": "missing-required-count",
+      "steps": [
+        {
+          "direction": "client",
+          "messageRef": "hello"
+        },
+        {
+          "direction": "server",
+          "messageRef": "welcome"
+        },
+        {
+          "direction": "client",
+          "messageRef": "openDocument"
+        },
+        {
+          "direction": "server",
+          "messageRef": "documentAccepted"
+        },
+        {
+          "direction": "client",
+          "messageRef": "requestCheck"
+        },
+        {
+          "direction": "server",
+          "message": {
+            "type": "event",
+            "sequence": 2,
+            "epoch": "${serverEpoch}",
+            "event": {
+              "type": "presentationContentReplaced",
+              "checkId": "check-diagnostic:1",
+              "content": {
+                "documentRevision": "diagnostic:1",
+                "status": "complete",
+                "coverage": "partial",
+                "appearance": {
+                  "highlight": {
+                    "style": "underline",
+                    "grammarColor": "#FF2D55",
+                    "fluencyColor": "#007AFF"
+                  },
+                  "diff": {
+                    "additionColor": "#34C759",
+                    "deletionColor": "#FF3B30",
+                    "showHiddenWhitespace": true
+                  }
+                },
+                "interaction": {
+                  "automaticChecksEnabled": false,
+                  "quickApply": {
+                    "enabled": true,
+                    "applyKey": "tab",
+                    "dismissKey": "escape",
+                    "activationStyle": "showTipAndHighlight"
+                  }
+                },
+                "suggestions": [],
+                "checkDiagnostics": {
+                  "issues": [
+                    {
+                      "sourceId": "z-first",
+                      "range": {
+                        "location": 1,
+                        "length": 2
+                      },
+                      "kind": "grammar",
+                      "reason": "unusableOutput"
+                    },
+                    {
+                      "sourceId": "a-second",
+                      "range": {
+                        "location": 0,
+                        "length": 6
+                      },
+                      "kind": "fluency",
+                      "reason": "cancelled"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "invalid": "checkDiagnostics"
+        },
+        {
+          "direction": "client",
+          "close": true
+        }
+      ]
+    },
+    {
+      "id": "split-surrogate",
+      "steps": [
+        {
+          "direction": "client",
+          "messageRef": "hello"
+        },
+        {
+          "direction": "server",
+          "messageRef": "welcome"
+        },
+        {
+          "direction": "client",
+          "messageRef": "openDocument"
+        },
+        {
+          "direction": "server",
+          "messageRef": "documentAccepted"
+        },
+        {
+          "direction": "client",
+          "messageRef": "requestCheck"
+        },
+        {
+          "direction": "server",
+          "message": {
+            "type": "event",
+            "sequence": 2,
+            "epoch": "${serverEpoch}",
+            "event": {
+              "type": "presentationContentReplaced",
+              "checkId": "check-diagnostic:1",
+              "content": {
+                "documentRevision": "diagnostic:1",
+                "status": "complete",
+                "coverage": "partial",
+                "appearance": {
+                  "highlight": {
+                    "style": "underline",
+                    "grammarColor": "#FF2D55",
+                    "fluencyColor": "#007AFF"
+                  },
+                  "diff": {
+                    "additionColor": "#34C759",
+                    "deletionColor": "#FF3B30",
+                    "showHiddenWhitespace": true
+                  }
+                },
+                "interaction": {
+                  "automaticChecksEnabled": false,
+                  "quickApply": {
+                    "enabled": true,
+                    "applyKey": "tab",
+                    "dismissKey": "escape",
+                    "activationStyle": "showTipAndHighlight"
+                  }
+                },
+                "suggestions": [],
+                "checkDiagnostics": {
+                  "issues": [
+                    {
+                      "sourceId": "z-first",
+                      "range": {
+                        "location": 2,
+                        "length": 1
+                      },
+                      "kind": "grammar",
+                      "reason": "unusableOutput"
+                    }
+                  ],
+                  "omittedIssueCount": 0
+                }
+              }
+            }
+          },
+          "invalid": "checkDiagnostics"
+        },
+        {
+          "direction": "client",
+          "close": true
+        }
+      ]
+    },
+    {
+      "id": "source-order",
+      "steps": [
+        {
+          "direction": "client",
+          "messageRef": "hello"
+        },
+        {
+          "direction": "server",
+          "messageRef": "welcome"
+        },
+        {
+          "direction": "client",
+          "messageRef": "openDocument"
+        },
+        {
+          "direction": "server",
+          "messageRef": "documentAccepted"
+        },
+        {
+          "direction": "client",
+          "messageRef": "requestCheck"
+        },
+        {
+          "direction": "server",
+          "message": {
+            "type": "event",
+            "sequence": 2,
+            "epoch": "${serverEpoch}",
+            "event": {
+              "type": "presentationContentReplaced",
+              "checkId": "check-diagnostic:1",
+              "content": {
+                "documentRevision": "diagnostic:1",
+                "status": "complete",
+                "coverage": "partial",
+                "appearance": {
+                  "highlight": {
+                    "style": "underline",
+                    "grammarColor": "#FF2D55",
+                    "fluencyColor": "#007AFF"
+                  },
+                  "diff": {
+                    "additionColor": "#34C759",
+                    "deletionColor": "#FF3B30",
+                    "showHiddenWhitespace": true
+                  }
+                },
+                "interaction": {
+                  "automaticChecksEnabled": false,
+                  "quickApply": {
+                    "enabled": true,
+                    "applyKey": "tab",
+                    "dismissKey": "escape",
+                    "activationStyle": "showTipAndHighlight"
+                  }
+                },
+                "suggestions": [],
+                "checkDiagnostics": {
+                  "issues": [
+                    {
+                      "sourceId": "a-second",
+                      "range": {
+                        "location": 0,
+                        "length": 6
+                      },
+                      "kind": "fluency",
+                      "reason": "cancelled"
+                    },
+                    {
+                      "sourceId": "z-first",
+                      "range": {
+                        "location": 1,
+                        "length": 2
+                      },
+                      "kind": "grammar",
+                      "reason": "unusableOutput"
+                    }
+                  ],
+                  "omittedIssueCount": 0
+                }
+              }
+            }
+          },
+          "invalid": "checkDiagnostics"
+        },
+        {
+          "direction": "client",
+          "close": true
+        }
+      ]
+    },
+    {
+      "id": "unknown-source",
+      "steps": [
+        {
+          "direction": "client",
+          "messageRef": "hello"
+        },
+        {
+          "direction": "server",
+          "messageRef": "welcome"
+        },
+        {
+          "direction": "client",
+          "messageRef": "openDocument"
+        },
+        {
+          "direction": "server",
+          "messageRef": "documentAccepted"
+        },
+        {
+          "direction": "client",
+          "messageRef": "requestCheck"
+        },
+        {
+          "direction": "server",
+          "message": {
+            "type": "event",
+            "sequence": 2,
+            "epoch": "${serverEpoch}",
+            "event": {
+              "type": "presentationContentReplaced",
+              "checkId": "check-diagnostic:1",
+              "content": {
+                "documentRevision": "diagnostic:1",
+                "status": "complete",
+                "coverage": "partial",
+                "appearance": {
+                  "highlight": {
+                    "style": "underline",
+                    "grammarColor": "#FF2D55",
+                    "fluencyColor": "#007AFF"
+                  },
+                  "diff": {
+                    "additionColor": "#34C759",
+                    "deletionColor": "#FF3B30",
+                    "showHiddenWhitespace": true
+                  }
+                },
+                "interaction": {
+                  "automaticChecksEnabled": false,
+                  "quickApply": {
+                    "enabled": true,
+                    "applyKey": "tab",
+                    "dismissKey": "escape",
+                    "activationStyle": "showTipAndHighlight"
+                  }
+                },
+                "suggestions": [],
+                "checkDiagnostics": {
+                  "issues": [
+                    {
+                      "sourceId": "missing",
+                      "range": {
+                        "location": 0,
+                        "length": 1
+                      },
+                      "kind": "grammar",
+                      "reason": "unusableOutput"
+                    }
+                  ],
+                  "omittedIssueCount": 0
+                }
+              }
+            }
+          },
+          "invalid": "checkDiagnostics"
+        },
+        {
+          "direction": "client",
+          "close": true
+        }
+      ]
+    },
+    {
+      "id": "unknown-revision",
+      "steps": [
+        {
+          "direction": "client",
+          "messageRef": "hello"
+        },
+        {
+          "direction": "server",
+          "messageRef": "welcome"
+        },
+        {
+          "direction": "client",
+          "messageRef": "openDocument"
+        },
+        {
+          "direction": "server",
+          "messageRef": "documentAccepted"
+        },
+        {
+          "direction": "client",
+          "messageRef": "requestCheck"
+        },
+        {
+          "direction": "server",
+          "message": {
+            "type": "event",
+            "sequence": 2,
+            "epoch": "${serverEpoch}",
+            "event": {
+              "type": "presentationContentReplaced",
+              "checkId": "check-diagnostic:missing",
+              "content": {
+                "documentRevision": "diagnostic:missing",
+                "status": "complete",
+                "coverage": "partial",
+                "appearance": {
+                  "highlight": {
+                    "style": "underline",
+                    "grammarColor": "#FF2D55",
+                    "fluencyColor": "#007AFF"
+                  },
+                  "diff": {
+                    "additionColor": "#34C759",
+                    "deletionColor": "#FF3B30",
+                    "showHiddenWhitespace": true
+                  }
+                },
+                "interaction": {
+                  "automaticChecksEnabled": false,
+                  "quickApply": {
+                    "enabled": true,
+                    "applyKey": "tab",
+                    "dismissKey": "escape",
+                    "activationStyle": "showTipAndHighlight"
+                  }
+                },
+                "suggestions": [],
+                "checkDiagnostics": {
+                  "issues": [
+                    {
+                      "sourceId": "z-first",
+                      "range": {
+                        "location": 1,
+                        "length": 2
+                      },
+                      "kind": "grammar",
+                      "reason": "unusableOutput"
+                    },
+                    {
+                      "sourceId": "a-second",
+                      "range": {
+                        "location": 0,
+                        "length": 6
+                      },
+                      "kind": "fluency",
+                      "reason": "cancelled"
+                    }
+                  ],
+                  "omittedIssueCount": 0
+                }
+              }
+            }
+          },
+          "invalid": "checkDiagnostics"
+        },
+        {
+          "direction": "client",
+          "close": true
+        }
+      ]
+    },
+    {
+      "id": "historical-scalar-boundary",
+      "steps": [
+        {
+          "direction": "client",
+          "messageRef": "hello"
+        },
+        {
+          "direction": "server",
+          "messageRef": "welcome"
+        },
+        {
+          "direction": "client",
+          "messageRef": "openDocument"
+        },
+        {
+          "direction": "server",
+          "messageRef": "documentAccepted"
+        },
+        {
+          "direction": "client",
+          "messageRef": "requestCheck"
+        },
+        {
+          "direction": "client",
+          "messageRef": "replaceDocument"
+        },
+        {
+          "direction": "server",
+          "message": {
+            "type": "event",
+            "sequence": 2,
+            "epoch": "${serverEpoch}",
+            "event": {
+              "type": "documentAccepted",
+              "revision": "diagnostic:2"
+            }
+          }
+        },
+        {
+          "direction": "server",
+          "message": {
+            "type": "event",
+            "sequence": 3,
+            "epoch": "${serverEpoch}",
+            "event": {
+              "type": "presentationContentReplaced",
+              "checkId": "check-diagnostic:1",
+              "content": {
+                "documentRevision": "diagnostic:1",
+                "status": "complete",
+                "coverage": "partial",
+                "appearance": {
+                  "highlight": {
+                    "style": "underline",
+                    "grammarColor": "#FF2D55",
+                    "fluencyColor": "#007AFF"
+                  },
+                  "diff": {
+                    "additionColor": "#34C759",
+                    "deletionColor": "#FF3B30",
+                    "showHiddenWhitespace": true
+                  }
+                },
+                "interaction": {
+                  "automaticChecksEnabled": false,
+                  "quickApply": {
+                    "enabled": true,
+                    "applyKey": "tab",
+                    "dismissKey": "escape",
+                    "activationStyle": "showTipAndHighlight"
+                  }
+                },
+                "suggestions": [],
+                "checkDiagnostics": {
+                  "issues": [
+                    {
+                      "sourceId": "z-first",
+                      "range": {
+                        "location": 2,
+                        "length": 1
+                      },
+                      "kind": "grammar",
+                      "reason": "unusableOutput"
+                    }
+                  ],
+                  "omittedIssueCount": 0
+                }
+              }
+            }
+          },
+          "invalid": "checkDiagnostics"
+        },
+        {
+          "direction": "client",
+          "close": true
+        }
+      ]
+    },
+    {
+      "id": "historical-source-order",
+      "steps": [
+        {
+          "direction": "client",
+          "messageRef": "hello"
+        },
+        {
+          "direction": "server",
+          "messageRef": "welcome"
+        },
+        {
+          "direction": "client",
+          "messageRef": "openDocument"
+        },
+        {
+          "direction": "server",
+          "messageRef": "documentAccepted"
+        },
+        {
+          "direction": "client",
+          "messageRef": "requestCheck"
+        },
+        {
+          "direction": "client",
+          "messageRef": "replaceDocument"
+        },
+        {
+          "direction": "server",
+          "message": {
+            "type": "event",
+            "sequence": 2,
+            "epoch": "${serverEpoch}",
+            "event": {
+              "type": "documentAccepted",
+              "revision": "diagnostic:2"
+            }
+          }
+        },
+        {
+          "direction": "server",
+          "message": {
+            "type": "event",
+            "sequence": 3,
+            "epoch": "${serverEpoch}",
+            "event": {
+              "type": "presentationContentReplaced",
+              "checkId": "check-diagnostic:1",
+              "content": {
+                "documentRevision": "diagnostic:1",
+                "status": "complete",
+                "coverage": "partial",
+                "appearance": {
+                  "highlight": {
+                    "style": "underline",
+                    "grammarColor": "#FF2D55",
+                    "fluencyColor": "#007AFF"
+                  },
+                  "diff": {
+                    "additionColor": "#34C759",
+                    "deletionColor": "#FF3B30",
+                    "showHiddenWhitespace": true
+                  }
+                },
+                "interaction": {
+                  "automaticChecksEnabled": false,
+                  "quickApply": {
+                    "enabled": true,
+                    "applyKey": "tab",
+                    "dismissKey": "escape",
+                    "activationStyle": "showTipAndHighlight"
+                  }
+                },
+                "suggestions": [],
+                "checkDiagnostics": {
+                  "issues": [
+                    {
+                      "sourceId": "a-second",
+                      "range": {
+                        "location": 0,
+                        "length": 6
+                      },
+                      "kind": "fluency",
+                      "reason": "cancelled"
+                    },
+                    {
+                      "sourceId": "z-first",
+                      "range": {
+                        "location": 1,
+                        "length": 2
+                      },
+                      "kind": "grammar",
+                      "reason": "unusableOutput"
+                    }
+                  ],
+                  "omittedIssueCount": 0
+                }
+              }
+            }
+          },
+          "invalid": "checkDiagnostics"
+        },
+        {
+          "direction": "client",
+          "close": true
+        }
+      ]
+    },
+    {
+      "id": "unactivated-field-is-ignored",
+      "steps": [
+        {
+          "direction": "client",
+          "messageRef": "helloUnactivated"
+        },
+        {
+          "direction": "server",
+          "messageRef": "welcomeUnactivated"
+        },
+        {
+          "direction": "client",
+          "messageRef": "openDocument"
+        },
+        {
+          "direction": "server",
+          "messageRef": "documentAccepted"
+        },
+        {
+          "direction": "client",
+          "messageRef": "requestCheck"
+        },
+        {
+          "direction": "server",
+          "message": {
+            "type": "event",
+            "sequence": 2,
+            "epoch": "${serverEpoch}",
+            "event": {
+              "type": "presentationContentReplaced",
+              "checkId": "check-diagnostic:1",
+              "content": {
+                "documentRevision": "diagnostic:1",
+                "status": "complete",
+                "coverage": "partial",
+                "appearance": {
+                  "highlight": {
+                    "style": "underline",
+                    "grammarColor": "#FF2D55",
+                    "fluencyColor": "#007AFF"
+                  },
+                  "diff": {
+                    "additionColor": "#34C759",
+                    "deletionColor": "#FF3B30",
+                    "showHiddenWhitespace": true
+                  }
+                },
+                "interaction": {
+                  "automaticChecksEnabled": false,
+                  "quickApply": {
+                    "enabled": true,
+                    "applyKey": "tab",
+                    "dismissKey": "escape",
+                    "activationStyle": "showTipAndHighlight"
+                  }
+                },
+                "suggestions": [],
+                "checkDiagnostics": "unknown portable extension value"
+              }
+            }
+          }
+        },
+        {
+          "direction": "client",
+          "message": {
+            "type": "command",
+            "sequence": 3,
+            "id": "diagnostic-command-3",
+            "command": {
+              "type": "closeDocument"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
